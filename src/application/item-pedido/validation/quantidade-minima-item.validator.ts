@@ -5,13 +5,13 @@ import { AddItemPedidoValidator } from 'src/application/item-pedido/validation/a
 
 @Injectable()
 export class QuantidadeMinimaItemValidator implements AddItemPedidoValidator {
-   public static ERROR_MESSAGE = 'A quantidade minima para um produto deve ser maio que zero';
+   public static ERROR_MESSAGE = 'A quantidade mínima para um produto deve ser maior que zero';
 
    private logger = new Logger(QuantidadeMinimaItemValidator.name);
 
    async validate({ quantidade, pedidoId, produtoId }: ItemPedido): Promise<boolean> {
       this.logger.log(
-         `Inicializando validação ${QuantidadeMinimaItemValidator.name} para quantidade minima de um item do pedido.`,
+         `Inicializando validação ${QuantidadeMinimaItemValidator.name} para quantidade mínima de um item do pedido.`,
       );
 
       if (quantidade > 0) {
@@ -22,7 +22,7 @@ export class QuantidadeMinimaItemValidator implements AddItemPedidoValidator {
          return true;
       }
 
-      this.logger.error(`Quantidade minima de um novo item invalida: ${quantidade}`);
+      this.logger.error(`Quantidade mínima de um novo item inválida: ${quantidade}`);
       throw new ValidationException(QuantidadeMinimaItemValidator.ERROR_MESSAGE);
    }
 }

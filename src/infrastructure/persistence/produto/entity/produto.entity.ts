@@ -32,6 +32,4 @@ export class ProdutoEntity {
    @Column({ name: 'ATIVO' })
    ativo: boolean;
 
-   @OneToMany(() => ItemPedidoEntity, (itemPedido) => itemPedido.produto)
-   itensPedido?: ItemPedidoEntity[];
 }

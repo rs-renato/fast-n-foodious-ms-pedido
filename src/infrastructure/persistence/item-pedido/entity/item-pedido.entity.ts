@@ -16,9 +16,9 @@ export class ItemPedidoEntity {
    @Column({ name: 'QUANTIDADE' })
    quantidade: number;
 
-   @ManyToOne(() => ProdutoEntity, (produto) => produto.itensPedido)
-   @JoinColumn({ name: 'PRODUTO_ID' })
-   produto?: ProdutoEntity;
+   // @ManyToOne(() => ProdutoEntity, (produto) => produto.itensPedido)
+   // @JoinColumn({ name: 'PRODUTO_ID' })
+   // produto?: ProdutoEntity;
 
    @ManyToOne(() => PedidoEntity, (pedido) => pedido.itensPedido)
    @JoinColumn({ name: 'PEDIDO_ID' })

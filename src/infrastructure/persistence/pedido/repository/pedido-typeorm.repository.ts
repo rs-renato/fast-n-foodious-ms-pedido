@@ -128,7 +128,8 @@ export class PedidoTypeormRepository implements IPedidoRepository {
             order: {
                id: 'ASC',
             },
-            relations: ['itensPedido', 'itensPedido.produto'],
+            relations: ['itensPedido'],
+            // relations: ['itensPedido', 'itensPedido.produto'],
          })
          .then((pedidoEntities) => {
             return pedidoEntities.map((pedido) => pedido);

@@ -35,6 +35,7 @@ import {
    PedidoConstants,
    ProdutoConstants,
 } from 'src/shared/constants';
+import { ProdutoIntegration } from '../../../integration/produto/produto.integration';
 
 export const PedidoProviders: Provider[] = [
    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -90,8 +91,9 @@ export const PedidoProviders: Provider[] = [
    },
    {
       provide: PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): BuscarPedidoPorIdUseCase => new BuscarPedidoPorIdUseCase(repository),
+      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+      useFactory: (repository: IPedidoRepository, produtoIntegration: ProdutoIntegration): BuscarPedidoPorIdUseCase =>
+         new BuscarPedidoPorIdUseCase(repository, produtoIntegration),
    },
    {
       provide: PedidoConstants.BUSCAR_ESTADO_PEDIDO_POR_ID_USECASE,
@@ -107,15 +109,20 @@ export const PedidoProviders: Provider[] = [
    },
    {
       provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_PENDENTES_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPendentesUseCase =>
-         new BuscarTodosPedidosPendentesUseCase(repository),
+      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+      useFactory: (
+         repository: IPedidoRepository,
+         produtoIntegration: ProdutoIntegration,
+      ): BuscarTodosPedidosPendentesUseCase => new BuscarTodosPedidosPendentesUseCase(repository, produtoIntegration),
    },
    {
       provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_NAO_FINALIZADOS_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): BuscarTodosPedidosNaoFinalizadosUseCase =>
-         new BuscarTodosPedidosNaoFinalizadosUseCase(repository),
+      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+      useFactory: (
+         repository: IPedidoRepository,
+         produtoIntegration: ProdutoIntegration,
+      ): BuscarTodosPedidosNaoFinalizadosUseCase =>
+         new BuscarTodosPedidosNaoFinalizadosUseCase(repository, produtoIntegration),
    },
    {
       provide: PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
