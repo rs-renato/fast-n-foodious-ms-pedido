@@ -12,31 +12,31 @@ import {
    ProdutoExistentePedidoValidator,
 } from 'src/application/item-pedido/validation';
 import { IRepository } from 'src/enterprise/repository/repository';
-import { ItemPedidoConstants, PedidoConstants, ProdutoConstants } from 'src/shared/constants';
+import { ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { SalvarItemPedidoUseCase } from 'src/application/item-pedido/usecase/salvar-item-pedido.usecase';
 import { EditarItemPedidoUseCase } from 'src/application/item-pedido/usecase/editar-item-pedido.usecase';
 import { DeletarItemPedidoUseCase } from 'src/application/item-pedido/usecase/deletar-item-pedido.usecase';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { ProdutoInativoPedidoValidator } from 'src/application/item-pedido/validation/produto-inativo.validator';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 
 export const ItemPedidoProviders: Provider[] = [
    { provide: ItemPedidoConstants.ISERVICE, useClass: ItemPedidoService },
    {
       provide: ItemPedidoConstants.ADD_ITEM_PEDIDO_VALIDATOR,
-      inject: [PedidoConstants.IREPOSITORY, ProdutoConstants.IREPOSITORY],
+      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
       useFactory: (
          pedidoRepository: IRepository<Pedido>,
-         produtoRepository: IRepository<Produto>,
+         produtoIntegration: ProdutoIntegration,
       ): AddItemPedidoValidator[] => [
          new QuantidadeMinimaItemValidator(),
          new PedidoExistenteValidator(pedidoRepository),
-         new ProdutoExistentePedidoValidator(produtoRepository),
-         new ProdutoInativoPedidoValidator(produtoRepository),
+         new ProdutoExistentePedidoValidator(produtoIntegration),
+         new ProdutoInativoPedidoValidator(produtoIntegration),
       ],
    },
    {
       provide: ItemPedidoConstants.EDITAR_ITEM_PEDIDO_VALIDATOR,
-      inject: [ItemPedidoConstants.IREPOSITORY, ProdutoConstants.IREPOSITORY],
+      inject: [ItemPedidoConstants.IREPOSITORY],
       useFactory: (repository: IRepository<ItemPedido>): EditarItemPedidoValidator[] => [
          new ItemPedidoExistenteValidator(repository),
       ],

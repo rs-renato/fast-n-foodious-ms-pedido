@@ -1,5 +1,5 @@
 import { Provider } from '@nestjs/common';
-import {ProdutoIntegration} from "../produto/produto.integration";
+import { ProdutoIntegration } from '../produto/produto.integration';
 
 export const IntegrationProviders: Provider[] = [
    {

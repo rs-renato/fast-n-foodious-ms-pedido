@@ -20,13 +20,11 @@ import { EditarPedidoValidator } from 'src/application/pedido/validation/editar-
 import { EstadoCorretoNovoPedidoValidator } from 'src/application/pedido/validation/estado-correto-novo-pedido.validator';
 import { PedidoExistenteValidator } from 'src/application/pedido/validation/pedido-existente.validator';
 import { SalvarPedidoValidator } from 'src/application/pedido/validation/salvar-pedido.validator';
-import { BuscarProdutoPorIdUseCase } from 'src/application/produto/usecase/buscar-produto-por-id.usecase';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { IRepository } from 'src/enterprise/repository/repository';
 import {
    ClienteConstants,
@@ -35,7 +33,8 @@ import {
    PedidoConstants,
    ProdutoConstants,
 } from 'src/shared/constants';
-import { ProdutoIntegration } from '../../../integration/produto/produto.integration';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 
 export const PedidoProviders: Provider[] = [
    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -138,17 +137,18 @@ export const PedidoProviders: Provider[] = [
          PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
          PedidoConstants.EDITAR_PEDIDO_USECASE,
          PagamentoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
+         ProdutoIntegration,
          PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
       ],
       useFactory: (
-         repository: IRepository<Produto>,
          buscarItensPorPedidoIdUsecase: BuscarItensPorPedidoIdUseCase,
          editarPedidoUsecase: EditarPedidoUseCase,
          solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
+         produtoIntegration: ProdutoIntegration,
          validators: CheckoutPedidoValidator[],
       ): CheckoutPedidoUseCase =>
          new CheckoutPedidoUseCase(
-            new BuscarProdutoPorIdUseCase(repository),
+            new BuscarProdutoPorIdUseCase(produtoIntegration),
             buscarItensPorPedidoIdUsecase,
             editarPedidoUsecase,
             solicitaPagamentoPedidoUseCase,

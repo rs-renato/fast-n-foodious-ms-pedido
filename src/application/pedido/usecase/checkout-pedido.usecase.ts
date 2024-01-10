@@ -3,11 +3,11 @@ import { SolicitaPagamentoPedidoUseCase } from 'src/application/pagamento/usecas
 import { BuscarItensPorPedidoIdUseCase } from 'src/application/pedido/usecase/buscar-itens-por-pedido-id.usecase';
 import { EditarPedidoUseCase } from 'src/application/pedido/usecase/editar-pedido.usecase';
 import { CheckoutPedidoValidator } from 'src/application/pedido/validation/checkout-pedido.validator';
-import { BuscarProdutoPorIdUseCase } from 'src/application/produto/usecase/buscar-produto-por-id.usecase';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { PagamentoConstants, PedidoConstants, ProdutoConstants } from 'src/shared/constants';
 import { ValidatorUtils } from 'src/shared/validator.utils';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
+import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 
 @Injectable()
 export class CheckoutPedidoUseCase {
