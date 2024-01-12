@@ -7,7 +7,7 @@ import { PagamentoConstants } from 'src/shared/constants';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { DateUtils } from 'src/shared/date.utils';
 import { CheckoutPedidoRealizadoValidator } from 'src/application/pedido/validation/checkout-pedido-realizado-validator';
-import { EstadoPagamento } from 'src/enterprise/pagamento/enum/estado-pagamento.enum';
+import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 
 describe('CheckoutPedidoRealizadoValidator', () => {
    let validator: CheckoutPedidoRealizadoValidator;

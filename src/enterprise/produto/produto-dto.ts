@@ -9,8 +9,8 @@ export class ProdutoDto {
       public id: number,
    ) {}
 
-   static fromJson(json: any) {
-       return new ProdutoDto(
+   static fromJson(json: any): ProdutoDto {
+      return new ProdutoDto(
          json.nome,
          json.idCategoriaProduto,
          json.descricao,

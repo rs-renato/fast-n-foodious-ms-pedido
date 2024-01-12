@@ -3,7 +3,7 @@ import { PagamentoProviders } from 'src/application/pagamento/providers/pagament
 import { IPagamentoService } from 'src/application/pagamento/service/pagamento.service.interface';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
-import { EstadoPagamento } from 'src/enterprise/pagamento/enum/estado-pagamento.enum';
+import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';

@@ -58,7 +58,7 @@ export class PagamentoTypeormRepository implements IRepository<Pagamento> {
    }
 
    async save(pagamento: Pagamento): Promise<Pagamento> {
-      this.logger.debug(`Salvando pagamento: ${JSON.stringify(pagamento)}`);
+      this.logger.debug(`Salvando pagamento 2: ${JSON.stringify(pagamento)}`);
       return this.repository
          .save({
             pedidoId: pagamento.pedidoId,

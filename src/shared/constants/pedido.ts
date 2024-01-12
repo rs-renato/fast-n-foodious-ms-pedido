@@ -14,3 +14,4 @@ export const BUSCAR_TODOS_PEDIDOS_NAO_FINALIZADOS_USECASE = 'BuscarTodosPedidosN
 export const BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE = 'BuscarItensPorPedidoIdUseCase';
 export const CHECKOUT_PEDIDO_USECASE = 'CheckoutPedidoUseCase';
 export const CHECKOUT_PEDIDO_VALIDATOR = 'CheckoutPedidoValidator';
+export const SOLICITA_PAGAMENTO_PEDIDO_USECASE = 'SolicitaPagamentoPedidoUseCase_NEW';

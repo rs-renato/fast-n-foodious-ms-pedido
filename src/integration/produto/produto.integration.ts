@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import * as process from 'process';
-import { Pedido } from '../../enterprise/pedido/model/pedido.model';
+import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 
 @Injectable()
 export class ProdutoIntegration {

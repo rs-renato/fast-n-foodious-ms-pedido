@@ -196,7 +196,7 @@ export class PedidoRestApi extends BaseRestApi {
 
       return await this.service.checkout(pedido).then((pedidoCheckout) => {
          if (pedidoCheckout) {
-            this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}}`);
+            this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
             return new CheckoutResponse(pedidoCheckout);
          }
          this.logger.debug(`Erro durante realização de checkout do pedido: ${id}`);

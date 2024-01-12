@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
-import { EstadoPagamento } from 'src/enterprise/pagamento/enum/estado-pagamento.enum';
+import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IRepository } from 'src/enterprise/repository/repository';
@@ -14,6 +14,7 @@ export class SolicitaPagamentoPedidoUseCase {
    constructor(@Inject(PagamentoConstants.IREPOSITORY) private repository: IRepository<Pagamento>) {}
 
    async solicitaPagamento(pedido: Pedido): Promise<Pagamento> {
+      this.logger.log('ENTROU NO LUGAR ERRADO!!!');
       const transacaoId = RandomIdGeneratorUtils.generate('transacaoId', pedido.id);
       const pagamento: Pagamento = {
          pedidoId: pedido.id,

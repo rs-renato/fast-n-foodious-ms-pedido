@@ -20,8 +20,8 @@ import {
    CategoriaProdutoConstants,
    PagamentoConstants,
 } from 'src/shared/constants';
-import {IntegrationProviders} from "../integration/providers/integration.providers";
-import {HttpModule} from "@nestjs/axios";
+import { IntegrationProviders } from '../integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
    imports: [HttpModule],
@@ -32,7 +32,7 @@ import {HttpModule} from "@nestjs/axios";
       ...ItemPedidoProviders,
       ...CategoriaProdutosProviders,
       ...PagamentoProviders,
-       ...IntegrationProviders
+      ...IntegrationProviders,
    ],
    exports: [
       { provide: ClienteConstants.ISERVICE, useClass: ClienteService },

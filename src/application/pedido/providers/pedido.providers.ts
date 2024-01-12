@@ -1,5 +1,4 @@
 import { Provider } from '@nestjs/common';
-import { SolicitaPagamentoPedidoUseCase } from 'src/application/pagamento/usecase';
 
 import { PedidoService } from 'src/application/pedido/service/pedido.service';
 import { BuscarEstadoPedidoPorIdUseCase } from 'src/application/pedido/usecase/buscar-estado-pedido-por-id.usecase';
@@ -26,15 +25,11 @@ import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
 import { IRepository } from 'src/enterprise/repository/repository';
-import {
-   ClienteConstants,
-   ItemPedidoConstants,
-   PagamentoConstants,
-   PedidoConstants,
-   ProdutoConstants,
-} from 'src/shared/constants';
+import { ClienteConstants, ItemPedidoConstants, PagamentoConstants, PedidoConstants } from 'src/shared/constants';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
+import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
+import { SolicitaPagamentoPedidoUseCase_NEW } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case_-n-e-w.service';
 
 export const PedidoProviders: Provider[] = [
    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -129,21 +124,25 @@ export const PedidoProviders: Provider[] = [
       useFactory: (repository: IRepository<ItemPedido>): BuscarItensPorPedidoIdUseCase =>
          new BuscarItensPorPedidoIdUseCase(repository),
    },
-
+   {
+      provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
+      inject: [PagamentoIntegration],
+      useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase_NEW =>
+         new SolicitaPagamentoPedidoUseCase_NEW(pagamentoIntegration),
+   },
    {
       provide: PedidoConstants.CHECKOUT_PEDIDO_USECASE,
       inject: [
-         ProdutoConstants.IREPOSITORY,
          PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
          PedidoConstants.EDITAR_PEDIDO_USECASE,
-         PagamentoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
+         PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
          ProdutoIntegration,
          PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
       ],
       useFactory: (
          buscarItensPorPedidoIdUsecase: BuscarItensPorPedidoIdUseCase,
          editarPedidoUsecase: EditarPedidoUseCase,
-         solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
+         solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase_NEW,
          produtoIntegration: ProdutoIntegration,
          validators: CheckoutPedidoValidator[],
       ): CheckoutPedidoUseCase =>
