@@ -21,11 +21,10 @@ import { PedidoExistenteValidator } from 'src/application/pedido/validation/pedi
 import { SalvarPedidoValidator } from 'src/application/pedido/validation/salvar-pedido.validator';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
-import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
 import { IRepository } from 'src/enterprise/repository/repository';
-import { ClienteConstants, ItemPedidoConstants, PagamentoConstants, PedidoConstants } from 'src/shared/constants';
+import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';

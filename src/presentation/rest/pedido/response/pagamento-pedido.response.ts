@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
-import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
+import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 
 export class PagamentoPedidoResponse {
    @ApiProperty({
@@ -21,7 +21,7 @@ export class PagamentoPedidoResponse {
    })
    public estadoPagamento: EstadoPagamento;
 
-   constructor(pagamento: Pagamento) {
+   constructor(pagamento: PagamentoDto) {
       this.transacaoId = pagamento.transacaoId;
       this.estadoPagamento = pagamento.estadoPagamento;
    }

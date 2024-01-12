@@ -1,10 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { AddItemPedidoValidator } from 'src/application/item-pedido/validation/add-item-pedido.validator';
-import { IRepository } from 'src/enterprise/repository/repository';
-import { ProdutoConstants } from 'src/shared/constants';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 
 @Injectable()

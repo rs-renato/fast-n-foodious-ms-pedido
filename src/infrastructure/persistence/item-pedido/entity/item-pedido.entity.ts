@@ -1,4 +1,3 @@
-import { ProdutoEntity } from 'src/infrastructure/persistence/produto/entity/produto.entity';
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PedidoEntity } from '../../pedido/entity/pedido.entity';
 
@@ -15,10 +14,6 @@ export class ItemPedidoEntity {
 
    @Column({ name: 'QUANTIDADE' })
    quantidade: number;
-
-   // @ManyToOne(() => ProdutoEntity, (produto) => produto.itensPedido)
-   // @JoinColumn({ name: 'PRODUTO_ID' })
-   // produto?: ProdutoEntity;
 
    @ManyToOne(() => PedidoEntity, (pedido) => pedido.itensPedido)
    @JoinColumn({ name: 'PEDIDO_ID' })
