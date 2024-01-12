@@ -45,13 +45,13 @@ export const PedidoProviders: Provider[] = [
 
    {
       provide: PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
-      inject: [ClienteConstants.IREPOSITORY, PagamentoConstants.IREPOSITORY],
+      inject: [ClienteConstants.IREPOSITORY, PagamentoIntegration],
       useFactory: (
          clienteRepository: IRepository<Cliente>,
-         pagamentoRepository: IRepository<Pagamento>,
+         pagamentoIntegration: PagamentoIntegration,
       ): CheckoutPedidoValidator[] => [
          new ClienteExistentePedidoValidator(clienteRepository),
-         new CheckoutPedidoRealizadoValidator(pagamentoRepository),
+         new CheckoutPedidoRealizadoValidator(pagamentoIntegration),
       ],
    },
    {
