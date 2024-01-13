@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
@@ -9,6 +8,8 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
 import { SalvarPedidoUseCase } from './salvar-pedido.usecase';
 import { DateUtils } from 'src/shared/date.utils';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('SalvarPedidoUseCase', () => {
    let useCase: SalvarPedidoUseCase;
@@ -31,9 +32,10 @@ describe('SalvarPedidoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...PedidoProviders,
-            ...PagamentoProviders,
+            ...IntegrationProviders,
             ...PersistenceInMemoryProviders,
             // Mock do serviço IRepository<Cliente>
             {

@@ -1,19 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
-import { Pagamento } from 'src/enterprise/pagamento/model/pagamento.model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
-import { IRepository } from 'src/enterprise/repository/repository';
 import { PagamentoConstants } from 'src/shared/constants';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { DateUtils } from 'src/shared/date.utils';
 import { CheckoutPedidoRealizadoValidator } from 'src/application/pedido/validation/checkout-pedido-realizado-validator';
 import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
+import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
+import { HttpModule } from '@nestjs/axios';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CheckoutPedidoRealizadoValidator', () => {
    let validator: CheckoutPedidoRealizadoValidator;
-   let pagamentoRepository: IRepository<Pagamento>;
+   let pagamentoIntegration: PagamentoIntegration;
 
-   const pagamento: Pagamento = {
+   const pagamento: PagamentoDto = {
       pedidoId: 1,
       transacaoId: '123-abc',
       estadoPagamento: EstadoPagamento.PENDENTE,
@@ -25,7 +28,9 @@ describe('CheckoutPedidoRealizadoValidator', () => {
    beforeEach(async () => {
       // Configuração do módulo de teste
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
+            ...IntegrationProviders,
             CheckoutPedidoRealizadoValidator,
             // Mock do repositório de Pagamento
             {
@@ -42,7 +47,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
 
       // Obtém a instância do validator e do repositório a partir do módulo de teste
       validator = module.get<CheckoutPedidoRealizadoValidator>(CheckoutPedidoRealizadoValidator);
-      pagamentoRepository = module.get<IRepository<Pagamento>>(PagamentoConstants.IREPOSITORY);
+      pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
    });
 
    describe('validate', () => {
@@ -54,6 +59,10 @@ describe('CheckoutPedidoRealizadoValidator', () => {
             estadoPedido: EstadoPedido.RECEBIDO,
             ativo: true,
          };
+
+         pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+            throw new NotFoundException('Pagamento não encontrado');
+         });
 
          const isValid = await validator.validate(pedido);
          expect(isValid).toBeTruthy();
@@ -69,8 +78,8 @@ describe('CheckoutPedidoRealizadoValidator', () => {
          };
 
          // Mock para retornar um pagamento, simulando que o pedido já realizou checkout
-         pagamentoRepository.findBy = jest.fn(() => {
-            return Promise.resolve([pagamento]);
+         pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+            return Promise.resolve(pagamento);
          });
 
          // O validator deve lançar uma exceção de validação

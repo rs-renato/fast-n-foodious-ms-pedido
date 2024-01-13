@@ -12,6 +12,7 @@ export const BUSCAR_TODOS_PEDIDOS_POR_ESTADO_USECASE = 'BuscarTodosPedidosPorEst
 export const BUSCAR_TODOS_PEDIDOS_PENDENTES_USECASE = 'BuscarTodosPedidosPendentesUseCase';
 export const BUSCAR_TODOS_PEDIDOS_NAO_FINALIZADOS_USECASE = 'BuscarTodosPedidosNaoFinalizadosUseCase';
 export const BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE = 'BuscarItensPorPedidoIdUseCase';
+export const BUSCAR_PRODUTO_POR_ID_USECASE = 'BuscarProdutoPorIdUseCase';
 export const CHECKOUT_PEDIDO_USECASE = 'CheckoutPedidoUseCase';
 export const CHECKOUT_PEDIDO_VALIDATOR = 'CheckoutPedidoValidator';
 export const SOLICITA_PAGAMENTO_PEDIDO_USECASE = 'SolicitaPagamentoPedidoUseCase_NEW';

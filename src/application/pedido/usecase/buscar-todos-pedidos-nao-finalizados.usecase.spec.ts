@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
@@ -7,6 +6,8 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosNaoFinalizadosUseCase } from './buscar-todos-pedidos-nao-finalizados.usecase';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
    let useCase: BuscarTodosPedidosNaoFinalizadosUseCase;
@@ -38,9 +39,10 @@ describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...PedidoProviders,
-            ...PagamentoProviders,
+            ...IntegrationProviders,
             ...PersistenceInMemoryProviders,
             // Mock do serviço IRepository<Pedido>
             {

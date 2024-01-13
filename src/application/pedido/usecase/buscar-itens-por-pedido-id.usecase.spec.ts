@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
@@ -8,6 +7,8 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { BuscarItensPorPedidoIdUseCase } from './buscar-itens-por-pedido-id.usecase';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('BuscarItensPorPedidoIdUseCase', () => {
    let useCase: BuscarItensPorPedidoIdUseCase;
@@ -21,10 +22,11 @@ describe('BuscarItensPorPedidoIdUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...ItemPedidoProviders,
             ...PedidoProviders,
-            ...PagamentoProviders,
+            ...IntegrationProviders,
             ...PersistenceInMemoryProviders,
          ],
       }).compile();
