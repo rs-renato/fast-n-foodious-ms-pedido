@@ -8,23 +8,23 @@ import { PedidoConstants } from 'src/shared/constants';
 
 @Injectable()
 export class PedidoExistenteValidator implements AddItemPedidoValidator {
-   public static ERROR_MESSAGE = 'Código de pedido inexistente';
+  public static ERROR_MESSAGE = 'Código de pedido inexistente';
 
-   private logger = new Logger(PedidoExistenteValidator.name);
+  private logger = new Logger(PedidoExistenteValidator.name);
 
-   constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IRepository<Pedido>) {}
+  constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IRepository<Pedido>) {}
 
-   async validate({ pedidoId }: ItemPedido): Promise<boolean> {
-      this.logger.log(`Inicializando validação ${PedidoExistenteValidator.name} de pedido existente: ${pedidoId}`);
+  async validate({ pedidoId }: ItemPedido): Promise<boolean> {
+    this.logger.log(`Inicializando validação ${PedidoExistenteValidator.name} de pedido existente: ${pedidoId}`);
 
-      return this.repository.findBy({ id: pedidoId }).then((pedidos) => {
-         if (pedidos.length > 0) {
-            this.logger.debug(`${PedidoExistenteValidator.name} finalizado com sucesso para pedido: ${pedidoId}`);
-            return true;
-         }
+    return this.repository.findBy({ id: pedidoId }).then((pedidos) => {
+      if (pedidos.length > 0) {
+        this.logger.debug(`${PedidoExistenteValidator.name} finalizado com sucesso para pedido: ${pedidoId}`);
+        return true;
+      }
 
-         this.logger.error(`Pedido nao existe na base de dados com o id: ${pedidoId}`);
-         throw new ValidationException(PedidoExistenteValidator.ERROR_MESSAGE);
-      });
-   }
+      this.logger.error(`Pedido nao existe na base de dados com o id: ${pedidoId}`);
+      throw new ValidationException(PedidoExistenteValidator.ERROR_MESSAGE);
+    });
+  }
 }

@@ -6,24 +6,24 @@ import { ProdutoIntegration } from 'src/integration/produto/produto.integration'
 
 @Injectable()
 export class ProdutoInativoPedidoValidator implements AddItemPedidoValidator {
-   public static ERROR_MESSAGE = 'O produto está inativo';
+  public static ERROR_MESSAGE = 'O produto está inativo';
 
-   private logger: Logger = new Logger(ProdutoInativoPedidoValidator.name);
+  private logger: Logger = new Logger(ProdutoInativoPedidoValidator.name);
 
-   constructor(@Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration) {}
+  constructor(@Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration) {}
 
-   async validate({ produtoId }: ItemPedido): Promise<boolean> {
-      this.logger.log(
-         `Inicializando validação ${ProdutoInativoPedidoValidator.name} para criar o pedido com o produto: ${produtoId}`,
-      );
+  async validate({ produtoId }: ItemPedido): Promise<boolean> {
+    this.logger.log(
+      `Inicializando validação ${ProdutoInativoPedidoValidator.name} para criar o pedido com o produto: ${produtoId}`,
+    );
 
-      const produtoDto = await this.produtoIntegration.getProdutoById(produtoId);
-      this.logger.debug(`Produto retornado: ${JSON.stringify(produtoDto)}`);
+    const produtoDto = await this.produtoIntegration.getProdutoById(produtoId);
+    this.logger.debug(`Produto retornado: ${JSON.stringify(produtoDto)}`);
 
-      if (produtoDto.ativo) {
-         return true;
-      }
+    if (produtoDto.ativo) {
+      return true;
+    }
 
-      throw new ValidationException(ProdutoInativoPedidoValidator.ERROR_MESSAGE);
-   }
+    throw new ValidationException(ProdutoInativoPedidoValidator.ERROR_MESSAGE);
+  }
 }

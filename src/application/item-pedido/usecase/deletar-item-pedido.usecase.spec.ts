@@ -6,46 +6,49 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { ItemPedidoConstants } from 'src/shared/constants';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
+import { HttpModule } from '@nestjs/axios';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('DeletarItemPedidoUseCase', () => {
-   let useCase: DeletarItemPedidoUseCase;
-   let repository: IRepository<ItemPedido>;
+  let useCase: DeletarItemPedidoUseCase;
+  let repository: IRepository<ItemPedido>;
 
-   const itemPedidoMock: ItemPedido = {
-      pedidoId: 1,
-      produtoId: 2,
-      quantidade: 3,
-      id: 1,
-   };
+  const itemPedidoMock: ItemPedido = {
+    pedidoId: 1,
+    produtoId: 2,
+    quantidade: 3,
+    id: 1,
+  };
 
-   beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-         providers: [...ItemPedidoProviders, ...PersistenceInMemoryProviders],
-      }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
+      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+    }).compile();
 
-      // Desabilita a saída de log
-      module.useLogger(false);
+    // Desabilita a saída de log
+    module.useLogger(false);
 
-      useCase = module.get<DeletarItemPedidoUseCase>(ItemPedidoConstants.DELETAR_ITEM_PEDIDO_USECASE);
-      repository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
+    useCase = module.get<DeletarItemPedidoUseCase>(ItemPedidoConstants.DELETAR_ITEM_PEDIDO_USECASE);
+    repository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
 
-      jest.spyOn(repository, 'findBy').mockResolvedValue([itemPedidoMock]);
-   });
+    jest.spyOn(repository, 'findBy').mockResolvedValue([itemPedidoMock]);
+  });
 
-   describe('deletarItemPedido', () => {
-      it('deve deletar um item de pedido com sucesso', async () => {
-         jest.spyOn(repository, 'delete').mockResolvedValue(true);
+  describe('deletarItemPedido', () => {
+    it('deve deletar um item de pedido com sucesso', async () => {
+      jest.spyOn(repository, 'delete').mockResolvedValue(true);
 
-         const result = await useCase.deletarItemPedido(itemPedidoMock.id);
+      const result = await useCase.deletarItemPedido(itemPedidoMock.id);
 
-         expect(result).toBeTruthy();
-      });
+      expect(result).toBeTruthy();
+    });
 
-      it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
-         const error = new Error('Erro no repositório');
-         jest.spyOn(repository, 'delete').mockRejectedValue(error);
+    it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
+      const error = new Error('Erro no repositório');
+      jest.spyOn(repository, 'delete').mockRejectedValue(error);
 
-         await expect(useCase.deletarItemPedido(itemPedidoMock.id)).rejects.toThrowError(ServiceException);
-      });
-   });
+      await expect(useCase.deletarItemPedido(itemPedidoMock.id)).rejects.toThrowError(ServiceException);
+    });
+  });
 });

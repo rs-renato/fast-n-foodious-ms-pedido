@@ -10,22 +10,22 @@ import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/ident
 
 @Injectable()
 export class ClienteService implements IClienteService {
-   constructor(
-      @Inject(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE) private buscarUsecase: BuscarClientePorCpfUseCase,
-      @Inject(ClienteConstants.SALVAR_CLIENTE_USECASE) private salvarUsecase: SalvarClienteUseCase,
-      @Inject(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE)
-      private identificarUsecase: IdentificarClienteUseCase,
-   ) {}
+  constructor(
+    @Inject(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE) private buscarUsecase: BuscarClientePorCpfUseCase,
+    @Inject(ClienteConstants.SALVAR_CLIENTE_USECASE) private salvarUsecase: SalvarClienteUseCase,
+    @Inject(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE)
+    private identificarUsecase: IdentificarClienteUseCase,
+  ) {}
 
-   async findByCpf(cpf: string): Promise<Cliente> {
-      return await this.buscarUsecase.buscarClientePorCpf(cpf);
-   }
+  async findByCpf(cpf: string): Promise<Cliente> {
+    return await this.buscarUsecase.buscarClientePorCpf(cpf);
+  }
 
-   async save(cliente: Cliente): Promise<Cliente> {
-      return await this.salvarUsecase.salvarCliente(cliente);
-   }
+  async save(cliente: Cliente): Promise<Cliente> {
+    return await this.salvarUsecase.salvarCliente(cliente);
+  }
 
-   async identifyByCpf(cpf: string): Promise<ClienteIdentificado> {
-      return await this.identificarUsecase.identificarClientePorCpf(cpf);
-   }
+  async identifyByCpf(cpf: string): Promise<ClienteIdentificado> {
+    return await this.identificarUsecase.identificarClientePorCpf(cpf);
+  }
 }

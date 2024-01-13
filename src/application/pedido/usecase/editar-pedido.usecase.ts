@@ -8,22 +8,22 @@ import { ValidatorUtils } from 'src/shared/validator.utils';
 
 @Injectable()
 export class EditarPedidoUseCase {
-   private logger = new Logger(EditarPedidoUseCase.name);
+  private logger = new Logger(EditarPedidoUseCase.name);
 
-   constructor(
-      @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
-      @Inject(PedidoConstants.EDITAR_PEDIDO_VALIDATOR)
-      private validators: EditarPedidoValidator[],
-   ) {}
+  constructor(
+    @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
+    @Inject(PedidoConstants.EDITAR_PEDIDO_VALIDATOR)
+    private validators: EditarPedidoValidator[],
+  ) {}
 
-   async editarPedido(pedido: Pedido): Promise<Pedido> {
-      await ValidatorUtils.executeValidators(this.validators, pedido);
-      return await this.repository
-         .edit(pedido)
-         .then((pedidoEditado) => pedidoEditado)
-         .catch((error) => {
-            this.logger.error(`Erro ao editar no banco de dados: ${error} `);
-            throw new ServiceException(`Houve um erro ao editar pedido: ${error}`);
-         });
-   }
+  async editarPedido(pedido: Pedido): Promise<Pedido> {
+    await ValidatorUtils.executeValidators(this.validators, pedido);
+    return await this.repository
+      .edit(pedido)
+      .then((pedidoEditado) => pedidoEditado)
+      .catch((error) => {
+        this.logger.error(`Erro ao editar no banco de dados: ${error} `);
+        throw new ServiceException(`Houve um erro ao editar pedido: ${error}`);
+      });
+  }
 }

@@ -4,11 +4,11 @@ import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 
 @Injectable()
 export class BuscarProdutoPorIdUseCase {
-   private logger = new Logger(BuscarProdutoPorIdUseCase.name);
+  private logger = new Logger(BuscarProdutoPorIdUseCase.name);
 
-   constructor(@Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration) {}
+  constructor(@Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration) {}
 
-   async buscarProdutoPorID(idProduto: number): Promise<ProdutoDto> {
-      return await this.produtoIntegration.getProdutoById(idProduto);
-   }
+  async buscarProdutoPorID(idProduto: number): Promise<ProdutoDto> {
+    return await this.produtoIntegration.getProdutoById(idProduto);
+  }
 }

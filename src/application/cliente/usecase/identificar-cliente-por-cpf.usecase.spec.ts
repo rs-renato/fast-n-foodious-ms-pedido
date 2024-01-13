@@ -8,41 +8,41 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { ClienteConstants } from 'src/shared/constants';
 
 describe('IdentificarClienteUseCase', () => {
-   let useCase: IdentificarClienteUseCase;
-   let buscarUsecase: BuscarClientePorCpfUseCase;
+  let useCase: IdentificarClienteUseCase;
+  let buscarUsecase: BuscarClientePorCpfUseCase;
 
-   const clienteMock: Cliente = {
-      id: 1,
-      nome: 'John Doe',
-      email: 'johndoe@example.com',
-      cpf: '25634428777',
-   };
+  const clienteMock: Cliente = {
+    id: 1,
+    nome: 'John Doe',
+    email: 'johndoe@example.com',
+    cpf: '25634428777',
+  };
 
-   beforeEach(async () => {
-      // Configuração do módulo de teste
-      const module: TestingModule = await Test.createTestingModule({
-         providers: [...ClienteProviders, ...PersistenceInMemoryProviders],
-      }).compile();
+  beforeEach(async () => {
+    // Configuração do módulo de teste
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [...ClienteProviders, ...PersistenceInMemoryProviders],
+    }).compile();
 
-      useCase = module.get<IdentificarClienteUseCase>(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE);
-      buscarUsecase = module.get<BuscarClientePorCpfUseCase>(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE);
-   });
+    useCase = module.get<IdentificarClienteUseCase>(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE);
+    buscarUsecase = module.get<BuscarClientePorCpfUseCase>(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE);
+  });
 
-   describe('identificarClientePorCpf', () => {
-      it('deve identificar um cliente existente por CPF com sucesso', async () => {
-         jest.spyOn(buscarUsecase, 'buscarClientePorCpf').mockResolvedValue(clienteMock);
+  describe('identificarClientePorCpf', () => {
+    it('deve identificar um cliente existente por CPF com sucesso', async () => {
+      jest.spyOn(buscarUsecase, 'buscarClientePorCpf').mockResolvedValue(clienteMock);
 
-         const result = await useCase.identificarClientePorCpf(clienteMock.cpf);
+      const result = await useCase.identificarClientePorCpf(clienteMock.cpf);
 
-         expect(result).toEqual(new ClienteIdentificado(clienteMock));
-      });
+      expect(result).toEqual(new ClienteIdentificado(clienteMock));
+    });
 
-      it('deve identificar um cliente anônimo quando o CPF é undefined', async () => {
-         const cpf = undefined;
+    it('deve identificar um cliente anônimo quando o CPF é undefined', async () => {
+      const cpf = undefined;
 
-         const result = await useCase.identificarClientePorCpf(cpf);
+      const result = await useCase.identificarClientePorCpf(cpf);
 
-         expect(result).toEqual(new ClienteIdentificado());
-      });
-   });
+      expect(result).toEqual(new ClienteIdentificado());
+    });
+  });
 });

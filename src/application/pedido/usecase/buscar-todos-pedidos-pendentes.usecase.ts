@@ -7,19 +7,19 @@ import { ProdutoIntegration } from '../../../integration/produto/produto.integra
 
 @Injectable()
 export class BuscarTodosPedidosPendentesUseCase {
-   private logger = new Logger(BuscarTodosPedidosPendentesUseCase.name);
+  private logger = new Logger(BuscarTodosPedidosPendentesUseCase.name);
 
-   constructor(
-      @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
-      @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
-   ) {}
+  constructor(
+    @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
+    @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
+  ) {}
 
-   async buscarTodosPedidosPendentes(): Promise<Pedido[]> {
-      const pedidos = await this.repository.listarPedidosPendentes().catch((error) => {
-         this.logger.error(`Erro ao buscar pedidos pendentes de pagamento no banco de dados: ${error}`);
-         throw new ServiceException(`Erro ao buscar pedidos pendentes de pagamento no banco de dados: ${error}`);
-      });
+  async buscarTodosPedidosPendentes(): Promise<Pedido[]> {
+    const pedidos = await this.repository.listarPedidosPendentes().catch((error) => {
+      this.logger.error(`Erro ao buscar pedidos pendentes de pagamento no banco de dados: ${error}`);
+      throw new ServiceException(`Erro ao buscar pedidos pendentes de pagamento no banco de dados: ${error}`);
+    });
 
-      return this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
-   }
+    return this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
+  }
 }

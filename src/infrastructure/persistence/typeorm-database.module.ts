@@ -8,16 +8,16 @@ import { PedidoEntity } from 'src/infrastructure/persistence/pedido/entity/pedid
 import { PersistenceTypeOrmProviders } from 'src/infrastructure/persistence/providers/persistence-typeorm.providers';
 
 @Module({
-   imports: [
-      DatabaseConstants,
-      TypeOrmModule.forFeature([ClienteEntity, PedidoEntity, ItemPedidoEntity]),
-      TypeOrmModule.forRootAsync({
-         imports: [MysqlConfig],
-         useFactory: async (config: TypeOrmModuleOptions) => config,
-         inject: [DatabaseConstants.DATABASE_CONFIG_NAME],
-      }),
-   ],
-   providers: [...PersistenceTypeOrmProviders],
-   exports: [...PersistenceTypeOrmProviders],
+  imports: [
+    DatabaseConstants,
+    TypeOrmModule.forFeature([ClienteEntity, PedidoEntity, ItemPedidoEntity]),
+    TypeOrmModule.forRootAsync({
+      imports: [MysqlConfig],
+      useFactory: async (config: TypeOrmModuleOptions) => config,
+      inject: [DatabaseConstants.DATABASE_CONFIG_NAME],
+    }),
+  ],
+  providers: [...PersistenceTypeOrmProviders],
+  exports: [...PersistenceTypeOrmProviders],
 })
 export class TypeormDatabaseModule {}
