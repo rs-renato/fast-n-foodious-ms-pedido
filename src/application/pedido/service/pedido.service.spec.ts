@@ -16,12 +16,16 @@ import { SalvarPedidoRequest } from 'src/presentation/rest/pedido/request';
 import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
+import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
+import { NotFoundException } from '@nestjs/common';
 
 describe('PedidoService', () => {
    let service: IPedidoService;
    let pedidoRepository: IPedidoRepository;
    let itemPedidoRepository: IRepository<ItemPedido>;
    let validators: SalvarPedidoValidator[];
+   let pagamentoIntegration: PagamentoIntegration;
 
    const pedido: Pedido = {
       id: 1,
@@ -88,6 +92,7 @@ describe('PedidoService', () => {
    beforeEach(async () => {
       // Configuração do módulo de teste
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...PedidoProviders,
             ...PersistenceInMemoryProviders,
@@ -132,6 +137,7 @@ describe('PedidoService', () => {
       itemPedidoRepository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
       validators = module.get<SalvarPedidoValidator[]>(PedidoConstants.SALVAR_PEDIDO_VALIDATOR);
       service = module.get<IPedidoService>(PedidoConstants.ISERVICE);
+      pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
    });
 
    describe('injeção de dependências', () => {
@@ -355,6 +361,10 @@ describe('PedidoService', () => {
             },
             pedido,
          };
+         pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+            throw new NotFoundException('Pagamento não encontrado');
+         });
+         jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedResult.pagamento);
          const resultado = await service.checkout(pedido);
          expect(resultado).toEqual(expectedResult);
       });

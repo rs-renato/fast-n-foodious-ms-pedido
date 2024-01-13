@@ -8,6 +8,7 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { BuscarItensPorPedidoIdUseCase } from './buscar-itens-por-pedido-id.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('BuscarItensPorPedidoIdUseCase', () => {
    let useCase: BuscarItensPorPedidoIdUseCase;
@@ -21,6 +22,7 @@ describe('BuscarItensPorPedidoIdUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...ItemPedidoProviders,
             ...PedidoProviders,

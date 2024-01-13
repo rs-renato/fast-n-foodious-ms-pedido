@@ -44,8 +44,11 @@ export class ProdutoIntegration {
 
    async insereProdutosEmItensPedido(pedidos: Pedido[]): Promise<Pedido[]> {
       for (const pedido of pedidos) {
-         for (const item of pedido.itensPedido) {
-            item.produto = await this.getProdutoById(item.produtoId);
+         if (pedido.hasOwnProperty('itensPedido')) {
+            // necessário porque itensPedido é opcional - sem essa verificação, ocorre erro 'itensPedido is not iterable'
+            for (const item of pedido.itensPedido) {
+               item.produto = await this.getProdutoById(item.produtoId);
+            }
          }
       }
       return pedidos;
@@ -56,29 +59,4 @@ export class ProdutoIntegration {
       const pedidos = await this.insereProdutosEmItensPedido(pedidoParametro);
       return pedidos[0];
    }
-
-   // async editarProduto(produtoDto: ProdutoDto): Promise<void> {
-   //    const produtoModificadoParaRecebido = {
-   //       clienteId: produtoDto.clienteId,
-   //       dataInicio: produtoDto.dataInicio,
-   //       estadoProduto: produtoDto.estadoProduto,
-   //       ativo: produtoDto.ativo,
-   //    };
-   //
-   //    this.logger.debug(
-   //       `editarProduto: invocando serviço de integração em http://${this.MS_PRODUTO_URL}/v1/produto/${produtoDto.id}`,
-   //    );
-   //    const request = this.httpService
-   //       .put(`http://${this.MS_PRODUTO_URL}/v1/produto/${produtoDto.id}`, produtoModificadoParaRecebido)
-   //       .pipe(map((res) => res.data))
-   //       .pipe(
-   //          catchError(() => {
-   //             throw new ServiceUnavailableException(
-   //                'Não foi possível realizar a integração com o MS de Produto para editar o produto.',
-   //             );
-   //          }),
-   //       );
-   //
-   //    await lastValueFrom(request);
-   // }
 }

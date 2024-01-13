@@ -9,6 +9,7 @@ import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
 import { SalvarPedidoUseCase } from './salvar-pedido.usecase';
 import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('SalvarPedidoUseCase', () => {
    let useCase: SalvarPedidoUseCase;
@@ -31,6 +32,7 @@ describe('SalvarPedidoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...PedidoProviders,
             ...IntegrationProviders,

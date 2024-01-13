@@ -6,6 +6,7 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { PedidoConstants } from 'src/shared/constants';
 import { DeletarPedidoUseCase } from './deletar-pedido.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('DeletarPedidoUseCase', () => {
    let useCase: DeletarPedidoUseCase;
@@ -15,6 +16,7 @@ describe('DeletarPedidoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
       }).compile();
 

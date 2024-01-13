@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
-import { IRepository } from 'src/enterprise/repository/repository';
 import { PagamentoConstants } from 'src/shared/constants';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { DateUtils } from 'src/shared/date.utils';

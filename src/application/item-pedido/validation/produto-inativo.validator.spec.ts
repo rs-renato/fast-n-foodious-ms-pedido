@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
-import { ProdutoConstants } from 'src/shared/constants';
 import { ProdutoInativoPedidoValidator } from 'src/application/item-pedido/validation/produto-inativo.validator';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';

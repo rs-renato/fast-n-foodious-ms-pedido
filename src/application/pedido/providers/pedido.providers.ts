@@ -130,6 +130,12 @@ export const PedidoProviders: Provider[] = [
          new SolicitaPagamentoPedidoUseCase(pagamentoIntegration),
    },
    {
+      provide: PedidoConstants.BUSCAR_PRODUTO_POR_ID_USECASE,
+      inject: [ProdutoIntegration],
+      useFactory: (produtoIntegration: ProdutoIntegration): BuscarProdutoPorIdUseCase =>
+         new BuscarProdutoPorIdUseCase(produtoIntegration),
+   },
+   {
       provide: PedidoConstants.CHECKOUT_PEDIDO_USECASE,
       inject: [
          PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,

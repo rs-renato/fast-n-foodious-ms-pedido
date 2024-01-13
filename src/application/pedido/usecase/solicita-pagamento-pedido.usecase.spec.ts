@@ -1,7 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
-import { ServiceException } from 'src/enterprise/exception/service.exception';
-
 import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';

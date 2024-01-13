@@ -7,6 +7,7 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosNaoFinalizadosUseCase } from './buscar-todos-pedidos-nao-finalizados.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
 
 describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
    let useCase: BuscarTodosPedidosNaoFinalizadosUseCase;
@@ -38,6 +39,7 @@ describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
             ...PedidoProviders,
             ...IntegrationProviders,
