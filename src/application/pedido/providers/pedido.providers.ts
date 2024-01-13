@@ -31,132 +31,132 @@ import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integr
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 
 export const PedidoProviders: Provider[] = [
-   { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
-   {
-      provide: PedidoConstants.SALVAR_PEDIDO_VALIDATOR,
-      inject: [ClienteConstants.IREPOSITORY],
-      useFactory: (clienteRepository: IRepository<Cliente>): SalvarPedidoValidator[] => [
-         new DataInicioNovoPedidoValidator(),
-         new EstadoCorretoNovoPedidoValidator(),
-         new ClienteExistentePedidoValidator(clienteRepository),
-      ],
-   },
+  { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
+  {
+    provide: PedidoConstants.SALVAR_PEDIDO_VALIDATOR,
+    inject: [ClienteConstants.IREPOSITORY],
+    useFactory: (clienteRepository: IRepository<Cliente>): SalvarPedidoValidator[] => [
+      new DataInicioNovoPedidoValidator(),
+      new EstadoCorretoNovoPedidoValidator(),
+      new ClienteExistentePedidoValidator(clienteRepository),
+    ],
+  },
 
-   {
-      provide: PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
-      inject: [ClienteConstants.IREPOSITORY, PagamentoIntegration],
-      useFactory: (
-         clienteRepository: IRepository<Cliente>,
-         pagamentoIntegration: PagamentoIntegration,
-      ): CheckoutPedidoValidator[] => [
-         new ClienteExistentePedidoValidator(clienteRepository),
-         new CheckoutPedidoRealizadoValidator(pagamentoIntegration),
-      ],
-   },
-   {
-      provide: PedidoConstants.EDITAR_PEDIDO_VALIDATOR,
-      inject: [ClienteConstants.IREPOSITORY, PedidoConstants.IREPOSITORY],
-      useFactory: (
-         clienteRepository: IRepository<Cliente>,
-         pedidoRepository: IRepository<Pedido>,
-      ): EditarPedidoValidator[] => [
-         new DataInicioNovoPedidoValidator(),
-         new ClienteExistentePedidoValidator(clienteRepository),
-         new PedidoExistenteValidator(pedidoRepository),
-      ],
-   },
-   {
-      provide: PedidoConstants.SALVAR_PEDIDO_USECASE,
-      inject: [PedidoConstants.IREPOSITORY, PedidoConstants.SALVAR_PEDIDO_VALIDATOR],
-      useFactory: (repository: IPedidoRepository, validators: SalvarPedidoValidator[]): SalvarPedidoUseCase =>
-         new SalvarPedidoUseCase(repository, validators),
-   },
-   {
-      provide: PedidoConstants.EDITAR_PEDIDO_USECASE,
-      inject: [PedidoConstants.IREPOSITORY, PedidoConstants.EDITAR_PEDIDO_VALIDATOR],
-      useFactory: (repository: IPedidoRepository, validators: EditarPedidoValidator[]): EditarPedidoUseCase =>
-         new EditarPedidoUseCase(repository, validators),
-   },
-   {
-      provide: PedidoConstants.DELETAR_PEDIDO_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): DeletarPedidoUseCase => new DeletarPedidoUseCase(repository),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE,
-      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
-      useFactory: (repository: IPedidoRepository, produtoIntegration: ProdutoIntegration): BuscarPedidoPorIdUseCase =>
-         new BuscarPedidoPorIdUseCase(repository, produtoIntegration),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_ESTADO_PEDIDO_POR_ID_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): BuscarEstadoPedidoPorIdUseCase =>
-         new BuscarEstadoPedidoPorIdUseCase(repository),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_ESTADO_USECASE,
-      inject: [PedidoConstants.IREPOSITORY],
-      useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPorEstadoUseCase =>
-         new BuscarTodosPedidosPorEstadoUseCase(repository),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_PENDENTES_USECASE,
-      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
-      useFactory: (
-         repository: IPedidoRepository,
-         produtoIntegration: ProdutoIntegration,
-      ): BuscarTodosPedidosPendentesUseCase => new BuscarTodosPedidosPendentesUseCase(repository, produtoIntegration),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_NAO_FINALIZADOS_USECASE,
-      inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
-      useFactory: (
-         repository: IPedidoRepository,
-         produtoIntegration: ProdutoIntegration,
-      ): BuscarTodosPedidosNaoFinalizadosUseCase =>
-         new BuscarTodosPedidosNaoFinalizadosUseCase(repository, produtoIntegration),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
-      inject: [ItemPedidoConstants.IREPOSITORY],
-      useFactory: (repository: IRepository<ItemPedido>): BuscarItensPorPedidoIdUseCase =>
-         new BuscarItensPorPedidoIdUseCase(repository),
-   },
-   {
-      provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
-      inject: [PagamentoIntegration],
-      useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase =>
-         new SolicitaPagamentoPedidoUseCase(pagamentoIntegration),
-   },
-   {
-      provide: PedidoConstants.BUSCAR_PRODUTO_POR_ID_USECASE,
-      inject: [ProdutoIntegration],
-      useFactory: (produtoIntegration: ProdutoIntegration): BuscarProdutoPorIdUseCase =>
-         new BuscarProdutoPorIdUseCase(produtoIntegration),
-   },
-   {
-      provide: PedidoConstants.CHECKOUT_PEDIDO_USECASE,
-      inject: [
-         PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
-         PedidoConstants.EDITAR_PEDIDO_USECASE,
-         PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
-         ProdutoIntegration,
-         PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
-      ],
-      useFactory: (
-         buscarItensPorPedidoIdUsecase: BuscarItensPorPedidoIdUseCase,
-         editarPedidoUsecase: EditarPedidoUseCase,
-         solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
-         produtoIntegration: ProdutoIntegration,
-         validators: CheckoutPedidoValidator[],
-      ): CheckoutPedidoUseCase =>
-         new CheckoutPedidoUseCase(
-            new BuscarProdutoPorIdUseCase(produtoIntegration),
-            buscarItensPorPedidoIdUsecase,
-            editarPedidoUsecase,
-            solicitaPagamentoPedidoUseCase,
-            validators,
-         ),
-   },
+  {
+    provide: PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
+    inject: [ClienteConstants.IREPOSITORY, PagamentoIntegration],
+    useFactory: (
+      clienteRepository: IRepository<Cliente>,
+      pagamentoIntegration: PagamentoIntegration,
+    ): CheckoutPedidoValidator[] => [
+      new ClienteExistentePedidoValidator(clienteRepository),
+      new CheckoutPedidoRealizadoValidator(pagamentoIntegration),
+    ],
+  },
+  {
+    provide: PedidoConstants.EDITAR_PEDIDO_VALIDATOR,
+    inject: [ClienteConstants.IREPOSITORY, PedidoConstants.IREPOSITORY],
+    useFactory: (
+      clienteRepository: IRepository<Cliente>,
+      pedidoRepository: IRepository<Pedido>,
+    ): EditarPedidoValidator[] => [
+      new DataInicioNovoPedidoValidator(),
+      new ClienteExistentePedidoValidator(clienteRepository),
+      new PedidoExistenteValidator(pedidoRepository),
+    ],
+  },
+  {
+    provide: PedidoConstants.SALVAR_PEDIDO_USECASE,
+    inject: [PedidoConstants.IREPOSITORY, PedidoConstants.SALVAR_PEDIDO_VALIDATOR],
+    useFactory: (repository: IPedidoRepository, validators: SalvarPedidoValidator[]): SalvarPedidoUseCase =>
+      new SalvarPedidoUseCase(repository, validators),
+  },
+  {
+    provide: PedidoConstants.EDITAR_PEDIDO_USECASE,
+    inject: [PedidoConstants.IREPOSITORY, PedidoConstants.EDITAR_PEDIDO_VALIDATOR],
+    useFactory: (repository: IPedidoRepository, validators: EditarPedidoValidator[]): EditarPedidoUseCase =>
+      new EditarPedidoUseCase(repository, validators),
+  },
+  {
+    provide: PedidoConstants.DELETAR_PEDIDO_USECASE,
+    inject: [PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IPedidoRepository): DeletarPedidoUseCase => new DeletarPedidoUseCase(repository),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE,
+    inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+    useFactory: (repository: IPedidoRepository, produtoIntegration: ProdutoIntegration): BuscarPedidoPorIdUseCase =>
+      new BuscarPedidoPorIdUseCase(repository, produtoIntegration),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_ESTADO_PEDIDO_POR_ID_USECASE,
+    inject: [PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IPedidoRepository): BuscarEstadoPedidoPorIdUseCase =>
+      new BuscarEstadoPedidoPorIdUseCase(repository),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_ESTADO_USECASE,
+    inject: [PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPorEstadoUseCase =>
+      new BuscarTodosPedidosPorEstadoUseCase(repository),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_PENDENTES_USECASE,
+    inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+    useFactory: (
+      repository: IPedidoRepository,
+      produtoIntegration: ProdutoIntegration,
+    ): BuscarTodosPedidosPendentesUseCase => new BuscarTodosPedidosPendentesUseCase(repository, produtoIntegration),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_NAO_FINALIZADOS_USECASE,
+    inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+    useFactory: (
+      repository: IPedidoRepository,
+      produtoIntegration: ProdutoIntegration,
+    ): BuscarTodosPedidosNaoFinalizadosUseCase =>
+      new BuscarTodosPedidosNaoFinalizadosUseCase(repository, produtoIntegration),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
+    inject: [ItemPedidoConstants.IREPOSITORY],
+    useFactory: (repository: IRepository<ItemPedido>): BuscarItensPorPedidoIdUseCase =>
+      new BuscarItensPorPedidoIdUseCase(repository),
+  },
+  {
+    provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
+    inject: [PagamentoIntegration],
+    useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase =>
+      new SolicitaPagamentoPedidoUseCase(pagamentoIntegration),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_PRODUTO_POR_ID_USECASE,
+    inject: [ProdutoIntegration],
+    useFactory: (produtoIntegration: ProdutoIntegration): BuscarProdutoPorIdUseCase =>
+      new BuscarProdutoPorIdUseCase(produtoIntegration),
+  },
+  {
+    provide: PedidoConstants.CHECKOUT_PEDIDO_USECASE,
+    inject: [
+      PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE,
+      PedidoConstants.EDITAR_PEDIDO_USECASE,
+      PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
+      ProdutoIntegration,
+      PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
+    ],
+    useFactory: (
+      buscarItensPorPedidoIdUsecase: BuscarItensPorPedidoIdUseCase,
+      editarPedidoUsecase: EditarPedidoUseCase,
+      solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
+      produtoIntegration: ProdutoIntegration,
+      validators: CheckoutPedidoValidator[],
+    ): CheckoutPedidoUseCase =>
+      new CheckoutPedidoUseCase(
+        new BuscarProdutoPorIdUseCase(produtoIntegration),
+        buscarItensPorPedidoIdUsecase,
+        editarPedidoUsecase,
+        solicitaPagamentoPedidoUseCase,
+        validators,
+      ),
+  },
 ];

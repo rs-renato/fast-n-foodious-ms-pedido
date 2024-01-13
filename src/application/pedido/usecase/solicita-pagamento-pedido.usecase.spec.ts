@@ -13,54 +13,54 @@ import { HttpModule } from '@nestjs/axios';
 import { ServiceUnavailableException } from '@nestjs/common';
 
 describe('SolicitaPagamentoPedidoUseCase', () => {
-   let useCase: SolicitaPagamentoPedidoUseCase;
-   let pagamentoIntegration: PagamentoIntegration;
+  let useCase: SolicitaPagamentoPedidoUseCase;
+  let pagamentoIntegration: PagamentoIntegration;
 
-   const pedido: Pedido = {
-      id: 1,
-      clienteId: 1,
-      dataInicio: '2023-08-30',
-      estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
-      ativo: true,
-      total: 10,
-   };
+  const pedido: Pedido = {
+    id: 1,
+    clienteId: 1,
+    dataInicio: '2023-08-30',
+    estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
+    ativo: true,
+    total: 10,
+  };
 
-   const pagamento: PagamentoDto = {
-      dataHoraPagamento: new Date(),
-      estadoPagamento: EstadoPagamento.PENDENTE,
-      pedidoId: 1,
-      total: 10,
-      transacaoId: '123456-abcdef',
-      id: 1,
-   };
+  const pagamento: PagamentoDto = {
+    dataHoraPagamento: new Date(),
+    estadoPagamento: EstadoPagamento.PENDENTE,
+    pedidoId: 1,
+    total: 10,
+    transacaoId: '123456-abcdef',
+    id: 1,
+  };
 
-   beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-         imports: [HttpModule],
-         providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
-      }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+    }).compile();
 
-      // Desabilita a saída de log
-      module.useLogger(false);
+    // Desabilita a saída de log
+    module.useLogger(false);
 
-      useCase = module.get<SolicitaPagamentoPedidoUseCase>(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE);
-      pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
-   });
+    useCase = module.get<SolicitaPagamentoPedidoUseCase>(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE);
+    pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+  });
 
-   describe('SolicitaPagamentoPedidoUseCase', () => {
-      it('deve realizar o pagamento do pedido e gerar o id de transação', async () => {
-         jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(pagamento);
+  describe('SolicitaPagamentoPedidoUseCase', () => {
+    it('deve realizar o pagamento do pedido e gerar o id de transação', async () => {
+      jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(pagamento);
 
-         const pagamentoResponse = await useCase.solicitaPagamento(pedido);
+      const pagamentoResponse = await useCase.solicitaPagamento(pedido);
 
-         expect(pagamentoResponse.pedidoId).toEqual(pedido.id);
-      });
+      expect(pagamentoResponse.pedidoId).toEqual(pedido.id);
+    });
 
-      it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
-         const error = new ServiceUnavailableException('Erro');
-         jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockRejectedValue(error);
+    it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
+      const error = new ServiceUnavailableException('Erro');
+      jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockRejectedValue(error);
 
-         await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(ServiceUnavailableException);
-      });
-   });
+      await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(ServiceUnavailableException);
+    });
+  });
 });

@@ -7,16 +7,16 @@ import { PedidoConstants } from 'src/shared/constants';
 
 @Injectable()
 export class BuscarTodosPedidosPorEstadoUseCase {
-   private logger = new Logger(BuscarTodosPedidosPorEstadoUseCase.name);
+  private logger = new Logger(BuscarTodosPedidosPorEstadoUseCase.name);
 
-   constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository) {}
+  constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository) {}
 
-   async buscarTodosPedidosPorEstado(estado: EstadoPedido): Promise<Pedido[]> {
-      const pedidos = await this.repository.findBy({ estadoPedido: estado }).catch((error) => {
-         this.logger.error(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
-         throw new ServiceException(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
-      });
+  async buscarTodosPedidosPorEstado(estado: EstadoPedido): Promise<Pedido[]> {
+    const pedidos = await this.repository.findBy({ estadoPedido: estado }).catch((error) => {
+      this.logger.error(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
+      throw new ServiceException(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
+    });
 
-      return pedidos;
-   }
+    return pedidos;
+  }
 }

@@ -7,7 +7,7 @@ import { ItemPedidoTypeormRepository } from 'src/infrastructure/persistence/item
 import { PedidoTypeormRepository } from 'src/infrastructure/persistence/pedido/repository/pedido-typeorm.repository';
 
 export const PersistenceTypeOrmProviders: Provider[] = [
-   { provide: ClienteConstants.IREPOSITORY, useClass: ClienteTypeormRepository },
-   { provide: PedidoConstants.IREPOSITORY, useClass: PedidoTypeormRepository },
-   { provide: ItemPedidoConstants.IREPOSITORY, useClass: ItemPedidoTypeormRepository },
+  { provide: ClienteConstants.IREPOSITORY, useClass: ClienteTypeormRepository },
+  { provide: PedidoConstants.IREPOSITORY, useClass: PedidoTypeormRepository },
+  { provide: ItemPedidoConstants.IREPOSITORY, useClass: ItemPedidoTypeormRepository },
 ];

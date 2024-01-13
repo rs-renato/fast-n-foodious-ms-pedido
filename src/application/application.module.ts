@@ -11,12 +11,12 @@ import { IntegrationProviders } from '../integration/providers/integration.provi
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-   imports: [HttpModule],
-   providers: [...ClienteProviders, ...PedidoProviders, ...ItemPedidoProviders, ...IntegrationProviders],
-   exports: [
-      { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
-      { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
-      { provide: ItemPedidoConstants.ISERVICE, useClass: ItemPedidoService },
-   ],
+  imports: [HttpModule],
+  providers: [...ClienteProviders, ...PedidoProviders, ...ItemPedidoProviders, ...IntegrationProviders],
+  exports: [
+    { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
+    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
+    { provide: ItemPedidoConstants.ISERVICE, useClass: ItemPedidoService },
+  ],
 })
 export class ApplicationModule {}

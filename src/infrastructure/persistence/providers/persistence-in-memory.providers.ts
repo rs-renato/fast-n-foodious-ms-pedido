@@ -6,7 +6,7 @@ import { ItemPedidoMemoryRepository } from 'src/infrastructure/persistence/item-
 import { PedidoMemoryRepository } from 'src/infrastructure/persistence/pedido/repository/pedido-memory.repository';
 
 export const PersistenceInMemoryProviders: Provider[] = [
-   { provide: ClienteConstants.IREPOSITORY, useClass: ClienteMemoryRepository },
-   { provide: PedidoConstants.IREPOSITORY, useClass: PedidoMemoryRepository },
-   { provide: ItemPedidoConstants.IREPOSITORY, useClass: ItemPedidoMemoryRepository },
+  { provide: ClienteConstants.IREPOSITORY, useClass: ClienteMemoryRepository },
+  { provide: PedidoConstants.IREPOSITORY, useClass: PedidoMemoryRepository },
+  { provide: ItemPedidoConstants.IREPOSITORY, useClass: ItemPedidoMemoryRepository },
 ];

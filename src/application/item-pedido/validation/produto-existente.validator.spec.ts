@@ -10,71 +10,71 @@ import { IntegrationProviders } from 'src/integration/providers/integration.prov
 import { NotFoundException } from '@nestjs/common';
 
 describe('ProdutoExistentePedidoValidator', () => {
-   let validator: ProdutoExistentePedidoValidator;
-   let produtoIntegration: ProdutoIntegration;
+  let validator: ProdutoExistentePedidoValidator;
+  let produtoIntegration: ProdutoIntegration;
 
-   const produto: ProdutoDto = {
-      id: 1,
-      nome: 'nome correto',
-      idCategoriaProduto: 1,
-      descricao: 'Teste',
-      preco: 10,
-      imagemBase64: '',
-      ativo: true,
-   };
+  const produto: ProdutoDto = {
+    id: 1,
+    nome: 'nome correto',
+    idCategoriaProduto: 1,
+    descricao: 'Teste',
+    preco: 10,
+    imagemBase64: '',
+    ativo: true,
+  };
 
-   const itemPedido: ItemPedido = {
-      pedidoId: 1,
-      produtoId: 2,
-      quantidade: 3,
-      id: 123,
-   };
+  const itemPedido: ItemPedido = {
+    pedidoId: 1,
+    produtoId: 2,
+    quantidade: 3,
+    id: 123,
+  };
 
-   beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-         imports: [HttpModule],
-         providers: [
-            ...IntegrationProviders,
-            ProdutoExistentePedidoValidator,
-            {
-               provide: ProdutoConstants.IREPOSITORY,
-               useValue: {
-                  findBy: jest.fn(() => {
-                     return Promise.resolve([produto]);
-                  }),
-               },
-            },
-         ],
-      }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
+      providers: [
+        ...IntegrationProviders,
+        ProdutoExistentePedidoValidator,
+        {
+          provide: ProdutoConstants.IREPOSITORY,
+          useValue: {
+            findBy: jest.fn(() => {
+              return Promise.resolve([produto]);
+            }),
+          },
+        },
+      ],
+    }).compile();
 
-      module.useLogger(false);
+    module.useLogger(false);
 
-      produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
-      validator = module.get<ProdutoExistentePedidoValidator>(ProdutoExistentePedidoValidator);
-   });
+    produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
+    validator = module.get<ProdutoExistentePedidoValidator>(ProdutoExistentePedidoValidator);
+  });
 
-   describe('injeção de dependências', () => {
-      it('deve existir instância de produtoIntegration definida', async () => {
-         expect(produtoIntegration).toBeDefined();
+  describe('injeção de dependências', () => {
+    it('deve existir instância de produtoIntegration definida', async () => {
+      expect(produtoIntegration).toBeDefined();
+    });
+  });
+
+  describe('validate', () => {
+    it('deve validar pedido quando existir um produto', async () => {
+      produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
+        Promise.resolve(produto);
       });
-   });
+      const result = await validator.validate(itemPedido);
 
-   describe('validate', () => {
-      it('deve validar pedido quando existir um produto', async () => {
-         produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
-            Promise.resolve(produto);
-         });
-         const result = await validator.validate(itemPedido);
+      expect(result).toBeTruthy();
+    });
 
-         expect(result).toBeTruthy();
+    it('não deve validar pedido quando não existir um produto', async () => {
+      produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
+        throw new NotFoundException('Pagamento não encontrado');
       });
 
-      it('não deve validar pedido quando não existir um produto', async () => {
-         produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
-            throw new NotFoundException('Pagamento não encontrado');
-         });
-
-         await expect(validator.validate(itemPedido)).rejects.toThrowError(ValidationException);
-      });
-   });
+      await expect(validator.validate(itemPedido)).rejects.toThrowError(ValidationException);
+    });
+  });
 });

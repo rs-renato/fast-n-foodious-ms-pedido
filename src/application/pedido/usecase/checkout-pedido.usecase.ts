@@ -11,42 +11,42 @@ import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/s
 
 @Injectable()
 export class CheckoutPedidoUseCase {
-   private logger: Logger = new Logger(CheckoutPedidoUseCase.name);
-   constructor(
-      @Inject(ProdutoConstants.BUSCAR_PRODUTO_POR_ID_USECASE)
-      private buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase,
-      @Inject(PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE)
-      private buscarItensPorPedidoIdUseCase: BuscarItensPorPedidoIdUseCase,
-      @Inject(PedidoConstants.EDITAR_PEDIDO_USECASE) private editarPedidoUseCase: EditarPedidoUseCase,
-      @Inject(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE)
-      private solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
-      @Inject(PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR)
-      private validators: CheckoutPedidoValidator[],
-   ) {}
+  private logger: Logger = new Logger(CheckoutPedidoUseCase.name);
+  constructor(
+    @Inject(ProdutoConstants.BUSCAR_PRODUTO_POR_ID_USECASE)
+    private buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase,
+    @Inject(PedidoConstants.BUSCAR_ITENS_PEDIDO_POR_PEDIDO_ID_USECASE)
+    private buscarItensPorPedidoIdUseCase: BuscarItensPorPedidoIdUseCase,
+    @Inject(PedidoConstants.EDITAR_PEDIDO_USECASE) private editarPedidoUseCase: EditarPedidoUseCase,
+    @Inject(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE)
+    private solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
+    @Inject(PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR)
+    private validators: CheckoutPedidoValidator[],
+  ) {}
 
-   async checkout(pedido: Pedido): Promise<PedidoComDadosDePagamento> {
-      this.logger.log(`Checkout ativado para pedido = ${JSON.stringify(pedido)}`);
-      await ValidatorUtils.executeValidators(this.validators, pedido);
-      // listar items pedido
-      const itemPedidos = await this.buscarItensPorPedidoIdUseCase.buscarItensPedidoPorPedidoId(pedido.id);
-      // calcular o total do pedido
-      let totalPedido = 0;
-      for (const itemPedido of itemPedidos) {
-         const produto = await this.buscarProdutoPorIdUseCase.buscarProdutoPorID(itemPedido.produtoId);
-         totalPedido += itemPedido.quantidade * produto.preco;
-      }
-      pedido.total = totalPedido;
+  async checkout(pedido: Pedido): Promise<PedidoComDadosDePagamento> {
+    this.logger.log(`Checkout ativado para pedido = ${JSON.stringify(pedido)}`);
+    await ValidatorUtils.executeValidators(this.validators, pedido);
+    // listar items pedido
+    const itemPedidos = await this.buscarItensPorPedidoIdUseCase.buscarItensPedidoPorPedidoId(pedido.id);
+    // calcular o total do pedido
+    let totalPedido = 0;
+    for (const itemPedido of itemPedidos) {
+      const produto = await this.buscarProdutoPorIdUseCase.buscarProdutoPorID(itemPedido.produtoId);
+      totalPedido += itemPedido.quantidade * produto.preco;
+    }
+    pedido.total = totalPedido;
 
-      // registra a necessidade de pagamento do pedido
-      const pagamento = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido);
-      this.logger.debug(`pagamento: ${JSON.stringify(pagamento)}`);
+    // registra a necessidade de pagamento do pedido
+    const pagamento = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido);
+    this.logger.debug(`pagamento: ${JSON.stringify(pagamento)}`);
 
-      const pedidoRetornado = await this.editarPedidoUseCase.editarPedido(pedido);
-      this.logger.debug(`pedidoRetornado: ${JSON.stringify(pedidoRetornado)}`);
+    const pedidoRetornado = await this.editarPedidoUseCase.editarPedido(pedido);
+    this.logger.debug(`pedidoRetornado: ${JSON.stringify(pedidoRetornado)}`);
 
-      return {
-         pedido: pedidoRetornado,
-         pagamento,
-      };
-   }
+    return {
+      pedido: pedidoRetornado,
+      pagamento,
+    };
+  }
 }

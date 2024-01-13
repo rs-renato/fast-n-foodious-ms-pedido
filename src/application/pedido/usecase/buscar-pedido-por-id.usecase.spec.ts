@@ -11,46 +11,46 @@ import { IntegrationProviders } from 'src/integration/providers/integration.prov
 import { HttpModule } from '@nestjs/axios';
 
 describe('BuscarPedidoPorIdUseCase', () => {
-   let useCase: BuscarPedidoPorIdUseCase;
-   let repository: IPedidoRepository;
+  let useCase: BuscarPedidoPorIdUseCase;
+  let repository: IPedidoRepository;
 
-   const pedidoId = 123;
-   const pedidoMock: Pedido = {
-      id: pedidoId,
-      clienteId: 456,
-      dataInicio: '2023-08-26',
-      estadoPedido: EstadoPedido.EM_PREPARACAO,
-      ativo: true,
-      total: 100.0,
-   };
+  const pedidoId = 123;
+  const pedidoMock: Pedido = {
+    id: pedidoId,
+    clienteId: 456,
+    dataInicio: '2023-08-26',
+    estadoPedido: EstadoPedido.EM_PREPARACAO,
+    ativo: true,
+    total: 100.0,
+  };
 
-   beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-         imports: [HttpModule],
-         providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
-      }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+    }).compile();
 
-      // Desabilita a saída de log
-      module.useLogger(false);
+    // Desabilita a saída de log
+    module.useLogger(false);
 
-      useCase = module.get<BuscarPedidoPorIdUseCase>(PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE);
-      repository = module.get<IPedidoRepository>(PedidoConstants.IREPOSITORY);
-   });
+    useCase = module.get<BuscarPedidoPorIdUseCase>(PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE);
+    repository = module.get<IPedidoRepository>(PedidoConstants.IREPOSITORY);
+  });
 
-   describe('buscarPedidoPorId', () => {
-      it('deve buscar um pedido por ID com sucesso', async () => {
-         jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);
+  describe('buscarPedidoPorId', () => {
+    it('deve buscar um pedido por ID com sucesso', async () => {
+      jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);
 
-         const result = await useCase.buscarPedidoPorId(pedidoId);
+      const result = await useCase.buscarPedidoPorId(pedidoId);
 
-         expect(result).toEqual(pedidoMock);
-      });
+      expect(result).toEqual(pedidoMock);
+    });
 
-      it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
-         const error = new Error('Erro no repositório');
-         jest.spyOn(repository, 'find').mockRejectedValue(error);
+    it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
+      const error = new Error('Erro no repositório');
+      jest.spyOn(repository, 'find').mockRejectedValue(error);
 
-         await expect(useCase.buscarPedidoPorId(pedidoId)).rejects.toThrowError(ServiceException);
-      });
-   });
+      await expect(useCase.buscarPedidoPorId(pedidoId)).rejects.toThrowError(ServiceException);
+    });
+  });
 });

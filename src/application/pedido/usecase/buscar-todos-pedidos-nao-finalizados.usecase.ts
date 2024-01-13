@@ -8,33 +8,33 @@ import { ProdutoIntegration } from '../../../integration/produto/produto.integra
 
 @Injectable()
 export class BuscarTodosPedidosNaoFinalizadosUseCase {
-   private logger = new Logger(BuscarTodosPedidosNaoFinalizadosUseCase.name);
+  private logger = new Logger(BuscarTodosPedidosNaoFinalizadosUseCase.name);
 
-   constructor(
-      @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
-      @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
-   ) {}
+  constructor(
+    @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
+    @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
+  ) {}
 
-   async buscarTodosPedidos(): Promise<Pedido[]> {
-      return await this.repository
-         .find({
-            where: [
-               { estadoPedido: EstadoPedido.RECEBIDO },
-               { estadoPedido: EstadoPedido.EM_PREPARACAO },
-               { estadoPedido: EstadoPedido.PRONTO },
-            ],
-            order: {
-               estadoPedido: 'DESC',
-            },
-            relations: ['itensPedido'],
-            // relations: ['itensPedido', 'itensPedido.produto'],
-         })
-         .then(async (pedidos) => {
-            return await this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
-         })
-         .catch((error) => {
-            this.logger.error(`Erro ao buscar todos pedidos no banco de dados: ${error} `);
-            throw new ServiceException(`Houve um erro ao buscar os pedidos: ${error}`);
-         });
-   }
+  async buscarTodosPedidos(): Promise<Pedido[]> {
+    return await this.repository
+      .find({
+        where: [
+          { estadoPedido: EstadoPedido.RECEBIDO },
+          { estadoPedido: EstadoPedido.EM_PREPARACAO },
+          { estadoPedido: EstadoPedido.PRONTO },
+        ],
+        order: {
+          estadoPedido: 'DESC',
+        },
+        relations: ['itensPedido'],
+        // relations: ['itensPedido', 'itensPedido.produto'],
+      })
+      .then(async (pedidos) => {
+        return await this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
+      })
+      .catch((error) => {
+        this.logger.error(`Erro ao buscar todos pedidos no banco de dados: ${error} `);
+        throw new ServiceException(`Houve um erro ao buscar os pedidos: ${error}`);
+      });
+  }
 }

@@ -11,13 +11,13 @@ import { ItemPedidoRestApi } from 'src/presentation/rest/item-pedido/api/item-pe
 import { PedidoRestApi } from 'src/presentation/rest/pedido/api/pedido.api';
 
 @Module({
-   imports: [ApplicationModule],
-   providers: [
-      { provide: APP_FILTER, useClass: GeneralExceptionHandler },
-      { provide: APP_FILTER, useClass: GeneralHttpExceptionHandler },
-      { provide: APP_FILTER, useClass: InfraestructureExceptionHandler },
-      { provide: APP_FILTER, useClass: ValidationExceptionHandler },
-   ],
-   controllers: [ClienteRestApi, PedidoRestApi, ItemPedidoRestApi, HealthRestApi],
+  imports: [ApplicationModule],
+  providers: [
+    { provide: APP_FILTER, useClass: GeneralExceptionHandler },
+    { provide: APP_FILTER, useClass: GeneralHttpExceptionHandler },
+    { provide: APP_FILTER, useClass: InfraestructureExceptionHandler },
+    { provide: APP_FILTER, useClass: ValidationExceptionHandler },
+  ],
+  controllers: [ClienteRestApi, PedidoRestApi, ItemPedidoRestApi, HealthRestApi],
 })
 export class PresentationModule {}
