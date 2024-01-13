@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: {{ .Values.application.name }}-volume
           persistentVolumeClaim:
-            claimName: {{ .Values.application.name }}-pvc
+            claimName: {{ .Values.pvc.name }}
         - name: mysql-init
           configMap:
             name: {{ .Values.mysql.name }}-env

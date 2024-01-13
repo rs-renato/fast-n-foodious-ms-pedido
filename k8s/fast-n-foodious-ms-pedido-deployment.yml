@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fast-n-foodious
+  name: fast-n-foodious-ms-pedido
 spec:
   selector:
     matchLabels:
-      app: fast-n-foodious
+      app: fast-n-foodious-ms-pedido
   template:
     metadata:
       labels:
-        app: fast-n-foodious
+        app: fast-n-foodious-ms-pedido
     spec:
       containers:
-      - name: fast-n-foodious
-        image: ottero/fast-n-foodious:latest
+      - name: fast-n-foodious-ms-pedido
+        image: ottero/fast-n-foodious-ms-pedido:latest
         resources:
           limits:
             memory: "512Mi"
@@ -38,17 +38,17 @@ spec:
         - containerPort: 3000
         envFrom:
           - configMapRef:
-              name: fast-n-foodious-env
+              name: fast-n-foodious-ms-pedido-env
         env:
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: fast-n-foodious-secret
+                name: fast-n-foodious-ms-pedido-secret
                 key: MYSQL_PASSWORD
           - name: SERVER_PORT
             valueFrom:
               configMapKeyRef:
-                name: fast-n-foodious-env
+                name: fast-n-foodious-ms-pedido-env
                 key: SERVER_PORT
 ---
 apiVersion: apps/v1
@@ -89,17 +89,17 @@ spec:
           failureThreshold: 3
         envFrom:
           - configMapRef:
-              name: fast-n-foodious-env
+              name: fast-n-foodious-ms-pedido-env
         env:
           - name: MYSQL_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: fast-n-foodious-secret
+                name: fast-n-foodious-ms-pedido-secret
                 key: MYSQL_ROOT_PASSWORD
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: fast-n-foodious-secret
+                name: fast-n-foodious-ms-pedido-secret
                 key: MYSQL_PASSWORD
         volumeMounts:
           - name: mysql-init
