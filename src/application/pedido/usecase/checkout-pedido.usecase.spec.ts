@@ -1,11 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { BuscarItensPorPedidoIdUseCase } from 'src/application/pedido/usecase/buscar-itens-por-pedido-id.usecase';
 import { EditarPedidoUseCase } from 'src/application/pedido/usecase/editar-pedido.usecase';
-import { ProdutoProviders } from 'src/application/produto/providers/produto.providers';
-import { BuscarProdutoPorIdUseCase } from 'src/application/produto/usecase/buscar-produto-por-id.usecase';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model/item-pedido.model';
@@ -15,6 +12,8 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ClienteConstants, PedidoConstants, ProdutoConstants } from 'src/shared/constants';
 import { CheckoutPedidoUseCase } from './checkout-pedido.usecase';
+import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('CheckoutPedidoUseCase', () => {
    let useCase: CheckoutPedidoUseCase;
@@ -71,9 +70,8 @@ describe('CheckoutPedidoUseCase', () => {
       const module: TestingModule = await Test.createTestingModule({
          providers: [
             ...PedidoProviders,
-            ...ProdutoProviders,
             ...ItemPedidoProviders,
-            ...PagamentoProviders,
+            ...IntegrationProviders,
             ...PersistenceInMemoryProviders,
 
             // Mock do serviço IRepository<Cliente>

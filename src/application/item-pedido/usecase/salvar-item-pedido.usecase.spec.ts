@@ -2,23 +2,26 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { AddItemPedidoValidator } from 'src/application/item-pedido/validation';
 import { IRepository } from 'src/enterprise/repository/repository';
-import { ItemPedidoConstants, PedidoConstants, ProdutoConstants } from 'src/shared/constants';
+import { ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
 import { SalvarItemPedidoUseCase } from 'src/application/item-pedido/usecase/salvar-item-pedido.usecase';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
+import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
+import { HttpModule } from '@nestjs/axios';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 
 describe('SalvarItemPedidoUseCase', () => {
    let useCase: SalvarItemPedidoUseCase;
    let repository: IRepository<ItemPedido>;
    let pedidoRepository: IRepository<Pedido>;
-   let produtoRepository: IRepository<Produto>;
+   let produtoIntegration: ProdutoIntegration;
    let adicionarValidators: AddItemPedidoValidator[];
 
-   const produto: Produto = {
+   const produto: ProdutoDto = {
       id: 1,
       nome: 'nome correto',
       idCategoriaProduto: 1,
@@ -46,7 +49,8 @@ describe('SalvarItemPedidoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
-         providers: [...ItemPedidoProviders, ...PersistenceInMemoryProviders],
+         imports: [HttpModule],
+         providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
       }).compile();
 
       // Desabilita a saída de log
@@ -55,11 +59,11 @@ describe('SalvarItemPedidoUseCase', () => {
       useCase = module.get<SalvarItemPedidoUseCase>(ItemPedidoConstants.SALVAR_ITEM_PEDIDO_USECASE);
       repository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
       pedidoRepository = module.get<IRepository<Pedido>>(PedidoConstants.IREPOSITORY);
-      produtoRepository = module.get<IRepository<Produto>>(ProdutoConstants.IREPOSITORY);
+      produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
       adicionarValidators = module.get<AddItemPedidoValidator[]>(ItemPedidoConstants.ADD_ITEM_PEDIDO_VALIDATOR);
 
       jest.spyOn(pedidoRepository, 'findBy').mockResolvedValue([pedido]);
-      jest.spyOn(produtoRepository, 'findBy').mockResolvedValue([produto]);
+      jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
    });
 
    describe('salvarItemPedido', () => {

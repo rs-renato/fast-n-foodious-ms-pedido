@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { IPedidoService } from 'src/application/pedido/service/pedido.service.interface';
 import { EstadoCorretoNovoPedidoValidator } from 'src/application/pedido/validation/estado-correto-novo-pedido.validator';
@@ -16,6 +15,7 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { SalvarPedidoRequest } from 'src/presentation/rest/pedido/request';
 import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { DateUtils } from 'src/shared/date.utils';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('PedidoService', () => {
    let service: IPedidoService;
@@ -91,7 +91,7 @@ describe('PedidoService', () => {
          providers: [
             ...PedidoProviders,
             ...PersistenceInMemoryProviders,
-            ...PagamentoProviders,
+            ...IntegrationProviders,
             // Mock do serviço IRepository<Pedido>
             {
                provide: PedidoConstants.IREPOSITORY,

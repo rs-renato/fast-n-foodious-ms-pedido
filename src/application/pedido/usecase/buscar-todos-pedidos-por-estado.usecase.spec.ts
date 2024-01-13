@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PagamentoProviders } from 'src/application/pagamento/providers/pagamento.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
@@ -8,6 +7,7 @@ import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repos
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosPorEstadoUseCase } from './buscar-todos-pedidos-por-estado.usecase';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('BuscarTodosPedidosPorEstadoUseCase', () => {
    let useCase: BuscarTodosPedidosPorEstadoUseCase;
@@ -35,7 +35,7 @@ describe('BuscarTodosPedidosPorEstadoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
-         providers: [...PedidoProviders, ...PagamentoProviders, ...PersistenceInMemoryProviders],
+         providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
       }).compile();
 
       // Desabilita a saída de log

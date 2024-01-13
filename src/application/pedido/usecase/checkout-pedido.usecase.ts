@@ -7,7 +7,7 @@ import { PedidoConstants, ProdutoConstants } from 'src/shared/constants';
 import { ValidatorUtils } from 'src/shared/validator.utils';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
-import { SolicitaPagamentoPedidoUseCase_NEW } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case_-n-e-w.service';
+import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case.service';
 
 @Injectable()
 export class CheckoutPedidoUseCase {
@@ -19,7 +19,7 @@ export class CheckoutPedidoUseCase {
       private buscarItensPorPedidoIdUseCase: BuscarItensPorPedidoIdUseCase,
       @Inject(PedidoConstants.EDITAR_PEDIDO_USECASE) private editarPedidoUseCase: EditarPedidoUseCase,
       @Inject(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE)
-      private solicitaPagamentoPedidoUseCase2: SolicitaPagamentoPedidoUseCase_NEW,
+      private solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
       @Inject(PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR)
       private validators: CheckoutPedidoValidator[],
    ) {}
@@ -38,13 +38,11 @@ export class CheckoutPedidoUseCase {
       pedido.total = totalPedido;
 
       // registra a necessidade de pagamento do pedido
-      this.logger.log('RODRIGO');
-      this.logger.log(`RODRIGO: pedido: ${JSON.stringify(pedido)}`);
-      const pagamento = await this.solicitaPagamentoPedidoUseCase2.solicitaPagamento2(pedido);
-      this.logger.log(`RODRIGO: pagamento: ${JSON.stringify(pagamento)}`);
+      const pagamento = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido);
+      this.logger.debug(`pagamento: ${JSON.stringify(pagamento)}`);
 
       const pedidoRetornado = await this.editarPedidoUseCase.editarPedido(pedido);
-      this.logger.log(`pedidoRetornado: ${JSON.stringify(pedidoRetornado)}`);
+      this.logger.debug(`pedidoRetornado: ${JSON.stringify(pedidoRetornado)}`);
 
       return {
          pedido: pedidoRetornado,

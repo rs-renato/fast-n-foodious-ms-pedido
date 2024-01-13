@@ -28,7 +28,7 @@ import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shar
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
-import { SolicitaPagamentoPedidoUseCase_NEW } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case_-n-e-w.service';
+import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case.service';
 
 export const PedidoProviders: Provider[] = [
    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -126,8 +126,8 @@ export const PedidoProviders: Provider[] = [
    {
       provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
       inject: [PagamentoIntegration],
-      useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase_NEW =>
-         new SolicitaPagamentoPedidoUseCase_NEW(pagamentoIntegration),
+      useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase =>
+         new SolicitaPagamentoPedidoUseCase(pagamentoIntegration),
    },
    {
       provide: PedidoConstants.CHECKOUT_PEDIDO_USECASE,
@@ -141,7 +141,7 @@ export const PedidoProviders: Provider[] = [
       useFactory: (
          buscarItensPorPedidoIdUsecase: BuscarItensPorPedidoIdUseCase,
          editarPedidoUsecase: EditarPedidoUseCase,
-         solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase_NEW,
+         solicitaPagamentoPedidoUseCase: SolicitaPagamentoPedidoUseCase,
          produtoIntegration: ProdutoIntegration,
          validators: CheckoutPedidoValidator[],
       ): CheckoutPedidoUseCase =>

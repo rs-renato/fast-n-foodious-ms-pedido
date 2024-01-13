@@ -6,6 +6,8 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { ItemPedidoConstants } from 'src/shared/constants';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
+import { HttpModule } from '@nestjs/axios';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('DeletarItemPedidoUseCase', () => {
    let useCase: DeletarItemPedidoUseCase;
@@ -20,7 +22,8 @@ describe('DeletarItemPedidoUseCase', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
-         providers: [...ItemPedidoProviders, ...PersistenceInMemoryProviders],
+         imports: [HttpModule],
+         providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
       }).compile();
 
       // Desabilita a saída de log

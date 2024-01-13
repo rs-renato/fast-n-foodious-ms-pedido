@@ -1,16 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProdutoExistentePedidoValidator } from './produto-existente.validator';
-import { IRepository } from 'src/enterprise/repository/repository';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ProdutoConstants } from 'src/shared/constants';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
+import { HttpModule } from '@nestjs/axios';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { NotFoundException } from '@nestjs/common';
 
 describe('ProdutoExistentePedidoValidator', () => {
    let validator: ProdutoExistentePedidoValidator;
-   let repository: IRepository<Produto>;
+   let produtoIntegration: ProdutoIntegration;
 
-   const produto: Produto = {
+   const produto: ProdutoDto = {
       id: 1,
       nome: 'nome correto',
       idCategoriaProduto: 1,
@@ -29,7 +32,9 @@ describe('ProdutoExistentePedidoValidator', () => {
 
    beforeEach(async () => {
       const module: TestingModule = await Test.createTestingModule({
+         imports: [HttpModule],
          providers: [
+            ...IntegrationProviders,
             ProdutoExistentePedidoValidator,
             {
                provide: ProdutoConstants.IREPOSITORY,
@@ -44,25 +49,30 @@ describe('ProdutoExistentePedidoValidator', () => {
 
       module.useLogger(false);
 
-      repository = module.get<IRepository<Produto>>(ProdutoConstants.IREPOSITORY);
+      produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
       validator = module.get<ProdutoExistentePedidoValidator>(ProdutoExistentePedidoValidator);
    });
 
    describe('injeção de dependências', () => {
-      it('deve existir instância de repositório definida', async () => {
-         expect(repository).toBeDefined();
+      it('deve existir instância de produtoIntegration definida', async () => {
+         expect(produtoIntegration).toBeDefined();
       });
    });
 
    describe('validate', () => {
       it('deve validar pedido quando existir um produto', async () => {
+         produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
+            Promise.resolve(produto);
+         });
          const result = await validator.validate(itemPedido);
 
          expect(result).toBeTruthy();
       });
 
-      it('não deve validar pedido quando não existir um pedido', async () => {
-         repository.findBy = jest.fn().mockImplementation(() => Promise.resolve([]));
+      it('não deve validar pedido quando não existir um produto', async () => {
+         produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
+            throw new NotFoundException('Pagamento não encontrado');
+         });
 
          await expect(validator.validate(itemPedido)).rejects.toThrowError(ValidationException);
       });

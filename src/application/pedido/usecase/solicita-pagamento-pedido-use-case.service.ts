@@ -4,12 +4,12 @@ import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integr
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 
 @Injectable()
-export class SolicitaPagamentoPedidoUseCase_NEW {
-   private logger = new Logger(SolicitaPagamentoPedidoUseCase_NEW.name);
+export class SolicitaPagamentoPedidoUseCase {
+   private logger = new Logger(SolicitaPagamentoPedidoUseCase.name);
 
    constructor(@Inject(PagamentoIntegration) private pagamentoIntegration: PagamentoIntegration) {}
 
-   async solicitaPagamento2(pedido: Pedido): Promise<PagamentoDto> {
+   async solicitaPagamento(pedido: Pedido): Promise<PagamentoDto> {
       this.logger.log(`solicitaPagamento: pedido = ${JSON.stringify(pedido)}`);
       const pagamentoDto = await this.pagamentoIntegration.solicitaPagamentoPedido(pedido.id, pedido.total);
       this.logger.debug(`pagamentoDto = ${pagamentoDto}`);
