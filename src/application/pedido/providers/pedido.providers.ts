@@ -28,7 +28,7 @@ import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shar
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
-import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case.service';
+import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 
 export const PedidoProviders: Provider[] = [
    { provide: PedidoConstants.ISERVICE, useClass: PedidoService },

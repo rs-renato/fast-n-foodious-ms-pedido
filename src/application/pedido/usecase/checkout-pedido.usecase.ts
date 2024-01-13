@@ -7,7 +7,7 @@ import { PedidoConstants, ProdutoConstants } from 'src/shared/constants';
 import { ValidatorUtils } from 'src/shared/validator.utils';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
-import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case.service';
+import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 
 @Injectable()
 export class CheckoutPedidoUseCase {

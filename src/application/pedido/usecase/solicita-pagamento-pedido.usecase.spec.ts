@@ -6,7 +6,7 @@ import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
-import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido-use-case.service';
+import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { PedidoConstants } from 'src/shared/constants';
 import { HttpModule } from '@nestjs/axios';
