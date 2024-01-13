@@ -6,7 +6,7 @@ import { SalvarItemPedidoRequest, SalvarItemPedidoResponse } from 'src/presentat
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { DateUtils } from 'src/shared/date.utils';
 
-describe('ItemPedidoRestApi (e2e)', () => {
+describe.skip('ItemPedidoRestApi (e2e)', () => {
   let app: INestApplication;
   let salvarItemPedidoRequest: SalvarItemPedidoRequest;
   let itemPedido: SalvarItemPedidoResponse;

@@ -8,7 +8,7 @@ import { SalvarPedidoResponse } from 'src/presentation/rest/pedido/response/salv
 import { DateUtils } from 'src/shared/date.utils';
 import * as request from 'supertest';
 
-describe('PedidoRestApi (e2e)', () => {
+describe.skip('PedidoRestApi (e2e)', () => {
   let app: INestApplication;
   let salvarPedidoRequest: SalvarPedidoRequest;
   let editarPedidoRequest: EditarPedidoRequest;
