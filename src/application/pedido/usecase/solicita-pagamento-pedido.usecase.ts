@@ -12,7 +12,7 @@ export class SolicitaPagamentoPedidoUseCase {
   async solicitaPagamento(pedido: Pedido): Promise<PagamentoDto> {
     this.logger.log(`solicitaPagamento: pedido = ${JSON.stringify(pedido)}`);
     const pagamentoDto = await this.pagamentoIntegration.solicitaPagamentoPedido(pedido.id, pedido.total);
-    this.logger.debug(`pagamentoDto = ${pagamentoDto}`);
+    this.logger.debug(`pagamentoDto = ${JSON.stringify(pagamentoDto)}`);
     return pagamentoDto;
   }
 }

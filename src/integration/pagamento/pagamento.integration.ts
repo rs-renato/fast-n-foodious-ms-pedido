@@ -21,7 +21,7 @@ export class PagamentoIntegration {
         pedidoId: pedidoId,
         totalPedido: totalPedido,
       })
-      .pipe(map((res) => res.data))
+      .pipe(map((res) => res.data.pagamento))
       .pipe(
         catchError((error) => {
           this.logger.error(`Erro ao solicitar pagamento: ${JSON.stringify(error)} `);
