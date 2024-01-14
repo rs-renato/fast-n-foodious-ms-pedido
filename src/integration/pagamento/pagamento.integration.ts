@@ -44,7 +44,7 @@ export class PagamentoIntegration {
     );
     const request = this.httpService
       .get(`http://${this.MS_PAGAMENTO_URL}/v1/pagamento/estado?pedidoId=${pedidoId}`)
-      .pipe(map((res) => res.data))
+      .pipe(map((res) => res.data.pagamento))
       .pipe(
         catchError((error) => {
           const statusError = error.response.status;
