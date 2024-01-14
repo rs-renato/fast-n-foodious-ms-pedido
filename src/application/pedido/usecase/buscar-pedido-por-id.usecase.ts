@@ -19,18 +19,18 @@ export class BuscarPedidoPorIdUseCase {
       .find({
         where: [{ id }],
         relations: ['itensPedido'],
-        // relations: ['itensPedido', 'itensPedido.produto'],
       })
       .then((pedidos) => {
         if (pedidos === undefined || pedidos.length === 0) {
           return pedidos[0];
         }
         return this.produtoIntegration.insereProdutoEmItemPedido(pedidos[0]);
-        // return pedidos[0];
       })
       .catch((error) => {
-        this.logger.error(`Erro ao consultar pedido no banco de dados: ${error} `);
-        throw new ServiceException(`Houve um erro ao consultar o pedido: ${error}`);
+        const errorMessage = `Erro ao consultar pedido no banco de dados: ${error}`;
+
+        this.logger.error(errorMessage);
+        throw new ServiceException(errorMessage);
       });
   }
 }
