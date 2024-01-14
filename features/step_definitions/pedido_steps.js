@@ -3,6 +3,7 @@ const { spec, expect } = require('pactum');
 
 const { getCurrentDate } = require('./utils');
 const { BASE_URL } = require('../config');
+const { novoPedido, pedidoEditado2, pedidoEditado1 } = require('../mocks');
 
 When('Nos solicitamos a criacao de um novo pedido com os dados:', async function ({ rawTable }) {
   const formattedData = rawTable
@@ -67,30 +68,16 @@ When('Nos solicitamos a edicao de um pedido com os dados:', async function ({ ra
     })
     .filter((content) => content);
   const pedido = formattedData[0];
-
   this.payload = pedido;
-  this.response = await spec()
-    .put(`${BASE_URL.PEDIDO}/{pedidoId}`)
-    .withPathParams({
-      pedidoId,
-    })
-    .withBody(this.payload);
+
+  this.response = await spec().put(`${BASE_URL.PEDIDO}/{pedidoId}`).withPathParams({
+    pedidoId,
+  });
 });
 
 Given('Nos temos pedidos cadastrados com estado recebido, em preparacao e pronto', async function () {
-  const pedido1 = {
-    clienteId: 1,
-    dataInicio: getCurrentDate(),
-    estadoPedido: 0,
-    ativo: true,
-  };
-
-  const pedido2 = {
-    clienteId: 1,
-    dataInicio: getCurrentDate(),
-    estadoPedido: 0,
-    ativo: true,
-  };
+  const pedido1 = novoPedido;
+  const pedido2 = novoPedido;
 
   this.response1 = await spec().post(BASE_URL.PEDIDO).withBody(pedido1);
   this.response2 = await spec().post(BASE_URL.PEDIDO).withBody(pedido2);
@@ -99,33 +86,24 @@ Given('Nos temos pedidos cadastrados com estado recebido, em preparacao e pronto
   this.pedido2Id = this.response2.body.id;
 
   const pedidoAtualizado1 = {
+    ...pedido1,
     id: this.pedido1Id,
-    clienteId: 1,
-    dataInicio: getCurrentDate(),
     estadoPedido: 2,
-    ativo: true,
   };
 
   const pedidoAtualizado2 = {
+    ...pedido2,
     id: this.pedido2Id,
-    clienteId: 1,
-    dataInicio: getCurrentDate(),
     estadoPedido: 3,
-    ativo: true,
   };
 
-  await spec()
-    .put(`${BASE_URL.PEDIDO}/{pedido_id}`)
-    .withPathParams({
-      pedido_id: pedidoAtualizado1.id,
-    })
-    .withBody(pedidoAtualizado1);
-  await spec()
-    .put(`${BASE_URL.PEDIDO}/{pedido_id}`)
-    .withPathParams({
-      pedido_id: pedidoAtualizado2.id,
-    })
-    .withBody(pedidoAtualizado2);
+  this.pedido1Editado = await spec().put(`${BASE_URL.PEDIDO}/{pedido_id}`).withPathParams({
+    pedido_id: pedidoAtualizado1.id,
+  });
+
+  this.pedido2Editado = await spec().put(`${BASE_URL.PEDIDO}/{pedido_id}`).withPathParams({
+    pedido_id: pedidoAtualizado2.id,
+  });
 });
 
 When('Nos solicitamos todos os pedidos', async function () {
@@ -133,11 +111,7 @@ When('Nos solicitamos todos os pedidos', async function () {
 });
 
 Then('Os pedidos devem ser apresentados na ordem esperada', function () {
-  const pedidosEsperados = [
-    { clienteId: 1, dataInicio: getCurrentDate(), estadoPedido: 3, ativo: true, id: 3 },
-    { clienteId: 1, dataInicio: getCurrentDate(), estadoPedido: 2, ativo: true, id: 2 },
-    { clienteId: 1, dataInicio: getCurrentDate(), estadoPedido: 1, ativo: true, id: 1 },
-  ];
+  const pedidosEsperados = [pedidoEditado2, pedidoEditado1];
 
   expect(this.response).should.have.body(pedidosEsperados);
 });

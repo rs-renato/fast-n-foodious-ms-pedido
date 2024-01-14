@@ -13,10 +13,6 @@ Then('Deve ser criado com sucesso', function () {
   expect(this.response).should.have.status(201);
 });
 
-Then('Deve ser editado com sucesso', function () {
-  expect(this.response).should.have.status(200);
-});
-
 Then('Deve ser retornado com sucesso', function () {
   expect(this.response).should.have.status(200);
 });
@@ -26,5 +22,9 @@ Then('Deve retornar erro de item nao encontrado', function () {
 });
 
 Then('Deve ser removido com sucesso', function () {
+  expect(this.response).should.have.status(200);
+});
+
+Then('Deve ser editado com sucesso', function () {
   expect(this.response).should.have.status(200);
 });
