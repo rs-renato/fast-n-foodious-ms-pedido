@@ -12,8 +12,10 @@ export class BuscarEstadoPedidoPorIdUseCase {
 
   async buscarEstadoPedidoPorId(pedidoId: number): Promise<{ estadoPedido: EstadoPedido }> {
     const pedidos = await this.repository.findBy({ id: pedidoId }).catch((error) => {
-      this.logger.error(`Erro ao buscar produto pedidoId=${pedidoId} no banco de dados: ${error}`);
-      throw new ServiceException(`Erro ao buscar produto pedidoId=${pedidoId} no banco de dados: ${error}`);
+      const errorMessage = `Erro ao buscar produto pedidoId=${pedidoId} no banco de dados: ${error}`;
+
+      this.logger.error(errorMessage);
+      throw new ServiceException(errorMessage);
     });
 
     if (pedidos.length > 0) {
@@ -22,6 +24,5 @@ export class BuscarEstadoPedidoPorIdUseCase {
         estadoPedido: pedidoEncontrado.estadoPedido,
       };
     }
-    return;
   }
 }

@@ -26,8 +26,8 @@ import {
   ListarPedidoNaoFinalizadoResponse,
   ListarPedidoPendenteResponse,
   SalvarPedidoResponse,
+  CheckoutResponse,
 } from 'src/presentation/rest/pedido/response';
-import { CheckoutResponse } from 'src/presentation/rest/pedido/response';
 import { PedidoConstants } from 'src/shared/constants';
 
 @Controller('v1/pedido')
