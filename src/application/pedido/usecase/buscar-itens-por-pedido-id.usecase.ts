@@ -6,19 +6,19 @@ import { ItemPedidoConstants } from 'src/shared/constants';
 
 @Injectable()
 export class BuscarItensPorPedidoIdUseCase {
-   private logger = new Logger(BuscarItensPorPedidoIdUseCase.name);
+  private logger = new Logger(BuscarItensPorPedidoIdUseCase.name);
 
-   constructor(@Inject(ItemPedidoConstants.IREPOSITORY) private itemPedidoRepository: IRepository<ItemPedido>) {}
+  constructor(@Inject(ItemPedidoConstants.IREPOSITORY) private itemPedidoRepository: IRepository<ItemPedido>) {}
 
-   async buscarItensPedidoPorPedidoId(id: number): Promise<ItemPedido[]> {
-      return await this.itemPedidoRepository
-         .findBy({ pedidoId: id })
-         .then((itens: ItemPedido[]) => {
-            return itens;
-         })
-         .catch((error) => {
-            this.logger.error(`Erro ao buscar itens de um pedido no banco de dados: ${error} `);
-            throw new ServiceException(`Houve um erro ao buscar os itens do pedido: ${error}`);
-         });
-   }
+  async buscarItensPedidoPorPedidoId(id: number): Promise<ItemPedido[]> {
+    return await this.itemPedidoRepository
+      .findBy({ pedidoId: id })
+      .then((itens: ItemPedido[]) => {
+        return itens;
+      })
+      .catch((error) => {
+        this.logger.error(`Erro ao buscar itens de um pedido no banco de dados: ${error} `);
+        throw new ServiceException(`Houve um erro ao buscar os itens do pedido: ${error}`);
+      });
+  }
 }
