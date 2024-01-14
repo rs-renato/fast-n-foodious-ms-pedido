@@ -65,6 +65,15 @@ jobs:
       - name: Stop and Remove Docker Containers
         run: docker-compose --env-file ./envs/prod.env down
 
+  bdd-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+      - name: Run BDD Tests
+        run: npm install && npm run test:bdd
+
   sonarcloud:
     runs-on: ubuntu-latest
     steps:
@@ -89,6 +98,7 @@ jobs:
       - check-tests-impl
       - e2e-in-memory
       - e2e-mysql
+      - bdd-test
       - sonarcloud
     steps:
       - uses: actions/checkout@v3
