@@ -47,6 +47,11 @@ const novoPedidoInteraction = {
         status: 201,
         body: pedido2,
       },
+      // item-pedido
+      3: {
+        status: 201,
+        body: pedido1,
+      },
     },
   },
 };

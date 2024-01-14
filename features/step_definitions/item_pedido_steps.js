@@ -1,7 +1,7 @@
 const { Given, When } = require('@cucumber/cucumber');
 const { spec } = require('pactum');
-const { getCurrentDate } = require('./utils');
 const { BASE_URL } = require('../config');
+const { novoCliente, novoPedido } = require('../mocks');
 
 let globalItemId;
 let globalPedidoId;
@@ -19,20 +19,15 @@ Given('Nos temos um produto cadastrado', async function () {
       imagemBase64: '',
       ativo: true,
     };
+    this.payload = novoProduto;
 
-    const response = await spec().post(BASE_URL.PRODUTO).withBody(novoProduto);
+    const response = await spec().post(BASE_URL.PRODUTO).withBody(this.payload);
     this.produtoId = response.body.id;
     globalProdutoId = this.produtoId;
   }
 });
 
 Given('Temos um cliente cadastrado', async function () {
-  const novoCliente = {
-    nome: 'Benjamin',
-    email: 'benjamin@test.com',
-    cpf: '54462836510',
-  };
-
   const response = await spec().post(BASE_URL.CLIENTE).withBody(novoCliente);
   this.clienteId = response.body.id;
   globalClienteId = this.clienteId;
@@ -42,14 +37,8 @@ Given('Temos um pedido criado', async function () {
   if (this.pedidoId !== undefined) {
     return true;
   } else {
-    const novoPedido = {
-      clienteId: this.clienteId,
-      dataInicio: getCurrentDate(),
-      estadoPedido: 0,
-      ativo: true,
-    };
-
     const response = await spec().post(BASE_URL.PEDIDO).withBody(novoPedido);
+
     this.pedidoId = response.body.id;
     globalPedidoId = this.pedidoId;
   }

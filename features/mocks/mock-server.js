@@ -1,5 +1,6 @@
 const { mock } = require('pactum');
 
+const { novoProdutoInteraction } = require('./produto');
 const {
   novoPedidoInteraction,
   checkoutPedidoInteraction,
@@ -11,18 +12,25 @@ const {
   editarPedido2Interaction,
   getTodosOsPedidosPendentesInteraction,
 } = require('./pedido');
-const { novoItemPedidoInteraction } = require('./item-pedido');
+const {
+  novoItemPedidoInteraction,
+  editarItemPedidoInteraction,
+  deleteItemPedidoInteraction,
+} = require('./item-pedido');
 const { pagamentoAceitoInteraction, pagamentoRejeitadoInteraction } = require('./pagamento');
+const { novoClienteInteraction } = require('./cliente');
 
 async function startMockServer() {
   const mockOpts = { port: 3000, host: '127.0.0.1' };
   await mock.setDefaults(mockOpts);
 
+  // Produto
+  mock.addInteraction(novoProdutoInteraction);
+
   // Pedido
   mock.addInteraction(editarPedido1Interaction);
   mock.addInteraction(editarPedido2Interaction);
   mock.addInteraction(novoPedidoInteraction);
-  mock.addInteraction(novoItemPedidoInteraction);
   mock.addInteraction(checkoutPedidoInteraction);
   mock.addInteraction(getEstadoDoPedidoInteraction);
   mock.addInteraction(getEstadoDoPedidoRejeitadoInteraction);
@@ -30,9 +38,17 @@ async function startMockServer() {
   mock.addInteraction(getTodosOsPedidosInteraction);
   mock.addInteraction(getTodosOsPedidosPendentesInteraction);
 
+  // Item do Pedido
+  mock.addInteraction(novoItemPedidoInteraction);
+  mock.addInteraction(editarItemPedidoInteraction);
+  mock.addInteraction(deleteItemPedidoInteraction);
+
   // Pagamento
   mock.addInteraction(pagamentoAceitoInteraction);
   mock.addInteraction(pagamentoRejeitadoInteraction);
+
+  // Cliente
+  mock.addInteraction(novoClienteInteraction);
 
   await mock.start();
 }
