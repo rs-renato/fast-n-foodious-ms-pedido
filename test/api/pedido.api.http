@@ -1,5 +1,5 @@
 ### Cria um cliente
-POST http://localhost:3000/v1/cliente
+POST http://localhost:3001/v1/cliente
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Cria um pedido
-POST http://localhost:3000/v1/pedido
+POST http://localhost:3001/v1/pedido
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ### Consulta pedido por ID
-GET http://localhost:3000/v1/pedido/1
+GET http://localhost:3001/v1/pedido/1
 
 ### Consulta estado de um pedido por ID
-GET http://localhost:3000/v1/pedido/1/estado
+GET http://localhost:3001/v1/pedido/1/estado

@@ -1,5 +1,5 @@
 ### Adiciona um novo item ao pedido
-POST http://localhost:3000/v1/item
+POST http://localhost:3001/v1/item
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Edita um item do pedido
-PUT http://localhost:3000/v1/item/4
+PUT http://localhost:3001/v1/item/4
 Content-Type: application/json
 
 {
