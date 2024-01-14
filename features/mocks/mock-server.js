@@ -17,7 +17,6 @@ const {
   editarItemPedidoInteraction,
   deleteItemPedidoInteraction,
 } = require('./item-pedido');
-const { pagamentoAceitoInteraction, pagamentoRejeitadoInteraction } = require('./pagamento');
 const { novoClienteInteraction } = require('./cliente');
 
 async function startMockServer() {
@@ -42,10 +41,6 @@ async function startMockServer() {
   mock.addInteraction(novoItemPedidoInteraction);
   mock.addInteraction(editarItemPedidoInteraction);
   mock.addInteraction(deleteItemPedidoInteraction);
-
-  // Pagamento
-  mock.addInteraction(pagamentoAceitoInteraction);
-  mock.addInteraction(pagamentoRejeitadoInteraction);
 
   // Cliente
   mock.addInteraction(novoClienteInteraction);
