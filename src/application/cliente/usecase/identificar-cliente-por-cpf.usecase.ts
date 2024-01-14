@@ -5,17 +5,17 @@ import { BuscarClientePorCpfUseCase } from 'src/application/cliente/usecase/busc
 
 @Injectable()
 export class IdentificarClienteUseCase {
-   constructor(
-      @Inject(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE) private buscarUsecase: BuscarClientePorCpfUseCase,
-   ) {}
+  constructor(
+    @Inject(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE) private buscarUsecase: BuscarClientePorCpfUseCase,
+  ) {}
 
-   async identificarClientePorCpf(cpf: string): Promise<ClienteIdentificado> {
-      if (cpf === undefined) {
-         return Promise.resolve(new ClienteIdentificado(undefined));
-      }
+  async identificarClientePorCpf(cpf: string): Promise<ClienteIdentificado> {
+    if (cpf === undefined) {
+      return Promise.resolve(new ClienteIdentificado(undefined));
+    }
 
-      return await this.buscarUsecase.buscarClientePorCpf(cpf).then((cliente) => {
-         return new ClienteIdentificado(cliente);
-      });
-   }
+    return await this.buscarUsecase.buscarClientePorCpf(cpf).then((cliente) => {
+      return new ClienteIdentificado(cliente);
+    });
+  }
 }

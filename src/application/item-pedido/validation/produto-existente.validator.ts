@@ -1,35 +1,34 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
-import { Produto } from 'src/enterprise/produto/model/produto.model';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { AddItemPedidoValidator } from 'src/application/item-pedido/validation/add-item-pedido.validator';
-import { IRepository } from 'src/enterprise/repository/repository';
-import { ProdutoConstants } from 'src/shared/constants';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 
 @Injectable()
 export class ProdutoExistentePedidoValidator implements AddItemPedidoValidator {
-   public static ERROR_MESSAGE = 'Código de produto inexistente';
+  public static ERROR_MESSAGE = 'Código de produto inexistente';
 
-   private logger: Logger = new Logger(ProdutoExistentePedidoValidator.name);
+  private logger: Logger = new Logger(ProdutoExistentePedidoValidator.name);
 
-   constructor(@Inject(ProdutoConstants.IREPOSITORY) private repository: IRepository<Produto>) {}
+  constructor(@Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration) {}
 
-   async validate({ produtoId }: ItemPedido): Promise<boolean> {
-      this.logger.log(
-         `Inicializando validação ${ProdutoExistentePedidoValidator.name} para criar o pedido com o produto: ${produtoId}`,
+  async validate({ produtoId }: ItemPedido): Promise<boolean> {
+    this.logger.log(
+      `Inicializando validação ${ProdutoExistentePedidoValidator.name} para criar o pedido com o produto: ${produtoId}`,
+    );
+
+    try {
+      const produtoDto = await this.produtoIntegration.getProdutoById(produtoId);
+      this.logger.debug(
+        `${ProdutoExistentePedidoValidator.name} finalizado com sucesso para produto: ${JSON.stringify(produtoDto)}`,
       );
-
-      await this.repository.findBy({ id: produtoId }).then((produtos) => {
-         if (produtos.length > 0) {
-            this.logger.debug(
-               `${ProdutoExistentePedidoValidator.name} finalizado com sucesso para produto: ${produtoId}`,
-            );
-            return true;
-         }
-
-         throw new ValidationException(ProdutoExistentePedidoValidator.ERROR_MESSAGE);
-      });
-
       return true;
-   }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new ValidationException(ProdutoExistentePedidoValidator.ERROR_MESSAGE);
+      }
+      this.logger.debug(`${ProdutoExistentePedidoValidator.name} finalizado com erro: ${error}`);
+      throw error;
+    }
+  }
 }

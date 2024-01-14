@@ -7,23 +7,23 @@ import { EditarPedidoValidator } from 'src/application/pedido/validation/editar-
 
 @Injectable()
 export class PedidoExistenteValidator implements EditarPedidoValidator {
-   public static ERROR_MESSAGE = 'Código de pedido inexistente';
+  public static ERROR_MESSAGE = 'Código de pedido inexistente';
 
-   private logger: Logger = new Logger(PedidoExistenteValidator.name);
+  private logger: Logger = new Logger(PedidoExistenteValidator.name);
 
-   constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IRepository<Pedido>) {}
+  constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IRepository<Pedido>) {}
 
-   async validate(pedido: Pedido): Promise<boolean> {
-      this.logger.log(
-         `Inicializando validação ${PedidoExistenteValidator.name} para editar o pedido ${pedido.id} do cliente: ${pedido.clienteId}`,
-      );
+  async validate(pedido: Pedido): Promise<boolean> {
+    this.logger.log(
+      `Inicializando validação ${PedidoExistenteValidator.name} para editar o pedido ${pedido.id} do cliente: ${pedido.clienteId}`,
+    );
 
-      await this.repository.findBy({ id: pedido.id }).then((pedidos) => {
-         if (pedidos.length === 0) {
-            throw new ValidationException(PedidoExistenteValidator.ERROR_MESSAGE);
-         }
-      });
+    await this.repository.findBy({ id: pedido.id }).then((pedidos) => {
+      if (pedidos.length === 0) {
+        throw new ValidationException(PedidoExistenteValidator.ERROR_MESSAGE);
+      }
+    });
 
-      return true;
-   }
+    return true;
+  }
 }

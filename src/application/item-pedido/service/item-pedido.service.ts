@@ -8,21 +8,21 @@ import { SalvarItemPedidoUseCase } from 'src/application/item-pedido/usecase/sal
 
 @Injectable()
 export class ItemPedidoService implements IItemPedidoService {
-   constructor(
-      @Inject(ItemPedidoConstants.SALVAR_ITEM_PEDIDO_USECASE) private salvarUsecase: SalvarItemPedidoUseCase,
-      @Inject(ItemPedidoConstants.EDITAR_ITEM_PEDIDO_USECASE) private editarUsecase: EditarItemPedidoUseCase,
-      @Inject(ItemPedidoConstants.DELETAR_ITEM_PEDIDO_USECASE) private deletarUsecase: DeletarItemPedidoUseCase,
-   ) {}
+  constructor(
+    @Inject(ItemPedidoConstants.SALVAR_ITEM_PEDIDO_USECASE) private salvarUsecase: SalvarItemPedidoUseCase,
+    @Inject(ItemPedidoConstants.EDITAR_ITEM_PEDIDO_USECASE) private editarUsecase: EditarItemPedidoUseCase,
+    @Inject(ItemPedidoConstants.DELETAR_ITEM_PEDIDO_USECASE) private deletarUsecase: DeletarItemPedidoUseCase,
+  ) {}
 
-   async save(item: ItemPedido): Promise<ItemPedido> {
-      return await this.salvarUsecase.salvarItemPedido(item);
-   }
+  async save(item: ItemPedido): Promise<ItemPedido> {
+    return await this.salvarUsecase.salvarItemPedido(item);
+  }
 
-   async edit(item: ItemPedido): Promise<ItemPedido> {
-      return await this.editarUsecase.editarItemPedido(item);
-   }
+  async edit(item: ItemPedido): Promise<ItemPedido> {
+    return await this.editarUsecase.editarItemPedido(item);
+  }
 
-   async delete(id: number): Promise<boolean> {
-      return await this.deletarUsecase.deletarItemPedido(id);
-   }
+  async delete(id: number): Promise<boolean> {
+    return await this.deletarUsecase.deletarItemPedido(id);
+  }
 }

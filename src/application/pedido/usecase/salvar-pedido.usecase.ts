@@ -8,22 +8,22 @@ import { ValidatorUtils } from 'src/shared/validator.utils';
 
 @Injectable()
 export class SalvarPedidoUseCase {
-   private logger = new Logger(SalvarPedidoUseCase.name);
+  private logger = new Logger(SalvarPedidoUseCase.name);
 
-   constructor(
-      @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
-      @Inject(PedidoConstants.SALVAR_PEDIDO_VALIDATOR)
-      private validators: SalvarPedidoValidator[],
-   ) {}
+  constructor(
+    @Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository,
+    @Inject(PedidoConstants.SALVAR_PEDIDO_VALIDATOR)
+    private validators: SalvarPedidoValidator[],
+  ) {}
 
-   async salvarPedido(pedido: Pedido): Promise<Pedido> {
-      await ValidatorUtils.executeValidators(this.validators, pedido);
-      return await this.repository
-         .save(pedido)
-         .then((novoPedido) => novoPedido)
-         .catch((error) => {
-            this.logger.error(`Erro ao salvar no banco de dados: ${error} `);
-            throw new ServiceException(`Houve um erro ao criar novo pedido: ${error}`);
-         });
-   }
+  async salvarPedido(pedido: Pedido): Promise<Pedido> {
+    await ValidatorUtils.executeValidators(this.validators, pedido);
+    return await this.repository
+      .save(pedido)
+      .then((novoPedido) => novoPedido)
+      .catch((error) => {
+        this.logger.error(`Erro ao salvar no banco de dados: ${error} `);
+        throw new ServiceException(`Houve um erro ao criar novo pedido: ${error}`);
+      });
+  }
 }

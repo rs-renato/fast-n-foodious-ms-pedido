@@ -5,17 +5,17 @@ import { PedidoConstants } from 'src/shared/constants';
 
 @Injectable()
 export class DeletarPedidoUseCase {
-   private logger = new Logger(DeletarPedidoUseCase.name);
+  private logger = new Logger(DeletarPedidoUseCase.name);
 
-   constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository) {}
+  constructor(@Inject(PedidoConstants.IREPOSITORY) private repository: IPedidoRepository) {}
 
-   async deletarPedido(pedidoId: number): Promise<boolean> {
-      return await this.repository
-         .delete(pedidoId)
-         .then(() => true)
-         .catch((error) => {
-            this.logger.error(`Erro ao deletar no banco de dados: ${error} `);
-            throw new ServiceException(`Houve um erro ao deletar o produto: ${error}`);
-         });
-   }
+  async deletarPedido(pedidoId: number): Promise<boolean> {
+    return await this.repository
+      .delete(pedidoId)
+      .then(() => true)
+      .catch((error) => {
+        this.logger.error(`Erro ao deletar no banco de dados: ${error} `);
+        throw new ServiceException(`Houve um erro ao deletar o produto: ${error}`);
+      });
+  }
 }

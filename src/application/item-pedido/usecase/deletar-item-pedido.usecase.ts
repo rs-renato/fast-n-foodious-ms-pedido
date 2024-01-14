@@ -8,20 +8,20 @@ import { ValidatorUtils } from 'src/shared/validator.utils';
 
 @Injectable()
 export class DeletarItemPedidoUseCase {
-   private logger = new Logger(DeletarItemPedidoUseCase.name);
+  private logger = new Logger(DeletarItemPedidoUseCase.name);
 
-   constructor(
-      @Inject(ItemPedidoConstants.IREPOSITORY) private repository: IRepository<ItemPedido>,
-      @Inject(ItemPedidoConstants.EDITAR_ITEM_PEDIDO_VALIDATOR)
-      private editarValidators: EditarItemPedidoValidator[],
-   ) {}
+  constructor(
+    @Inject(ItemPedidoConstants.IREPOSITORY) private repository: IRepository<ItemPedido>,
+    @Inject(ItemPedidoConstants.EDITAR_ITEM_PEDIDO_VALIDATOR)
+    private editarValidators: EditarItemPedidoValidator[],
+  ) {}
 
-   async deletarItemPedido(id: number): Promise<boolean> {
-      await ValidatorUtils.executeValidators(this.editarValidators, { id });
+  async deletarItemPedido(id: number): Promise<boolean> {
+    await ValidatorUtils.executeValidators(this.editarValidators, { id });
 
-      return await this.repository.delete(id).catch((error) => {
-         this.logger.error(`Erro ao deletar no banco de dados: ${error} `);
-         throw new ServiceException(`Houve um erro ao deletar o item do pedido: ${error}`);
-      });
-   }
+    return await this.repository.delete(id).catch((error) => {
+      this.logger.error(`Erro ao deletar no banco de dados: ${error} `);
+      throw new ServiceException(`Houve um erro ao deletar o item do pedido: ${error}`);
+    });
+  }
 }

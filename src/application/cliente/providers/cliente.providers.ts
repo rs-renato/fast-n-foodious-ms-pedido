@@ -14,39 +14,37 @@ import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/ident
 import { ClienteConstants } from 'src/shared/constants';
 
 export const ClienteProviders: Provider[] = [
-   { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
-   {
-      provide: ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE,
-      inject: [ClienteConstants.IREPOSITORY, ClienteConstants.BUSCAR_CLIENTE_VALIDATOR],
-      useFactory: (
-         repository: IRepository<Cliente>,
-         validators: BuscarClienteValidator[],
-      ): BuscarClientePorCpfUseCase => new BuscarClientePorCpfUseCase(repository, validators),
-   },
-   {
-      provide: ClienteConstants.SALVAR_CLIENTE_USECASE,
-      inject: [ClienteConstants.IREPOSITORY, ClienteConstants.SALVAR_CLIENTE_VALIDATOR],
-      useFactory: (repository: IRepository<Cliente>, validators: SalvarClienteValidator[]): SalvarClienteUseCase =>
-         new SalvarClienteUseCase(repository, validators),
-   },
-   {
-      provide: ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE,
-      inject: [ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE],
-      useFactory: (usecase: BuscarClientePorCpfUseCase): IdentificarClienteUseCase =>
-         new IdentificarClienteUseCase(usecase),
-   },
-   {
-      provide: ClienteConstants.SALVAR_CLIENTE_VALIDATOR,
-      inject: [ClienteConstants.IREPOSITORY],
-      useFactory: (repository: IRepository<Cliente>): SalvarClienteValidator[] => [
-         new CpfValidoClienteValidator(),
-         new EmailValidoClienteValidator(),
-         new EmailUnicoClienteValidator(repository),
-         new CpfUnicoClienteValidator(repository),
-      ],
-   },
-   {
-      provide: ClienteConstants.BUSCAR_CLIENTE_VALIDATOR,
-      useFactory: (): BuscarClienteValidator[] => [new CpfValidoClienteValidator()],
-   },
+  { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
+  {
+    provide: ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE,
+    inject: [ClienteConstants.IREPOSITORY, ClienteConstants.BUSCAR_CLIENTE_VALIDATOR],
+    useFactory: (repository: IRepository<Cliente>, validators: BuscarClienteValidator[]): BuscarClientePorCpfUseCase =>
+      new BuscarClientePorCpfUseCase(repository, validators),
+  },
+  {
+    provide: ClienteConstants.SALVAR_CLIENTE_USECASE,
+    inject: [ClienteConstants.IREPOSITORY, ClienteConstants.SALVAR_CLIENTE_VALIDATOR],
+    useFactory: (repository: IRepository<Cliente>, validators: SalvarClienteValidator[]): SalvarClienteUseCase =>
+      new SalvarClienteUseCase(repository, validators),
+  },
+  {
+    provide: ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE,
+    inject: [ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE],
+    useFactory: (usecase: BuscarClientePorCpfUseCase): IdentificarClienteUseCase =>
+      new IdentificarClienteUseCase(usecase),
+  },
+  {
+    provide: ClienteConstants.SALVAR_CLIENTE_VALIDATOR,
+    inject: [ClienteConstants.IREPOSITORY],
+    useFactory: (repository: IRepository<Cliente>): SalvarClienteValidator[] => [
+      new CpfValidoClienteValidator(),
+      new EmailValidoClienteValidator(),
+      new EmailUnicoClienteValidator(repository),
+      new CpfUnicoClienteValidator(repository),
+    ],
+  },
+  {
+    provide: ClienteConstants.BUSCAR_CLIENTE_VALIDATOR,
+    useFactory: (): BuscarClienteValidator[] => [new CpfValidoClienteValidator()],
+  },
 ];
