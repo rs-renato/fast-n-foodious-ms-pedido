@@ -14,7 +14,7 @@ export class PagamentoIntegration {
 
   async solicitaPagamentoPedido(pedidoId: number, totalPedido: number): Promise<PagamentoDto> {
     this.logger.debug(
-      `solicitaPagamentoPedido: invocando serviço de integração em http://${this.MS_PAGAMENTO_URL}/v1/pagamento/solicitar para o pedido ${pedidoId}`,
+      `solicitaPagamentoPedido: invocando serviço de integração em http://${this.MS_PAGAMENTO_URL}/v1/pagamento/solicitar para o pedido ${pedidoId}, com o total ${totalPedido}`,
     );
     const request = this.httpService
       .post(`http://${this.MS_PAGAMENTO_URL}/v1/pagamento/solicitar`, {
@@ -44,14 +44,14 @@ export class PagamentoIntegration {
     );
     const request = this.httpService
       .get(`http://${this.MS_PAGAMENTO_URL}/v1/pagamento/estado?pedidoId=${pedidoId}`)
-      .pipe(map((res) => res.data.pagamento))
+      .pipe(map((res) => res.data))
       .pipe(
         catchError((error) => {
+          this.logger.warn(`Houve um erro ao buscar pagamento por pedido id: ${pedidoId} - ${JSON.stringify(error)}`);
           const statusError = error.response.status;
           if (statusError === 404) {
             throw new NotFoundException(`Pagamento para pedido de id ${pedidoId} não encontrado.`);
           }
-          this.logger.error(`Erro ao buscar pagamento por pedido id: ${JSON.stringify(error)} `);
           throw new ServiceUnavailableException(
             'Não foi possível realizar a integração com o MS de Pagamento para solicitar o pagamento.',
           );
