@@ -37,6 +37,6 @@ CREATE TABLE IF NOT EXISTS PEDIDO (
 CREATE TABLE IF NOT EXISTS ITEM_PEDIDO (
                                        ID INT AUTO_INCREMENT PRIMARY KEY,
                                        PEDIDO_ID INT NOT NULL, CONSTRAINT FK_PEDIDO_ID FOREIGN KEY (PEDIDO_ID) REFERENCES PEDIDO(ID),
-                                       PRODUTO_ID INT NOT NULL, CONSTRAINT FK_PRODUTO_ID FOREIGN KEY (PRODUTO_ID) REFERENCES PRODUTO(ID),
+                                       PRODUTO_ID INT NOT NULL,
                                        QUANTIDADE INT NOT NULL
 );
