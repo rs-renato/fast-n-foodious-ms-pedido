@@ -9,9 +9,9 @@
 ![Static Badge](https://img.shields.io/badge/iac-black?style=for-the-badge) ![Static Badge](https://img.shields.io/badge/v1.0.x-version?logo=terraform&color=%23623CE4&labelColor=white&label=Terraform)
 
 
-# 🍔 Fast & Foodious - Produto ![Github Actions](https://github.com/rodrigo-ottero/fast-n-foodious-ms-pedido/actions/workflows/ci-pipeline.yml/badge.svg?branch=main) ![Static Badge](https://img.shields.io/badge/v1.0.0-version?logo=&color=%232496ED&labelColor=white&label=fast-n-foodious-ms-pedido)
+# 🍔 Fast & Foodious - Pedido ![Github Actions](https://github.com/rodrigo-ottero/fast-n-foodious-ms-pedido/actions/workflows/ci-pipeline.yml/badge.svg?branch=main) ![Static Badge](https://img.shields.io/badge/v1.0.0-version?logo=&color=%232496ED&labelColor=white&label=fast-n-foodious-ms-pedido)
 
-Sistema de auto-atendimento de fast food (microsserviço pagamento). Projeto de conclusão da Fase 04 da pós gradução em Software Architecture.
+Sistema de auto-atendimento de fast food (microsserviço pedido). Projeto de conclusão da Fase 04 da pós gradução em Software Architecture.
 [TLDR; Execução em modo produção (on premisse deprecated)](#%EF%B8%8F-execução-em-modo-produção-deprecated-substituído-por-aws-fargate-ecs)
 
 * [Arquitetura de Solução (Cloud AWS)](#arquitetura-de-solução-cloud-aws)
@@ -47,7 +47,7 @@ Sistema de auto-atendimento de fast food (microsserviço pagamento). Projeto de 
         * [Preparo de Pedidos](#preparo-de-pedidos)
         * [Entrega de Pedidos](#entrega-de-pedidos)
         * [Fluxo de etapas dos Pedidos](#fluxo-de-etapas-dos-pedidos)
-* [Links Externos](#links-externos)        
+* [Links Externos](#links-externos)
 
 ## Arquitetura de Solução (Cloud AWS)
 ![fast-n-foodious-aws](docs/diagramas/fast-n-foodious-aws.png)
@@ -137,13 +137,13 @@ $ NODE_ENV=local-mock-repository npm run start
 ### ⚡️ Execução em modo local (mysql repository)
 Utilizado **`apenas para desenvolvimento local, modo watch, debug, testes e2e `**. Inicia o contianer mysql com as variáveis locais e inicia a aplicação `(fora do container)`com as variáveis locais:
 ```bash
-$ docker-compose --env-file ./envs/local.env -p "fast-n-foodious" up mysql
+$ docker-compose --env-file ./envs/local.env -p "fast-n-foodious" up mysql-pedido
 $ docker ps
 CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS         PORTS                               NAMES
-83c9b4d8880a   mysql:8.0   "docker-entrypoint.s…"   3 seconds ago   Up 2 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+83c9b4d8880a   mysql:8.0   "docker-entrypoint.s…"   3 seconds ago   Up 2 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
 
 # Executa a aplicação com as variáveis locais, conectando no container do mysql
-$ MYSQL_HOST=localhost MYSQL_HOST=localhost NODE_ENV=local npm run start
+$ MYSQL_HOST=localhost NODE_ENV=local npm run start
 ```
 
 ### 🚨⚡️ Execução em modo produção (deprecated: substituído por AWS Fargate ECS)
@@ -157,15 +157,15 @@ Inicia o container da aplicação e do mysql com as variáveis de produção, ut
 $ docker-compose --env-file ./envs/prod.env build
 $ docker-compose --env-file ./envs/prod.env up -d
 $ docker ps
-CONTAINER ID   IMAGE                         COMMAND                  CREATED         STATUS         PORTS                               NAMES
-2a0f11e4ffe3   fast-n-foodious-ms-pedido     "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
-06ebf6b90fa7   mysql:8.0                     "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS         PORTS                               NAMES
+2a0f11e4ffe3   fast-n-foodious-ms-pedido    "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
+06ebf6b90fa7   mysql:8.0                    "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
 ```
 
 A opção acima, executa o container do micro serviço de forma isolada. Para rodar todos os micro serviços de forma conjunta, deve-se utilizar o `docker-compose-all.yml`. Este comando subirá todos os micro serviços e o banco de dados mysql. Esta forma de inicialização é recomendada para testes e as imagens é baixadas do github em sua versão latest:
 
 ```bash
-$ docker-compose --env-file ./envs/prod.env -f docker-compose-all.yml -p "fast-n-foodious" up
+$ docker-compose --env-file ./envs/prod.env -f docker-compose-all.yml -p "fast-n-foodious" up --build
 ```
 
 #### 💀 Docker (Modo Desbravador!)
@@ -173,10 +173,10 @@ Inicia o container da aplicação e do mysql com as variáveis de produção, ut
 ```bash
 $ docker network create fast-n-foodious-network
 
-$ docker run -d --rm --name mysql -p 3306:3306 \
+$ docker run -d --rm --name mysql-pedido -p 3306:3306 \
     --env-file ./envs/prod.env --network fast-n-foodious-network \
     -v ./scripts/schema:/docker-entrypoint-initdb.d \
-    -v mysql-data:/data/db \
+    -v mysql-data-pedido:/data/db \
     mysql:8.0
 
 $ docker run -d --rm --name fast-n-foodious-ms-pedido -p 3001:3000 \
@@ -184,9 +184,9 @@ $ docker run -d --rm --name fast-n-foodious-ms-pedido -p 3001:3000 \
     ottero/fast-n-foodious-ms-pedido:latest
 
 $ docker ps
-CONTAINER ID   IMAGE                                         COMMAND                  CREATED         STATUS         PORTS                               NAMES
-88bf7eae7e46   ottero/fast-n-foodious-ms-pedido:latest       "docker-entrypoint.s…"   2 seconds ago   Up 1 second    0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
-8b0268d435a6   mysql:8.0                                     "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+CONTAINER ID   IMAGE                                        COMMAND                  CREATED         STATUS         PORTS                               NAMES
+88bf7eae7e46   ottero/fast-n-foodious-ms-pedido:latest      "docker-entrypoint.s…"   2 seconds ago   Up 1 second    0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
+8b0268d435a6   mysql:8.0                                    "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
 ```
 
 #### 🫧 Kubernetes (Modo Fácil!)
@@ -207,25 +207,25 @@ TEST SUITE: None
 
 $ kubectl get all
 
-NAME                                                    READY   STATUS    RESTARTS        AGE
-pod/fast-n-foodious-ms-pedido-5c6cbcbf76-v4bgd          1/1     Running   1 (2m29s ago)   3m28s
-pod/mysql-595c5c9d4f-x7grb                              1/1     Running   0               3m28s
+NAME                                               READY   STATUS    RESTARTS        AGE
+pod/fast-n-foodious-ms-pedido-5c6cbcbf76-v4bgd     1/1     Running   1 (2m29s ago)   3m28s
+pod/mysql-pedido-595c5c9d4f-x7grb                  1/1     Running   0               3m28s
 
-NAME                                                TYPE              CLUSTER-IP      EXTERNAL-IP     PORT(S)        AGE
-service/fast-n-foodious-ms-pedido-svc               LoadBalancer      10.97.158.122   localhost       80:30000/TCP   3m28s
-service/kubernetes                                  ClusterIP         10.96.0.1       <none>          443/TCP        9d
-service/mysql                                       ClusterIP         10.109.101.116  <none>          3306/TCP       3m28s
+NAME                                           TYPE              CLUSTER-IP      EXTERNAL-IP     PORT(S)        AGE
+service/fast-n-foodious-ms-pedido-svc          LoadBalancer      10.97.158.122   localhost       80:30001/TCP   3m28s
+service/kubernetes                             ClusterIP         10.96.0.1       <none>          443/TCP        9d
+service/mysql-pedido                           ClusterIP         10.109.101.116  <none>          3306/TCP       3m28s
 
-NAME                                                READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/fast-n-foodious-ms-pedido           1/1     1            1           3m28s
-deployment.apps/mysql                               1/1     1            1           3m28s
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/fast-n-foodious-ms-pedido      1/1     1            1           3m28s
+deployment.apps/mysql-pedido                   1/1     1            1           3m28s
 
-NAME                                                        DESIRED   CURRENT   READY   AGE
-replicaset.apps/fast-n-foodious-ms-pedido-5c6cbcbf76        1         1         1       3m28s
-replicaset.apps/mysql-595c5c9d4f                            1         1         1       3m28s
+NAME                                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/fast-n-foodious-ms-pedido-5c6cbcbf76   1         1         1       3m28s
+replicaset.apps/mysql-pedido-595c5c9d4f                1         1         1       3m28s
 
-NAME                                                                        REFERENCE                               TARGETS             MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa           Deployment/fast-n-foodious-ms-pedido   46%/70%, 0%/70%     1         3         1          3m28s
+NAME                                                                   REFERENCE                               TARGETS             MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa      Deployment/fast-n-foodious-ms-pedido    46%/70%, 0%/70%     1         3         1          3m28s
 ```
 
 #### 💀 Kubernetes (Modo Desbravador!)
@@ -238,63 +238,63 @@ secret/fast-n-foodious-ms-pedido-secret created
 
 $ kubectl apply -f k8s/fast-n-foodious-ms-pedido-configmap.yml 
 configmap/fast-n-foodious-ms-pedido-env created
-configmap/mysql-env created
+configmap/mysql-pedido-env created
 
-$ kubectl apply -f k8s/fast-n-foodious-pv.yml 
-persistentvolume/fast-n-foodious-pv created
+$ kubectl apply -f k8s/fast-n-foodious-ms-pedido-pv.yml 
+persistentvolume/fast-n-foodious-ms-pedido-pv created
 
-$ kubectl apply -f k8s/fast-n-foodious-pvc.yml 
-persistentvolumeclaim/fast-n-foodious-pvc created
+$ kubectl apply -f k8s/fast-n-foodious-ms-pedido-pvc.yml 
+persistentvolumeclaim/fast-n-foodious-ms-pedido-pvc created
 
 $ kubectl apply -f k8s/fast-n-foodious-ms-pedido-deployment.yml 
 deployment.apps/fast-n-foodious-ms-pedido created
-deployment.apps/mysql created
+deployment.apps/mysql-pedido created
 
 $ kubectl apply -f k8s/fast-n-foodious-ms-pedido-service.yml 
 service/fast-n-foodious-ms-pedido-svc created
-service/mysql created
+service/mysql-pedido created
 
 $ kubectl apply -f k8s/fast-n-foodious-ms-pedido-hpa.yml 
-horizontalpodautoscaler.autoscaling/fast-n-foodious-hpa created
+horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa created
 
 $ kubectl get all
-NAME                                                    READY   STATUS    RESTARTS   AGE
-pod/fast-n-foodious-ms-pedido-7fc6f95bdb-krcnm          1/1     Running   0          2m58s
-pod/mysql-595c5c9d4f-5vpj8                              1/1     Running   0          2m58s
+NAME                                                READY   STATUS    RESTARTS   AGE
+pod/fast-n-foodious-ms-pedido-7fc6f95bdb-krcnm      1/1     Running   0          2m58s
+pod/mysql-595c5c9d4f-5vpj8                          1/1     Running   0          2m58s
 
-NAME                                                TYPE            CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
-service/fast-n-foodious-ms-pedido-svc               LoadBalancer    10.110.74.44   localhost       80:30000/TCP     2m53s
-service/kubernetes                                  ClusterIP       10.96.0.1       <none>        443/TCP          5m52s
-service/mysql                                       ClusterIP       10.108.3.249    <none>        3306/TCP         2m53s
+NAME                                            TYPE            CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/fast-n-foodious-ms-pedido-svc           LoadBalancer    10.110.74.44   localhost       80:30001/TCP     2m53s
+service/kubernetes                              ClusterIP       10.96.0.1       <none>        443/TCP          5m52s
+service/mysql-pedido                            ClusterIP       10.108.3.249    <none>        3306/TCP         2m53s
 
-NAME                                                READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/fast-n-foodious-ms-pedido           1/1     1            1           2m59s
-deployment.apps/mysql                               1/1     1            1           2m59s
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/fast-n-foodious-ms-pedido      1/1     1            1           2m59s
+deployment.apps/mysql-pedido                   1/1     1            1           2m59s
 
-NAME                                                        DESIRED   CURRENT   READY   AGE
-replicaset.apps/fast-n-foodious-ms-pedido-7fc6f95bdb        1         1         1       2m59s
-replicaset.apps/mysql-595c5c9d4f                            1         1         1       2m58s
+NAME                                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/fast-n-foodious-ms-pedido-7fc6f95bdb   1         1         1       2m59s
+replicaset.apps/mysql-pedido-595c5c9d4f                1         1         1       2m58s
 
-NAME                                                                        REFERENCE                                   TARGETS           MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa           fast-n-foodious-ms-pedido-n-foodious     69%/80%, 0%/80%   1         3         1          2m48s 
+NAME                                                                   REFERENCE                               TARGETS           MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa      fast-n-foodious-ms-pedido-n-foodious    69%/80%, 0%/80%   1         3         1          2m48s 
 ```
 
 ## 🧾 Documentação da API (Swagger)
 `docker`    http://localhost:3001/api
 
-`k8s`       http://localhost:80/api
+`k8s`       http://localhost:3001/api
 
 ## 🧼 Desinstalação & Cleanup
 Para realizar a desistalação da aplicação e o cleanup da infraestrutura, basta realizar os comandos abaixos de acordo com o modo de instalação.
 1. Se você utilizou o `docker` para subir a aplicação:
 
 ```bash
-$ docker stop mysql fast-n-foodious-ms-pedido
-mysql
+$ docker stop mysql-pedido fast-n-foodious-ms-pedido
+mysql-pedido
 fast-n-foodious-ms-pedido
 
-$ docker volume rm mysql-data
-mysql-data
+$ docker volume rm mysql-data-pedido
+mysql-data-pedido
 
 $ docker network rm fast-n-foodious-network
 fast-n-foodious-network
@@ -311,12 +311,12 @@ Deleted: sha256:f93cb6531dabccc23848e273402d3fbef0515206efab1a29ccc1be81bf273dea
 
 2. Se você utilizou o `docker compose` para subir a aplicação:
 ```bash
-$ docker-compose --env-file ./envs/local.env down -v
+$ docker-compose --env-file ./envs/local.env -p "fast-n-foodious" down -v
 [+] Running 4/4
- ✔ Container fast-n-foodious-ms-pedido                 Removed                                                                                           0.8s 
- ✔ Container mysql                                     Removed                                                                                           1.1s 
- ✔ Volume fast-n-foodious-ms-pagamento_mysql-data      Removed                                                                                           0.0s 
- ✔ Network fast-n-foodious_fast-n-foodious-network     Removed                                                                                           0.1s
+ ✔ Container fast-n-foodious-ms-pedido             Removed                                                                                           0.8s 
+ ✔ Container mysql-pedido                          Removed                                                                                           1.1s 
+ ✔ Volume fast-n-foodious-ms-pedido_mysql-data     Removed                                                                                           0.0s 
+ ✔ Network fast-n-foodious_fast-n-foodious-network Removed                                                                                           0.1s
 
 $ docker image rm fast-n-foodious-ms-pedido-fast-n-foodious
 Untagged: fast-n-foodious-ms-pedido-fast-n-foodious-ms-pedido:latest
@@ -342,21 +342,21 @@ horizontalpodautoscaler.autoscaling "fast-n-foodious-ms-pedido-hpa" deleted
 
 $ kubectl delete -f k8s/fast-n-foodious-ms-pedido-service.yml 
 service "fast-n-foodious-ms-pedido-svc" deleted
-service "mysql" deleted
+service "mysql-pedido" deleted
 
 $ kubectl delete -f k8s/fast-n-foodious-ms-pedido-deployment.yml 
 deployment.apps "fast-n-foodious-ms-pedido" deleted
-deployment.apps "mysql" deleted
+deployment.apps "mysql-pedido" deleted
 
-$ kubectl delete -f k8s/fast-n-foodious-pvc.yml 
-persistentvolumeclaim "fast-n-foodious-pvc" deleted
+$ kubectl delete -f k8s/fast-n-foodious-ms-pedido-pvc.yml 
+persistentvolumeclaim "fast-n-foodious-ms-pedido-pvc" deleted
 
-$ kubectl delete -f k8s/fast-n-foodious-pv.yml 
-persistentvolume "fast-n-foodious-pv" deleted
+$ kubectl delete -f k8s/fast-n-foodious-ms-pedido-pv.yml 
+persistentvolume "fast-n-foodious-ms-pedido-pv" deleted
 
 $ kubectl delete -f k8s/fast-n-foodious-ms-pedido-configmap.yml 
 configmap "fast-n-foodious-ms-pedido-env" deleted
-configmap "mysql-env" deleted
+configmap "mysql-pedido-env" deleted
 
 $ kubectl delete -f k8s/fast-n-foodious-ms-pedido-secret.yml 
 secret "fast-n-foodious-ms-pedido-secret" deleted
@@ -410,7 +410,7 @@ $ docker-compose --env-file ./envs/{env-name}.env -p "fast-n-foodious" down {ser
 **Nota:** Os serviços registrados no docker-compose são:
 ```
 - fast-n-foodious-ms-pedido
-- mysql
+- mysql-pedido
 ```
 
 ## 🧪 Testes
@@ -430,14 +430,7 @@ $ NODE_ENV=local-mock-repository npm run test:e2e
 # 2. Considere remover o volume criado no mysql caso execute o teste mais de uma vez!
 $ NODE_ENV=local npm run test:e2e
 
-# Execução de testes bdd SEM dependência de banco de dados (in-memory repository), considerar os comandos em terminais distintos
-$ NODE_ENV=local-mock-repository npm run start && npx wait-on http://localhost:3001
-$ npm run test:bdd
-
-# Execução de testes bdd COM dependência de banco de dados (mysql repository)
-# 1. Necessita do container mysql em execução!
-# 2. Considere remover o volume criado no mysql caso execute o teste mais de uma vez!
-$ MYSQL_HOST=localhost NODE_ENV=local npm run start && npx wait-on http://localhost:3001
+# Execução de testes bdd
 $ NODE_ENV=local npm run test:bdd
 ```
 
@@ -451,11 +444,11 @@ job.batch/k6-stress-job created
 configmap/k6-stress-env created
 
 $ kubectl get po
-NAME                                                READY   STATUS    RESTARTS        AGE
-fast-n-foodious-ms-pedido-5c6cbcbf76-n5vn5          1/1     Running   1 (6m49s ago)   7m46s
-fast-n-foodious-ms-pedido-5c6cbcbf76-q5q7t          1/1     Running   0               106s
-k6-stress-job-fkjv9                                 1/1     Running   0               6s
-mysql-595c5c9d4f-chlrx                              1/1     Running   0               7m46s
+NAME                                           READY   STATUS    RESTARTS        AGE
+fast-n-foodious-ms-pedido-5c6cbcbf76-n5vn5     1/1     Running   1 (6m49s ago)   7m46s
+fast-n-foodious-ms-pedido-5c6cbcbf76-q5q7t     1/1     Running   0               106s
+k6-stress-job-fkjv9                            1/1     Running   0               6s
+mysql-pedido-595c5c9d4f-chlrx                  1/1     Running   0               7m46s
 
 $ kubectl logs -f k6-stress-job-fkjv9
 

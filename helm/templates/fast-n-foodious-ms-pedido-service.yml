@@ -8,8 +8,8 @@ spec:
   type: LoadBalancer
   ports:
   - port: {{ .Values.service.loadbalancer.port }}
-    nodePort: 30000
-    targetPort: 3000
+    nodePort: 30001
+    targetPort: 3001
 ---
 apiVersion: v1
 kind: Service

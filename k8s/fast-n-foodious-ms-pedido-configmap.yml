@@ -4,7 +4,7 @@ metadata:
   name: fast-n-foodious-ms-pedido-env
 data:
   MYSQL_DATABASE: FAST_N_FOODIOUS
-  MYSQL_HOST: mysql
+  MYSQL_HOST: mysql-pedido
   MYSQL_PORT: '3306'
   MYSQL_USER: fnf_user
   MYSQL_ROOT_HOST: '%'
@@ -14,7 +14,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-env
+  name: mysql-pedido-env
 data:
   init.sql: |
     -- Criação de banco de dados
