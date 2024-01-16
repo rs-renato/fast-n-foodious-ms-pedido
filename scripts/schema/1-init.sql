@@ -23,29 +23,6 @@ CREATE TABLE IF NOT EXISTS CLIENTE (
 CREATE UNIQUE INDEX cliente_email_idx ON CLIENTE(EMAIL);
 CREATE UNIQUE INDEX cliente_cpf_idx ON CLIENTE(CPF);
 
--- Tabela CATEGORIA_PRODUTO
-CREATE TABLE IF NOT EXISTS CATEGORIA_PRODUTO (
-                                                 ID INT PRIMARY KEY, -- sem auto_increment porque o conteúdo da tabela é fixa
-                                                 NOME VARCHAR(255) NOT NULL
-);
-
--- indexes para tabela CATEGORIA_PRODUTO
-CREATE UNIQUE INDEX categoria_produto_nome_idx ON CATEGORIA_PRODUTO(NOME);
-
--- Tabela PRODUTO
-CREATE TABLE IF NOT EXISTS PRODUTO (
-                                       ID INT AUTO_INCREMENT PRIMARY KEY,
-                                       PRODUTO_CATEGORIA_ID INT NOT NULL, CONSTRAINT FK_PRODUTO_CATEGORIA FOREIGN KEY (PRODUTO_CATEGORIA_ID) REFERENCES CATEGORIA_PRODUTO(ID),
-                                       NOME VARCHAR(255) NOT NULL,
-                                       DESCRICAO VARCHAR(255) NOT NULL,
-                                       PRECO DECIMAL(5,2) NOT NULL,
-                                       IMAGEM TEXT, -- base64
-                                       ATIVO BOOLEAN NOT NULL DEFAULT TRUE
-);
-
--- indexes para tabela PRODUTO
-CREATE UNIQUE INDEX produto_nome_idx ON PRODUTO(NOME);
-
 -- Tabela PEDIDO
 CREATE TABLE IF NOT EXISTS PEDIDO (
                                        ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,16 +37,6 @@ CREATE TABLE IF NOT EXISTS PEDIDO (
 CREATE TABLE IF NOT EXISTS ITEM_PEDIDO (
                                        ID INT AUTO_INCREMENT PRIMARY KEY,
                                        PEDIDO_ID INT NOT NULL, CONSTRAINT FK_PEDIDO_ID FOREIGN KEY (PEDIDO_ID) REFERENCES PEDIDO(ID),
-                                       PRODUTO_ID INT NOT NULL, CONSTRAINT FK_PRODUTO_ID FOREIGN KEY (PRODUTO_ID) REFERENCES PRODUTO(ID),
+                                       PRODUTO_ID INT NOT NULL,
                                        QUANTIDADE INT NOT NULL
-);
-
--- Tabela PAGAMENTO
-CREATE TABLE IF NOT EXISTS PAGAMENTO (
-                                       ID INT AUTO_INCREMENT PRIMARY KEY,
-                                       PEDIDO_ID INT NOT NULL, CONSTRAINT FK_PAGAMENTO_PEDIDO_ID FOREIGN KEY (PEDIDO_ID) REFERENCES PEDIDO(ID),
-                                       TRANSACAO_ID VARCHAR(255) NOT NULL,
-                                       ESTADO_PAGAMENTO INT NOT NULL,
-                                       TOTAL DECIMAL(8,2) NOT NULL,
-                                       DATA_HORA_PAGAMENTO DATETIME NULL
 );
