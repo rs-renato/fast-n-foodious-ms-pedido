@@ -7,17 +7,17 @@ spec:
     app: fast-n-foodious-ms-pedido
   type: LoadBalancer
   ports:
-  - port: 80
-    nodePort: 30000
-    targetPort: 3000
+  - port: 3001
+    nodePort: 30001
+    targetPort: 3001
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-pedido
 spec:
   selector:
-    app: mysql
+    app: mysql-pedido
   ports:
   - port: 3306
 

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: fast-n-foodious-pvc
+  name: fast-n-foodious-ms-pedido-pvc
 spec:
   resources:
     requests:
@@ -9,4 +9,4 @@ spec:
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  storageClassName: fast-n-foodious-storage
+  storageClassName: fast-n-foodious-ms-pedido-storage
