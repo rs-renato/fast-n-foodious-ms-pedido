@@ -16,7 +16,7 @@ spec:
         image: ottero/fast-n-foodious-ms-pedido:latest
         resources:
           limits:
-            memory: "512Mi"
+            memory: "768Mi"
             cpu: "500m"
         livenessProbe:
           httpGet:
@@ -102,15 +102,15 @@ spec:
                 name: fast-n-foodious-ms-pedido-secret
                 key: MYSQL_PASSWORD
         volumeMounts:
-          - name: mysql-init
+          - name: fast-n-foodious-ms-pedido-mysql-init
             mountPath: /docker-entrypoint-initdb.d
           - name: fast-n-foodious-ms-pedido-volume
-            mountPath: /var/lib/mysql
+            mountPath: /var/lib/mysql-pedido
       volumes:
         - name: fast-n-foodious-ms-pedido-volume
           persistentVolumeClaim:
             claimName: fast-n-foodious-ms-pedido-pvc
-        - name: mysql-init
+        - name: fast-n-foodious-ms-pedido-mysql-init
           configMap:
             name: mysql-pedido-env
             items:
