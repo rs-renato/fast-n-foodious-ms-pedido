@@ -140,7 +140,7 @@ Utilizado **`apenas para desenvolvimento local, modo watch, debug, testes e2e `*
 $ docker-compose --env-file ./envs/local.env -p "fast-n-foodious" up mysql-pedido
 $ docker ps
 CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS         PORTS                               NAMES
-83c9b4d8880a   mysql:8.0   "docker-entrypoint.s…"   3 seconds ago   Up 2 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
+83c9b4d8880a   mysql:8.0   "docker-entrypoint.s…"   3 seconds ago   Up 2 seconds   0.0.0.0:3307->3307/tcp, 33060/tcp   mysql-pedido
 
 # Executa a aplicação com as variáveis locais, conectando no container do mysql
 $ MYSQL_HOST=localhost NODE_ENV=local npm run start
@@ -159,7 +159,7 @@ $ docker-compose --env-file ./envs/prod.env up -d
 $ docker ps
 CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS         PORTS                               NAMES
 2a0f11e4ffe3   fast-n-foodious-ms-pedido    "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
-06ebf6b90fa7   mysql:8.0                    "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
+06ebf6b90fa7   mysql:8.0                    "docker-entrypoint.s…"   5 seconds ago   Up 4 seconds   0.0.0.0:3307->3307/tcp, 33060/tcp   mysql-pedido
 ```
 
 A opção acima, executa o container do micro serviço de forma isolada. Para rodar todos os micro serviços de forma conjunta, deve-se utilizar o `docker-compose-all.yml`. Este comando subirá todos os micro serviços e o banco de dados mysql. Esta forma de inicialização é recomendada para testes e as imagens é baixadas do github em sua versão latest:
@@ -173,7 +173,7 @@ Inicia o container da aplicação e do mysql com as variáveis de produção, ut
 ```bash
 $ docker network create fast-n-foodious-network
 
-$ docker run -d --rm --name mysql-pedido -p 3306:3306 \
+$ docker run -d --rm --name mysql-pedido -p 3307:3307 \
     --env-file ./envs/prod.env --network fast-n-foodious-network \
     -v ./scripts/schema:/docker-entrypoint-initdb.d \
     -v mysql-data-pedido:/data/db \
@@ -186,7 +186,7 @@ $ docker run -d --rm --name fast-n-foodious-ms-pedido -p 3001:3000 \
 $ docker ps
 CONTAINER ID   IMAGE                                        COMMAND                  CREATED         STATUS         PORTS                               NAMES
 88bf7eae7e46   ottero/fast-n-foodious-ms-pedido:latest      "docker-entrypoint.s…"   2 seconds ago   Up 1 second    0.0.0.0:3000->3001/tcp              fast-n-foodious-ms-pedido
-8b0268d435a6   mysql:8.0                                    "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql-pedido
+8b0268d435a6   mysql:8.0                                    "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   0.0.0.0:3307->3307/tcp, 33060/tcp   mysql-pedido
 ```
 
 #### 🫧 Kubernetes (Modo Fácil!)
@@ -212,9 +212,9 @@ pod/fast-n-foodious-ms-pedido-5c6cbcbf76-v4bgd     1/1     Running   1 (2m29s ag
 pod/mysql-pedido-595c5c9d4f-x7grb                  1/1     Running   0               3m28s
 
 NAME                                           TYPE              CLUSTER-IP      EXTERNAL-IP     PORT(S)        AGE
-service/fast-n-foodious-ms-pedido-svc          LoadBalancer      10.97.158.122   localhost       80:30001/TCP   3m28s
+service/fast-n-foodious-ms-pedido-svc          LoadBalancer      10.97.158.122   localhost       3001:30001/TCP   3m28s
 service/kubernetes                             ClusterIP         10.96.0.1       <none>          443/TCP        9d
-service/mysql-pedido                           ClusterIP         10.109.101.116  <none>          3306/TCP       3m28s
+service/mysql-pedido                           ClusterIP         10.109.101.116  <none>          3307/TCP       3m28s
 
 NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/fast-n-foodious-ms-pedido      1/1     1            1           3m28s
@@ -263,9 +263,9 @@ pod/fast-n-foodious-ms-pedido-7fc6f95bdb-krcnm      1/1     Running   0         
 pod/mysql-595c5c9d4f-5vpj8                          1/1     Running   0          2m58s
 
 NAME                                            TYPE            CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
-service/fast-n-foodious-ms-pedido-svc           LoadBalancer    10.110.74.44   localhost       80:30001/TCP     2m53s
+service/fast-n-foodious-ms-pedido-svc           LoadBalancer    10.110.74.44   localhost       3001:30001/TCP     2m53s
 service/kubernetes                              ClusterIP       10.96.0.1       <none>        443/TCP          5m52s
-service/mysql-pedido                            ClusterIP       10.108.3.249    <none>        3306/TCP         2m53s
+service/mysql-pedido                            ClusterIP       10.108.3.249    <none>        3307/TCP         2m53s
 
 NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/fast-n-foodious-ms-pedido      1/1     1            1           2m59s
