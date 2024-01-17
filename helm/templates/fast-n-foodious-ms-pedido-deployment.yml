@@ -104,15 +104,15 @@ spec:
                 name: {{ .Values.application.name }}-secret
                 key: MYSQL_PASSWORD
         volumeMounts:
-          - name: mysql-init
+          - name: {{ .Values.application.name }}-mysql-init
             mountPath: /docker-entrypoint-initdb.d
           - name: {{ .Values.application.name }}-volume
-            mountPath: /var/lib/mysql
+            mountPath: {{ .Values.mysql.mountPath }}
       volumes:
         - name: {{ .Values.application.name }}-volume
           persistentVolumeClaim:
             claimName: {{ .Values.pvc.name }}
-        - name: mysql-init
+        - name: {{ .Values.application.name }}-mysql-init
           configMap:
             name: {{ .Values.mysql.name }}-env
             items:
