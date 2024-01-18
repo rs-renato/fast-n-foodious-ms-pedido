@@ -8,8 +8,8 @@ import { PedidoConstants } from 'src/shared/constants';
 
 @Injectable()
 export class CheckoutPedidoValidoValidator implements CheckoutPedidoValidator {
-  public static PEDIDO_INEXISTENTE_ERROR_MESSAGE = 'Código de pedido inexistente';
-  public static CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout';
+  public static readonly PEDIDO_INEXISTENTE_ERROR_MESSAGE = 'Código de pedido inexistente';
+  public static readonly CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout';
 
   private logger: Logger = new Logger(CheckoutPedidoValidoValidator.name);
 
@@ -24,7 +24,7 @@ export class CheckoutPedidoValidoValidator implements CheckoutPedidoValidator {
       throw new ValidationException(CheckoutPedidoValidoValidator.PEDIDO_INEXISTENTE_ERROR_MESSAGE);
     }
 
-    await this.repositoryPedido.findBy({ id: id }).then((pedidos) => {
+    await this.repositoryPedido.findBy({ id }).then((pedidos) => {
       if (pedidos.length === 0) {
         throw new ValidationException(CheckoutPedidoValidoValidator.PEDIDO_INEXISTENTE_ERROR_MESSAGE);
       }

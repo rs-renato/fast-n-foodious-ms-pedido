@@ -78,5 +78,19 @@ describe('CheckoutPedidoValidator', () => {
         CheckoutPedidoValidoValidator.PEDIDO_INEXISTENTE_ERROR_MESSAGE,
       );
     });
+
+    it('não deve validar pedido quando checkout ja realizado', async () => {
+      const pedidoRecebido = {
+        ...pedido,
+        id: 1,
+        estadoPedido: EstadoPedido.RECEBIDO,
+      };
+
+      // mock repository to return empty array
+      (repository.findBy as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve([pedidoRecebido]);
+      });
+      await expect(validator.validate(pedido)).rejects.toThrowError('Pedido informado já realizou checkout');
+    });
   });
 });
