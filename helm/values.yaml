@@ -15,6 +15,7 @@ service:
 mysql:
   name: mysql-pedido
   image: mysql:8.0
+  mountPath: /var/lib/mysql-pedido
   resources:
     limits:
       memory: "768Mi"
@@ -42,7 +43,7 @@ pv:
 pvc:
   name: fast-n-foodious-ms-pedido-pvc
   requests:
-      storage: 300Mi
+      storage: 500Mi
 
 storageClassName: fast-n-foodious-ms-pedido-storage
 
