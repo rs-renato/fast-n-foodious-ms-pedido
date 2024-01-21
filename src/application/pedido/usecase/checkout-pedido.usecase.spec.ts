@@ -30,19 +30,20 @@ describe('CheckoutPedidoUseCase', () => {
   let pagamentoIntegration: PagamentoIntegration;
   let produtoIntegration: ProdutoIntegration;
 
+  const itemPedidoMock: ItemPedido = {
+    pedidoId: 1,
+    produtoId: 1,
+    quantidade: 2,
+    id: 1,
+  };
+
   const pedido: Pedido = {
     id: 1,
     clienteId: 101,
     dataInicio: '2023-08-26',
     estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
     ativo: true,
-  };
-
-  const itemPedidoMock: ItemPedido = {
-    pedidoId: 1,
-    produtoId: 1,
-    quantidade: 2,
-    id: 1,
+    itensPedido: [itemPedidoMock],
   };
 
   const expectedCheckoutPedido = {

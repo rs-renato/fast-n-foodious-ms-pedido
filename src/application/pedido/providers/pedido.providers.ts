@@ -14,6 +14,7 @@ import { SalvarPedidoUseCase } from 'src/application/pedido/usecase/salvar-pedid
 import { CheckoutPedidoRealizadoValidator } from 'src/application/pedido/validation/checkout-pedido-realizado-validator';
 import { CheckoutPedidoValidator } from 'src/application/pedido/validation/checkout-pedido.validator';
 import { ClienteExistentePedidoValidator } from 'src/application/pedido/validation/cliente-existente-pedido.validator';
+import { CheckoutPedidoQuantidadeDeItensValidator } from 'src/application/pedido/validation/checkout-pedido-quantidade-de-itens-validator';
 import { DataInicioNovoPedidoValidator } from 'src/application/pedido/validation/data-inicio-novo-pedido.validator';
 import { EditarPedidoValidator } from 'src/application/pedido/validation/editar-pedido.validator';
 import { EstadoCorretoNovoPedidoValidator } from 'src/application/pedido/validation/estado-correto-novo-pedido.validator';
@@ -51,6 +52,7 @@ export const PedidoProviders: Provider[] = [
     ): CheckoutPedidoValidator[] => [
       new ClienteExistentePedidoValidator(clienteRepository),
       new CheckoutPedidoRealizadoValidator(pagamentoIntegration),
+      new CheckoutPedidoQuantidadeDeItensValidator(),
     ],
   },
   {

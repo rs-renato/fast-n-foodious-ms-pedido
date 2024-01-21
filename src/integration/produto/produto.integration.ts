@@ -22,7 +22,8 @@ export class ProdutoIntegration {
       .pipe(map((res) => res.data))
       .pipe(
         catchError((error) => {
-          const statusError = error.response.status;
+          const statusError = error?.response?.status ?? error?.status;
+
           if (statusError === 404) {
             throw new NotFoundException(`Produto ${id} não encontrado.`);
           }

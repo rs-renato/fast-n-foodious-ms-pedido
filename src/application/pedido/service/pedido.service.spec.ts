@@ -19,6 +19,8 @@ import { IntegrationProviders } from 'src/integration/providers/integration.prov
 import { HttpModule } from '@nestjs/axios';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { NotFoundException } from '@nestjs/common';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
@@ -26,6 +28,14 @@ describe('PedidoService', () => {
   let itemPedidoRepository: IRepository<ItemPedido>;
   let validators: SalvarPedidoValidator[];
   let pagamentoIntegration: PagamentoIntegration;
+  let produtoIntegration: ProdutoIntegration;
+
+  const pedidoId = 123;
+
+  const itensPedidoMock: ItemPedido[] = [
+    { pedidoId, produtoId: 1, quantidade: 2, id: 1 },
+    { pedidoId, produtoId: 2, quantidade: 1, id: 2 },
+  ];
 
   const pedido: Pedido = {
     id: 1,
@@ -34,6 +44,7 @@ describe('PedidoService', () => {
     estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
     ativo: true,
     total: 10,
+    itensPedido: itensPedidoMock,
   };
 
   const cliente: Cliente = {
@@ -83,11 +94,15 @@ describe('PedidoService', () => {
     },
   ];
 
-  const pedidoId = 123;
-  const itensPedidoMock: ItemPedido[] = [
-    { pedidoId, produtoId: 1, quantidade: 2, id: 1 },
-    { pedidoId, produtoId: 2, quantidade: 1, id: 2 },
-  ];
+  const produto: ProdutoDto = {
+    id: 1,
+    nome: 'nome correto',
+    idCategoriaProduto: 1,
+    descricao: 'Teste',
+    preco: 10,
+    imagemBase64: '',
+    ativo: true,
+  };
 
   beforeEach(async () => {
     // Configuração do módulo de teste
@@ -138,6 +153,9 @@ describe('PedidoService', () => {
     validators = module.get<SalvarPedidoValidator[]>(PedidoConstants.SALVAR_PEDIDO_VALIDATOR);
     service = module.get<IPedidoService>(PedidoConstants.ISERVICE);
     pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+    produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
+
+    jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
   });
 
   describe('injeção de dependências', () => {

@@ -27,7 +27,7 @@ export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator
         this.logger.debug(`O pedido ${id} ainda não realizou checkout`);
         return true;
       }
-      this.logger.error(`Erro ao buscar pagamento por pedido id: ${JSON.stringify(error)} `);
+      this.logger.error(`Erro ao buscar pagamento por pedido id ${id}: ${JSON.stringify(error)} `);
       throw error;
     }
     this.logger.debug(`O pedido ${id} já realizou checkout (Pagamento: ${pagamentoDto.estadoPagamento})`);
