@@ -38,7 +38,9 @@ describe('ClienteRestApi', () => {
             // Mocka chamada para o save, rejeitando a promise em caso de request undefined
             save: jest.fn((request) => (request ? Promise.resolve(response) : Promise.reject(new Error('error')))),
             findByCpf: jest.fn((cpf) =>
-              cpf === response.cpf ? Promise.resolve(response) : Promise.reject(new NaoEncontradoApplicationException()),
+              cpf === response.cpf
+                ? Promise.resolve(response)
+                : Promise.reject(new NaoEncontradoApplicationException()),
             ),
             identifyByCpf: jest.fn((cpf) =>
               cpf === response.cpf ? Promise.resolve(response) : Promise.resolve(new ClienteIdentificado(undefined)),

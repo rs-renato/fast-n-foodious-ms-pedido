@@ -18,10 +18,12 @@ export class IdentificarClienteUseCase {
       return Promise.resolve(new ClienteIdentificado(undefined));
     }
 
-    return await this.buscarUsecase.buscarClientePorCpf(cpf)
+    return await this.buscarUsecase
+      .buscarClientePorCpf(cpf)
       .then((cliente) => {
         return new ClienteIdentificado(cliente);
-      }).catch((error) => {
+      })
+      .catch((error) => {
         if (error instanceof NaoEncontradoApplicationException) {
           return new ClienteIdentificado(undefined);
         }

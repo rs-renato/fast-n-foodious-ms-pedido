@@ -18,12 +18,10 @@ export class BuscarClientePorCpfUseCase {
 
   async buscarClientePorCpf(cpf: string): Promise<Cliente> {
     await ValidatorUtils.executeValidators(this.buscarValidators, new Cliente(undefined, undefined, cpf));
-    const clientes = await this.repository
-      .findBy({ cpf: cpf })
-      .catch((error) => {
-        this.logger.error(`Erro ao consultar cliente no banco de dados: ${error} `);
-        throw new ServiceException(`Houve um erro ao consultar o cliente: ${error}`);
-      });
+    const clientes = await this.repository.findBy({ cpf: cpf }).catch((error) => {
+      this.logger.error(`Erro ao consultar cliente no banco de dados: ${error} `);
+      throw new ServiceException(`Houve um erro ao consultar o cliente: ${error}`);
+    });
 
     if (!clientes.length) {
       this.logger.error(`Cliente cpf=${cpf} não encontrado`);

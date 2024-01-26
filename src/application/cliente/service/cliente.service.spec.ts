@@ -183,7 +183,7 @@ describe('CienteService', () => {
         return Promise.resolve([]);
       });
 
-      await expect(service.findByCpf('00000000191')).rejects.toThrowError(NaoEncontradoApplicationException)
+      await expect(service.findByCpf('00000000191')).rejects.toThrowError(NaoEncontradoApplicationException);
     });
 
     it('não deve buscar cliente com cpf inválido', async () => {
