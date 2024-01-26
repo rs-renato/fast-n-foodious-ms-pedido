@@ -28,15 +28,14 @@ export class BuscarPedidoPorIdUseCase {
         throw new ServiceException(errorMessage);
       });
 
-      if (!pedidos.length) {
-        this.logger.error(`Pedido id=${id} não encontrado`);
-        throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${id}`);
-      }
-  
-     return await this.produtoIntegration.populaProdutoEmItemPedido(pedidos[0])
-      .catch((error) => {
-        this.logger.error(`Erro ao popular detalhes do pedido id=${id}: ${JSON.stringify(error)}`);
-        throw new IntegrationApplicationException(`Houve um erro ao consultar detalhes do pedido: ${id}`);
-      });
+    if (!pedidos.length) {
+      this.logger.error(`Pedido id=${id} não encontrado`);
+      throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${id}`);
+    }
+
+    return await this.produtoIntegration.populaProdutoEmItemPedido(pedidos[0]).catch((error) => {
+      this.logger.error(`Erro ao popular detalhes do pedido id=${id}: ${JSON.stringify(error)}`);
+      throw new IntegrationApplicationException(`Houve um erro ao consultar detalhes do pedido: ${id}`);
+    });
   }
 }

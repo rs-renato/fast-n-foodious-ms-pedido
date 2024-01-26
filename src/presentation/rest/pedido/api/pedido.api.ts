@@ -119,8 +119,8 @@ export class PedidoRestApi extends BaseRestApi {
   async findById(@Param('id', ParseIntPipe) id: number): Promise<BuscarPorIdPedidoResponse> {
     this.logger.debug(`Procurando Pedido id: ${id}`);
     return await this.service.findById(id).then((pedido) => {
-        this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
-        return new BuscarPorIdPedidoResponse(pedido);
+      this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
+      return new BuscarPorIdPedidoResponse(pedido);
     });
   }
 
