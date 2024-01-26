@@ -5,7 +5,6 @@ import {
   HttpCode,
   Inject,
   Logger,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -172,12 +171,8 @@ export class PedidoRestApi extends BaseRestApi {
     this.logger.debug(`Realizando checkout do pedido id: ${id}`);
 
     const pedido = await this.service.findById(id).then((pedidoBuscado) => {
-      if (pedidoBuscado) {
         this.logger.log(`Pedido encontrado com sucesso: ${pedidoBuscado.id}}`);
         return pedidoBuscado;
-      }
-      this.logger.debug(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException(`Pedido não encontrado: ${id}`);
     });
 
     return await this.service.checkout(pedido).then((pedidoCheckout) => {
