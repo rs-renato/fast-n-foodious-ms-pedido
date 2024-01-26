@@ -18,10 +18,10 @@ import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
-import { NotFoundException } from '@nestjs/common';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
@@ -301,7 +301,9 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await expect(service.findAllByEstadoDoPedido(EstadoPedido.EM_PREPARACAO)).rejects.toThrowError(NaoEncontradoApplicationException);
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.EM_PREPARACAO)).rejects.toThrowError(
+        NaoEncontradoApplicationException,
+      );
     });
 
     it('nao retorna produtos com estado - PRONTO (3)', async () => {
@@ -309,7 +311,9 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await expect(service.findAllByEstadoDoPedido(EstadoPedido.PRONTO)).rejects.toThrowError(NaoEncontradoApplicationException);
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.PRONTO)).rejects.toThrowError(
+        NaoEncontradoApplicationException,
+      );
     });
 
     it('nao retorna produtos com estado - FINALIZADO (4)', async () => {
@@ -317,7 +321,9 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await expect(service.findAllByEstadoDoPedido(EstadoPedido.FINALIZADO)).rejects.toThrowError(NaoEncontradoApplicationException);
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.FINALIZADO)).rejects.toThrowError(
+        NaoEncontradoApplicationException,
+      );
     });
 
     it('não deve encontrar pedidos por ESTADO quando houver um erro de banco ', async () => {
@@ -373,7 +379,7 @@ describe('PedidoService', () => {
         pedido,
       };
       pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-        throw new NotFoundException('Pagamento não encontrado');
+        throw new IntegrationApplicationException('Pagamento não encontrado');
       });
       jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedResult.pagamento);
       const resultado = await service.checkout(pedido);

@@ -1,9 +1,10 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CheckoutPedidoValidator } from 'src/application/pedido/validation/checkout-pedido.validator';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 @Injectable()
 export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator {
@@ -23,7 +24,7 @@ export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator
       pagamentoDto = await this.pagamentoIntegration.buscarPorPedidoId(id);
       this.logger.debug(`PagamentoDto: ${JSON.stringify(pagamentoDto)}`);
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof IntegrationApplicationException) {
         this.logger.debug(`O pedido ${id} ainda não realizou checkout`);
         return true;
       }

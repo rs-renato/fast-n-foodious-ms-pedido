@@ -10,7 +10,7 @@ import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
-import { NotFoundException } from '@nestjs/common';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('CheckoutPedidoRealizadoValidator', () => {
   let validator: CheckoutPedidoRealizadoValidator;
@@ -61,7 +61,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
       };
 
       pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-        throw new NotFoundException('Pagamento não encontrado');
+        throw new IntegrationApplicationException('Pagamento não encontrado');
       });
 
       const isValid = await validator.validate(pedido);

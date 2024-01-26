@@ -15,11 +15,11 @@ import { CheckoutPedidoUseCase } from './checkout-pedido.usecase';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
-import { NotFoundException } from '@nestjs/common';
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('CheckoutPedidoUseCase', () => {
   let useCase: CheckoutPedidoUseCase;
@@ -122,7 +122,7 @@ describe('CheckoutPedidoUseCase', () => {
     jest.spyOn(editarPedidoUseCase, 'editarPedido').mockResolvedValue(pedido);
 
     pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-      throw new NotFoundException('Pagamento não encontrado');
+      throw new IntegrationApplicationException('Pagamento não encontrado');
     });
 
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
