@@ -50,8 +50,8 @@ export class PedidoService implements IPedidoService {
     return await this.deletarUsecase.deletarPedido(pedidoId);
   }
 
-  async findById(id: number): Promise<Pedido> {
-    return await this.buscarPorIdUsecase.buscarPedidoPorId(id);
+  async findById(id: number, populaProdutoEmItemPedido: boolean = true): Promise<Pedido> {
+    return await this.buscarPorIdUsecase.buscarPedidoPorId(id, populaProdutoEmItemPedido);
   }
 
   async findByIdEstadoDoPedido(pedidoId: number): Promise<{ estadoPedido: EstadoPedido }> {

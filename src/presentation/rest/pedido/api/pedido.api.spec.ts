@@ -183,7 +183,7 @@ describe('PedidoRestApi', () => {
     it('deve buscar o pedido por ID', async () => {
       const result = await restApi.findById(1);
 
-      expect(service.findById).toHaveBeenCalledWith(salvarPedidoResponse.id);
+      expect(service.findById).toHaveBeenCalledWith(salvarPedidoResponse.id, true);
       expect(result).toEqual(salvarPedidoResponse);
     });
 

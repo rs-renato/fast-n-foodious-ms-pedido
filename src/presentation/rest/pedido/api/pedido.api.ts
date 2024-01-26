@@ -105,7 +105,7 @@ export class PedidoRestApi extends BaseRestApi {
   @ApiOkResponse({ description: 'Pedido encontrado com sucesso', type: BuscarPorIdPedidoResponse })
   async findById(@Param('id', ParseIntPipe) id: number): Promise<BuscarPorIdPedidoResponse> {
     this.logger.debug(`Procurando Pedido id: ${id}`);
-    return await this.service.findById(id).then((pedido) => {
+    return await this.service.findById(id, true).then((pedido) => {
       this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
       return new BuscarPorIdPedidoResponse(pedido);
     });
@@ -121,7 +121,7 @@ export class PedidoRestApi extends BaseRestApi {
   async findByIdEstadoDoPedido(@Param('id', ParseIntPipe) id: number): Promise<BuscarPorIdEstadoPedidoResponse> {
     this.logger.debug(`Procurando Pedido id: ${id}`);
 
-    return await this.service.findById(id).then((pedido) => {
+    return await this.service.findById(id, false).then((pedido) => {
       this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
       return new BuscarPorIdEstadoPedidoResponse(pedido.estadoPedido);
     });
