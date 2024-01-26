@@ -43,7 +43,7 @@ export class ProdutoIntegration {
     return produtoDto;
   }
 
-  async insereProdutosEmItensPedido(pedidos: Pedido[]): Promise<Pedido[]> {
+  async populaProdutosEmItensPedido(pedidos: Pedido[]): Promise<Pedido[]> {
     for (const pedido of pedidos) {
       if (pedido.hasOwnProperty('itensPedido')) {
         // necessário porque itensPedido é opcional - sem essa verificação, ocorre erro 'itensPedido is not iterable'
@@ -55,9 +55,9 @@ export class ProdutoIntegration {
     return pedidos;
   }
 
-  async insereProdutoEmItemPedido(pedido: Pedido): Promise<Pedido> {
+  async populaProdutoEmItemPedido(pedido: Pedido): Promise<Pedido> {
     const pedidoParametro = [pedido];
-    const pedidos = await this.insereProdutosEmItensPedido(pedidoParametro);
+    const pedidos = await this.populaProdutosEmItensPedido(pedidoParametro);
     return pedidos[0];
   }
 }

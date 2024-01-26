@@ -21,6 +21,7 @@ import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integr
 import { NotFoundException } from '@nestjs/common';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
@@ -246,9 +247,7 @@ describe('PedidoService', () => {
       pedidoRepository.find = jest.fn().mockImplementation(() => {
         return Promise.resolve([]);
       });
-      await service.findById(2).then((pedidoEncontrado) => {
-        expect(pedidoEncontrado).toEqual(undefined);
-      });
+      await expect(service.findById(2)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
 
     it('não deve encontrar pedido por id quando houver um erro de banco ', async () => {

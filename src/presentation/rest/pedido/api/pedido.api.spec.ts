@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { IPedidoService } from 'src/application/pedido/service/pedido.service.interface';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
@@ -86,7 +87,7 @@ describe('PedidoRestApi', () => {
                 ? Promise.resolve(salvarPedidoResponse)
                 : id === pedidoAntesCheckout.id
                 ? Promise.resolve(pedidoAntesCheckout)
-                : Promise.resolve(undefined),
+                : Promise.reject(new NaoEncontradoApplicationException()),
             ),
             findAllByEstadoDoPedido: jest.fn((estado) =>
               Promise.resolve([salvarPedidoResponse].filter((pedido) => pedido.estadoPedido === estado)),
@@ -187,10 +188,7 @@ describe('PedidoRestApi', () => {
     });
 
     it('não deve encontrar o pedido', async () => {
-      await restApi.findById(2).catch((error) => {
-        expect(error.message).toEqual('Pedido não encontrado');
-        expect(error.status).toEqual(404);
-      });
+      await expect(restApi.findById(2)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
   });
 
@@ -202,10 +200,7 @@ describe('PedidoRestApi', () => {
     });
 
     it('não deve encontrar o pedido', async () => {
-      await restApi.findByIdEstadoDoPedido(2).catch((error) => {
-        expect(error.message).toEqual(`Pedido não encontrado: ${2}`);
-        expect(error.status).toEqual(404);
-      });
+      await expect(restApi.findByIdEstadoDoPedido(2)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
   });
 
@@ -217,10 +212,7 @@ describe('PedidoRestApi', () => {
     });
 
     it('não deve encontrar o pedido', async () => {
-      await restApi.findByIdEstadoDoPedido(2).catch((error) => {
-        expect(error.message).toEqual(`Pedido não encontrado: ${2}`);
-        expect(error.status).toEqual(404);
-      });
+      await expect(restApi.findByIdEstadoDoPedido(2)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
   });
 
@@ -290,10 +282,7 @@ describe('PedidoRestApi', () => {
     });
 
     it('deve falhar se pedido não existir', async () => {
-      await restApi.checkout(10000).catch((error) => {
-        expect(error.message).toEqual(`Pedido não encontrado: 10000`);
-        expect(error.status).toEqual(404);
-      });
+      await expect(restApi.checkout(10000)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
   });
 });
