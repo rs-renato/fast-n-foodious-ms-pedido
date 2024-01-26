@@ -378,7 +378,7 @@ describe('PedidoService', () => {
         pedido,
       };
       pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-          throw new NaoEncontradoApplicationException('Pagamento não encontrado');
+        throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
       jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedResult.pagamento);
       jest.spyOn(service, 'findById').mockResolvedValue(pedido);

@@ -71,9 +71,8 @@ export class PedidoService implements IPedidoService {
   }
 
   async checkout(id: number): Promise<PedidoComDadosDePagamento> {
-    return await this.findById(id)
-      .then((pedido) => {
-        return this.checkoutPedidoUsecase.checkout(pedido);
+    return await this.findById(id).then((pedido) => {
+      return this.checkoutPedidoUsecase.checkout(pedido);
     });
   }
 

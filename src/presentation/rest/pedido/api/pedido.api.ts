@@ -158,8 +158,8 @@ export class PedidoRestApi extends BaseRestApi {
   async checkout(@Param('id', ParseIntPipe) id: number): Promise<CheckoutResponse> {
     this.logger.debug(`Realizando checkout do pedido id: ${id}`);
     return await this.service.checkout(id).then((pedidoCheckout) => {
-        this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
-        return new CheckoutResponse(pedidoCheckout);
+      this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
+      return new CheckoutResponse(pedidoCheckout);
     });
   }
 }
