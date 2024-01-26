@@ -1,10 +1,11 @@
-import { ServiceUnavailableException, Injectable, Logger, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import * as process from 'process';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class ProdutoIntegration {
@@ -23,12 +24,13 @@ export class ProdutoIntegration {
       .pipe(map((res) => res.data))
       .pipe(
         catchError((error) => {
+          this.logger.warn(`Houve um erro ao buscar produto id: ${id} - ${JSON.stringify(error)}`);
           const statusError = error?.response?.status ?? error?.status;
 
           if (statusError === HttpStatus.NOT_FOUND) {
-            throw new IntegrationApplicationException(`Produto ${id} não encontrado.`);
+            throw new NaoEncontradoApplicationException(`Produto ${id} não encontrado.`);
           }
-          throw new ServiceUnavailableException(
+          throw new IntegrationApplicationException(
             'Não foi possível realizar a integração com o MS de Produto para buscar o produto.',
           );
         }),

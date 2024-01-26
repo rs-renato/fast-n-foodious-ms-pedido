@@ -10,7 +10,7 @@ import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/s
 import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { PedidoConstants } from 'src/shared/constants';
 import { HttpModule } from '@nestjs/axios';
-import { ServiceUnavailableException } from '@nestjs/common';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('SolicitaPagamentoPedidoUseCase', () => {
   let useCase: SolicitaPagamentoPedidoUseCase;
@@ -57,10 +57,10 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
     });
 
     it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
-      const error = new ServiceUnavailableException('Erro');
+      const error = new IntegrationApplicationException('Erro');
       jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockRejectedValue(error);
 
-      await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(ServiceUnavailableException);
+      await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(IntegrationApplicationException);
     });
   });
 });

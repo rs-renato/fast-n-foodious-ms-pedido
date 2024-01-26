@@ -1,18 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Inject,
-  Logger,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Logger, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IPedidoService } from 'src/application/pedido/service/pedido.service.interface';
-import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { BaseRestApi } from 'src/presentation/rest/base.api';
@@ -169,19 +157,9 @@ export class PedidoRestApi extends BaseRestApi {
   @ApiOkResponse({ description: 'Pedido encontrado com sucesso', type: CheckoutResponse })
   async checkout(@Param('id', ParseIntPipe) id: number): Promise<CheckoutResponse> {
     this.logger.debug(`Realizando checkout do pedido id: ${id}`);
-
-    const pedido = await this.service.findById(id).then((pedidoBuscado) => {
-        this.logger.log(`Pedido encontrado com sucesso: ${pedidoBuscado.id}}`);
-        return pedidoBuscado;
-    });
-
-    return await this.service.checkout(pedido).then((pedidoCheckout) => {
-      if (pedidoCheckout) {
+    return await this.service.checkout(id).then((pedidoCheckout) => {
         this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
         return new CheckoutResponse(pedidoCheckout);
-      }
-      this.logger.debug(`Erro durante realização de checkout do pedido: ${id}`);
-      throw new ServiceException(`Erro durante realização de checkout do pedido: ${id}`);
     });
   }
 }

@@ -3,7 +3,7 @@ import { ValidationException } from 'src/enterprise/exception/validation.excepti
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { AddItemPedidoValidator } from 'src/application/item-pedido/validation/add-item-pedido.validator';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
-import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class ProdutoExistentePedidoValidator implements AddItemPedidoValidator {
@@ -25,7 +25,7 @@ export class ProdutoExistentePedidoValidator implements AddItemPedidoValidator {
       );
       return true;
     } catch (error) {
-      if (error instanceof IntegrationApplicationException) {
+      if (error instanceof NaoEncontradoApplicationException) {
         throw new ValidationException(ProdutoExistentePedidoValidator.ERROR_MESSAGE);
       }
       this.logger.debug(`${ProdutoExistentePedidoValidator.name} finalizado com erro: ${error}`);

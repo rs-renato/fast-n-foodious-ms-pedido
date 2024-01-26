@@ -1,9 +1,10 @@
-import { ServiceUnavailableException, Injectable, Logger, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import * as process from 'process';
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class PagamentoIntegration {
@@ -26,7 +27,7 @@ export class PagamentoIntegration {
       .pipe(
         catchError((error) => {
           this.logger.error(`Erro ao solicitar pagamento: ${JSON.stringify(error)} `);
-          throw new ServiceUnavailableException(
+          throw new IntegrationApplicationException(
             'Não foi possível realizar a integração com o MS de Pagamento para solicitar o pagamento.',
           );
         }),
@@ -49,11 +50,11 @@ export class PagamentoIntegration {
       .pipe(
         catchError((error) => {
           this.logger.warn(`Houve um erro ao buscar pagamento por pedido id: ${pedidoId} - ${JSON.stringify(error)}`);
-          const statusError = error.response.status;
+          const statusError = error?.response?.status ?? error?.status;
           if (statusError === HttpStatus.NOT_FOUND) {
-            throw new IntegrationApplicationException(`Pagamento para pedido de id ${pedidoId} não encontrado.`);
+            throw new NaoEncontradoApplicationException(`Pagamento para pedido de id ${pedidoId} não encontrado.`);
           }
-          throw new ServiceUnavailableException(
+          throw new IntegrationApplicationException(
             'Não foi possível realizar a integração com o MS de Pagamento para solicitar o pagamento.',
           );
         }),

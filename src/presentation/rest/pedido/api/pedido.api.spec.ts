@@ -94,10 +94,10 @@ describe('PedidoRestApi', () => {
             ),
             listarPedidosPendentes: jest.fn(() => Promise.resolve([pedido])),
             listarPedidosNaoFinalizados: jest.fn(() => Promise.resolve([pedido])),
-            checkout: jest.fn((pedido) =>
-              pedido.id === checkoutPedidoResponse.pedido.id
+            checkout: jest.fn((id) =>
+              id === checkoutPedidoResponse.pedido.id
                 ? Promise.resolve(checkoutPedidoResponse)
-                : Promise.reject(new Error('error')),
+                : Promise.reject(new NaoEncontradoApplicationException('error')),
             ),
           },
         },

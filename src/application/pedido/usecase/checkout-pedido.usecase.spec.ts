@@ -19,7 +19,7 @@ import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integr
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
-import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 describe('CheckoutPedidoUseCase', () => {
   let useCase: CheckoutPedidoUseCase;
@@ -122,7 +122,7 @@ describe('CheckoutPedidoUseCase', () => {
     jest.spyOn(editarPedidoUseCase, 'editarPedido').mockResolvedValue(pedido);
 
     pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-      throw new IntegrationApplicationException('Pagamento não encontrado');
+      throw new NaoEncontradoApplicationException('Pagamento não encontrado');
     });
 
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);

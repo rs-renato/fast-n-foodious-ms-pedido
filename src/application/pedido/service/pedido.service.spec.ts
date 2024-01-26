@@ -21,7 +21,6 @@ import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integr
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
-import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
@@ -379,10 +378,11 @@ describe('PedidoService', () => {
         pedido,
       };
       pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
-        throw new IntegrationApplicationException('Pagamento não encontrado');
+          throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
       jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedResult.pagamento);
-      const resultado = await service.checkout(pedido);
+      jest.spyOn(service, 'findById').mockResolvedValue(pedido);
+      const resultado = await service.checkout(pedido.id);
       expect(resultado).toEqual(expectedResult);
     });
   });
