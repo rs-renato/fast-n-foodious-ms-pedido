@@ -16,7 +16,7 @@ export class BuscarPedidoPorIdUseCase {
     @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
   ) {}
 
-  async buscarPedidoPorId(id: number, populaProdutoEmItemPedido: boolean = true): Promise<Pedido> {
+  async buscarPedidoPorId(id: number, populaProdutoEmItemPedido = true): Promise<Pedido> {
     const pedidos = await this.repository
       .find({
         where: [{ id }],
@@ -33,7 +33,7 @@ export class BuscarPedidoPorIdUseCase {
       throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${id}`);
     }
 
-    if (!populaProdutoEmItemPedido){
+    if (!populaProdutoEmItemPedido) {
       return pedidos[0];
     }
 
