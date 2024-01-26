@@ -20,6 +20,6 @@ export class BuscarTodosPedidosPendentesUseCase {
       throw new ServiceException(`Erro ao buscar pedidos pendentes de pagamento no banco de dados: ${error}`);
     });
 
-    return this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
+    return this.produtoIntegration.populaProdutosEmItensPedido(pedidos);
   }
 }

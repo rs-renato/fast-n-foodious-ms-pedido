@@ -303,7 +303,7 @@ describe('ClienteRestApi (e2e)', () => {
       .get(`/v1/cliente?cpf=00000000191`)
       .then((response) => {
         expect(response.status).toEqual(404);
-        expect(response.body.message).toEqual('Cliente não encontrado');
+        expect(response.body.message).toEqual('Cliente não encontrado: 00000000191');
       });
   });
 

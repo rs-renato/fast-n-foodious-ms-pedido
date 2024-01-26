@@ -1,9 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { BaseRestApi } from 'src/presentation/rest/base.api';
 
+
 @Controller(['/', '/health'])
-@ApiTags('Health')
+@ApiExcludeController()
 export class HealthRestApi extends BaseRestApi {
   @Get()
   @ApiOperation({
