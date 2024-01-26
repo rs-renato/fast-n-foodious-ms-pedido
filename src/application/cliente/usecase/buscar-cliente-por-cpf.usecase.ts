@@ -5,6 +5,7 @@ import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { IRepository } from 'src/enterprise/repository/repository';
 import { ClienteConstants } from 'src/shared/constants';
 import { ValidatorUtils } from 'src/shared/validator.utils';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class BuscarClientePorCpfUseCase {
@@ -17,14 +18,18 @@ export class BuscarClientePorCpfUseCase {
 
   async buscarClientePorCpf(cpf: string): Promise<Cliente> {
     await ValidatorUtils.executeValidators(this.buscarValidators, new Cliente(undefined, undefined, cpf));
-    return await this.repository
+    const clientes = await this.repository
       .findBy({ cpf: cpf })
-      .then((clientes) => {
-        return clientes[0];
-      })
       .catch((error) => {
         this.logger.error(`Erro ao consultar cliente no banco de dados: ${error} `);
         throw new ServiceException(`Houve um erro ao consultar o cliente: ${error}`);
       });
+
+    if (!clientes.length) {
+      this.logger.error(`Cliente cpf=${cpf} não encontrado`);
+      throw new NaoEncontradoApplicationException(`Cliente não encontrado: ${cpf}`);
+    }
+
+    return clientes[0];
   }
 }

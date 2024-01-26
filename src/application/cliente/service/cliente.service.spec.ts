@@ -12,6 +12,7 @@ import { RepositoryException } from 'src/infrastructure/exception/repository.exc
 import { ClienteConstants } from 'src/shared/constants';
 import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 describe('CienteService', () => {
   let service: IClienteService;
@@ -182,9 +183,7 @@ describe('CienteService', () => {
         return Promise.resolve([]);
       });
 
-      await service.findByCpf('00000000191').then((cliente) => {
-        expect(cliente).toBeUndefined();
-      });
+      await expect(service.findByCpf('00000000191')).rejects.toThrowError(NaoEncontradoApplicationException)
     });
 
     it('não deve buscar cliente com cpf inválido', async () => {
@@ -229,7 +228,7 @@ describe('CienteService', () => {
       });
     });
 
-    it('deve identificar cliente anomimo por cpf vazio', async () => {
+    it('deve identificar cliente anomimo por cpf undefined', async () => {
       await service.identifyByCpf(undefined).then((clienteIdentificado) => {
         expect(clienteIdentificado.anonimo).toEqual(true);
       });

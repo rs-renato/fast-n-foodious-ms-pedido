@@ -5,7 +5,6 @@ import {
   HttpCode,
   Inject,
   Logger,
-  NotFoundException,
   Post,
   Query,
   ValidationPipe,
@@ -56,10 +55,6 @@ export class ClienteRestApi extends BaseRestApi {
   async buscaPorCpf(@Query(ValidationPipe) query: BuscarPorCpfClienteRequest): Promise<BuscarPorCpfClienteResponse> {
     this.logger.debug(`Consultando cliente por cpf: ${query}`);
     return await this.service.findByCpf(query.cpf).then((cliente) => {
-      if (cliente === undefined) {
-        throw new NotFoundException('Cliente não encontrado');
-      }
-
       return new BuscarPorCpfClienteResponse(cliente);
     });
   }
