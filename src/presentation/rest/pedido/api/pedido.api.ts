@@ -135,13 +135,8 @@ export class PedidoRestApi extends BaseRestApi {
     this.logger.debug(`Procurando Pedido id: ${id}`);
 
     return await this.service.findById(id).then((pedido) => {
-      if (pedido) {
         this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
         return new BuscarPorIdEstadoPedidoResponse(pedido.estadoPedido);
-      }
-
-      this.logger.debug(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException(`Pedido não encontrado: ${id}`);
     });
   }
 
@@ -160,13 +155,8 @@ export class PedidoRestApi extends BaseRestApi {
     this.logger.debug(`Procurando Pedidos com estado: ${estado}`);
 
     return await this.service.findAllByEstadoDoPedido(estado).then((pedidos) => {
-      if (pedidos.length > 0) {
         this.logger.log(`Pedidos com estado: ${estado} encontrados com sucesso`);
         return pedidos.map((pedido) => new BuscarTodosPorEstadoPedidoResponse(pedido));
-      }
-
-      this.logger.debug(`Pedidos com estado: ${estado} não encontrados`);
-      throw new NotFoundException(`Pedidos com estado: ${estado} não encontrados`);
     });
   }
 

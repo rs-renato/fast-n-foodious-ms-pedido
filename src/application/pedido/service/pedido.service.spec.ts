@@ -301,9 +301,7 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await service.findAllByEstadoDoPedido(EstadoPedido.EM_PREPARACAO).then((pedidos) => {
-        expect(pedidos).toHaveLength(0);
-      });
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.EM_PREPARACAO)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
 
     it('nao retorna produtos com estado - PRONTO (3)', async () => {
@@ -311,9 +309,7 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await service.findAllByEstadoDoPedido(EstadoPedido.PRONTO).then((pedidos) => {
-        expect(pedidos).toHaveLength(0);
-      });
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.PRONTO)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
 
     it('nao retorna produtos com estado - FINALIZADO (4)', async () => {
@@ -321,9 +317,7 @@ describe('PedidoService', () => {
         return Promise.resolve(mockedPedidos.filter((pedido) => pedido.estadoPedido === attributes.estadoPedido));
       });
 
-      await service.findAllByEstadoDoPedido(EstadoPedido.FINALIZADO).then((pedidos) => {
-        expect(pedidos).toHaveLength(0);
-      });
+      await expect(service.findAllByEstadoDoPedido(EstadoPedido.FINALIZADO)).rejects.toThrowError(NaoEncontradoApplicationException);
     });
 
     it('não deve encontrar pedidos por ESTADO quando houver um erro de banco ', async () => {
