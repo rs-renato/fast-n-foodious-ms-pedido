@@ -15,7 +15,7 @@ import { IntegrationApplicationException } from 'src/application/exception/integ
 describe('BuscarPedidoPorIdUseCase', () => {
   let useCase: BuscarPedidoPorIdUseCase;
   let repository: IPedidoRepository;
-  let produtoIntegration: ProdutoIntegration
+  let produtoIntegration: ProdutoIntegration;
 
   const pedidoId = 123;
   const pedidoMock: Pedido = {
@@ -30,8 +30,7 @@ describe('BuscarPedidoPorIdUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule],
-      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders,
-      ],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log
@@ -67,7 +66,7 @@ describe('BuscarPedidoPorIdUseCase', () => {
     });
 
     it('deve lançar uma IntegrationApplicationException em caso de erro na integração', async () => {
-      jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);      
+      jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);
       jest.spyOn(produtoIntegration, 'populaProdutoEmItemPedido').mockRejectedValue(new Error('any error'));
 
       await expect(useCase.buscarPedidoPorId(pedidoId)).rejects.toThrowError(IntegrationApplicationException);
