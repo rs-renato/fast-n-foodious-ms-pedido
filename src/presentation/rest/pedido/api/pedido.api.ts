@@ -1,19 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Inject,
-  Logger,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Logger, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IPedidoService } from 'src/application/pedido/service/pedido.service.interface';
-import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { BaseRestApi } from 'src/presentation/rest/base.api';
@@ -118,13 +105,9 @@ export class PedidoRestApi extends BaseRestApi {
   @ApiOkResponse({ description: 'Pedido encontrado com sucesso', type: BuscarPorIdPedidoResponse })
   async findById(@Param('id', ParseIntPipe) id: number): Promise<BuscarPorIdPedidoResponse> {
     this.logger.debug(`Procurando Pedido id: ${id}`);
-    return await this.service.findById(id).then((pedido) => {
-      if (pedido) {
-        this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
-        return new BuscarPorIdPedidoResponse(pedido);
-      }
-      this.logger.debug(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException('Pedido não encontrado');
+    return await this.service.findById(id, true).then((pedido) => {
+      this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
+      return new BuscarPorIdPedidoResponse(pedido);
     });
   }
 
@@ -138,14 +121,9 @@ export class PedidoRestApi extends BaseRestApi {
   async findByIdEstadoDoPedido(@Param('id', ParseIntPipe) id: number): Promise<BuscarPorIdEstadoPedidoResponse> {
     this.logger.debug(`Procurando Pedido id: ${id}`);
 
-    return await this.service.findById(id).then((pedido) => {
-      if (pedido) {
-        this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
-        return new BuscarPorIdEstadoPedidoResponse(pedido.estadoPedido);
-      }
-
-      this.logger.debug(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException(`Pedido não encontrado: ${id}`);
+    return await this.service.findById(id, false).then((pedido) => {
+      this.logger.log(`Pedido encontrado com sucesso: ${pedido.id}}`);
+      return new BuscarPorIdEstadoPedidoResponse(pedido.estadoPedido);
     });
   }
 
@@ -164,13 +142,8 @@ export class PedidoRestApi extends BaseRestApi {
     this.logger.debug(`Procurando Pedidos com estado: ${estado}`);
 
     return await this.service.findAllByEstadoDoPedido(estado).then((pedidos) => {
-      if (pedidos.length > 0) {
-        this.logger.log(`Pedidos com estado: ${estado} encontrados com sucesso`);
-        return pedidos.map((pedido) => new BuscarTodosPorEstadoPedidoResponse(pedido));
-      }
-
-      this.logger.debug(`Pedidos com estado: ${estado} não encontrados`);
-      throw new NotFoundException(`Pedidos com estado: ${estado} não encontrados`);
+      this.logger.log(`Pedidos com estado: ${estado} encontrados com sucesso`);
+      return pedidos.map((pedido) => new BuscarTodosPorEstadoPedidoResponse(pedido));
     });
   }
 
@@ -184,23 +157,9 @@ export class PedidoRestApi extends BaseRestApi {
   @ApiOkResponse({ description: 'Pedido encontrado com sucesso', type: CheckoutResponse })
   async checkout(@Param('id', ParseIntPipe) id: number): Promise<CheckoutResponse> {
     this.logger.debug(`Realizando checkout do pedido id: ${id}`);
-
-    const pedido = await this.service.findById(id).then((pedidoBuscado) => {
-      if (pedidoBuscado) {
-        this.logger.log(`Pedido encontrado com sucesso: ${pedidoBuscado.id}}`);
-        return pedidoBuscado;
-      }
-      this.logger.debug(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException(`Pedido não encontrado: ${id}`);
-    });
-
-    return await this.service.checkout(pedido).then((pedidoCheckout) => {
-      if (pedidoCheckout) {
-        this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
-        return new CheckoutResponse(pedidoCheckout);
-      }
-      this.logger.debug(`Erro durante realização de checkout do pedido: ${id}`);
-      throw new ServiceException(`Erro durante realização de checkout do pedido: ${id}`);
+    return await this.service.checkout(id).then((pedidoCheckout) => {
+      this.logger.log(`Checkout realizado com sucesso para pedido: ${pedidoCheckout.pedido.id}`);
+      return new CheckoutResponse(pedidoCheckout);
     });
   }
 }

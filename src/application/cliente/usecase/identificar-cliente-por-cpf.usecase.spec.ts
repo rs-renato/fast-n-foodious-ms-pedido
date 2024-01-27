@@ -4,6 +4,7 @@ import { BuscarClientePorCpfUseCase } from 'src/application/cliente/usecase/busc
 import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/identificar-cliente-por-cpf.usecase';
 import { ClienteIdentificado } from 'src/enterprise/cliente/model/cliente-identificado.model';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
+import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ClienteConstants } from 'src/shared/constants';
 
@@ -38,11 +39,13 @@ describe('IdentificarClienteUseCase', () => {
     });
 
     it('deve identificar um cliente anônimo quando o CPF é undefined', async () => {
-      const cpf = undefined;
-
-      const result = await useCase.identificarClientePorCpf(cpf);
-
+      const result = await useCase.identificarClientePorCpf(undefined);
       expect(result).toEqual(new ClienteIdentificado());
+    });
+
+    it('nao deve identificar um cliente em caso de erro', async () => {
+      jest.spyOn(buscarUsecase, 'buscarClientePorCpf').mockRejectedValue(new ServiceException('any error'));
+      await expect(useCase.identificarClientePorCpf(clienteMock.cpf)).rejects.toThrow(ServiceException);
     });
   });
 });

@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
@@ -16,6 +17,11 @@ export class BuscarTodosPedidosPorEstadoUseCase {
       this.logger.error(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
       throw new ServiceException(`Erro ao buscar produtos com estadoPedido=${estado} no banco de dados: ${error}`);
     });
+
+    if (!pedidos.length) {
+      this.logger.error(`Pedidos com estado id=${estado} não encontrados`);
+      throw new NaoEncontradoApplicationException(`Pedidos com estado: ${estado} não encontrados`);
+    }
 
     return pedidos;
   }

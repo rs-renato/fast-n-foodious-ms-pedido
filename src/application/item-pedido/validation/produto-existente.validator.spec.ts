@@ -7,7 +7,7 @@ import { ProdutoIntegration } from 'src/integration/produto/produto.integration'
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
-import { NotFoundException } from '@nestjs/common';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 describe('ProdutoExistentePedidoValidator', () => {
   let validator: ProdutoExistentePedidoValidator;
@@ -71,7 +71,7 @@ describe('ProdutoExistentePedidoValidator', () => {
 
     it('não deve validar pedido quando não existir um produto', async () => {
       produtoIntegration.getProdutoById = jest.fn().mockImplementation(() => {
-        throw new NotFoundException('Pagamento não encontrado');
+        throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
 
       await expect(validator.validate(itemPedido)).rejects.toThrowError(ValidationException);

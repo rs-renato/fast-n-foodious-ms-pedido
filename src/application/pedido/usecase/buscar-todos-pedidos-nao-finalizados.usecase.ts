@@ -30,7 +30,7 @@ export class BuscarTodosPedidosNaoFinalizadosUseCase {
         // relations: ['itensPedido', 'itensPedido.produto'],
       })
       .then(async (pedidos) => {
-        return await this.produtoIntegration.insereProdutosEmItensPedido(pedidos);
+        return await this.produtoIntegration.populaProdutosEmItensPedido(pedidos);
       })
       .catch((error) => {
         this.logger.error(`Erro ao buscar todos pedidos no banco de dados: ${error} `);

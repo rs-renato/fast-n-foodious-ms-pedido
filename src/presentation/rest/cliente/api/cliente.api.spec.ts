@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IClienteService } from 'src/application/cliente/service/cliente.service.interface';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { ClienteIdentificado } from 'src/enterprise/cliente/model/cliente-identificado.model';
 import { ClienteRestApi } from 'src/presentation/rest/cliente/api/cliente.api';
 import { SalvarClienteRequest } from 'src/presentation/rest/cliente/request/salvar-cliente.request';
@@ -37,7 +38,9 @@ describe('ClienteRestApi', () => {
             // Mocka chamada para o save, rejeitando a promise em caso de request undefined
             save: jest.fn((request) => (request ? Promise.resolve(response) : Promise.reject(new Error('error')))),
             findByCpf: jest.fn((cpf) =>
-              cpf === response.cpf ? Promise.resolve(response) : Promise.resolve(undefined),
+              cpf === response.cpf
+                ? Promise.resolve(response)
+                : Promise.reject(new NaoEncontradoApplicationException()),
             ),
             identifyByCpf: jest.fn((cpf) =>
               cpf === response.cpf ? Promise.resolve(response) : Promise.resolve(new ClienteIdentificado(undefined)),
@@ -100,10 +103,7 @@ describe('ClienteRestApi', () => {
 
     it('não deve buscar cliente por cpf inexistente', async () => {
       // Chama o método buscaPorCpf do restApi
-      await restApi.buscaPorCpf({ cpf: '123456' }).catch((error) => {
-        expect(error.message).toEqual('Cliente não encontrado');
-        expect(error.status).toEqual(404);
-      });
+      await expect(restApi.buscaPorCpf({ cpf: '123456' })).rejects.toThrow(NaoEncontradoApplicationException);
 
       // Verifica se o método findByCpf do serviço foi chamado corretamente com a requisição
       expect(service.findByCpf).toHaveBeenCalledWith('123456');

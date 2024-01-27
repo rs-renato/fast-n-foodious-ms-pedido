@@ -50,8 +50,8 @@ export class PedidoService implements IPedidoService {
     return await this.deletarUsecase.deletarPedido(pedidoId);
   }
 
-  async findById(id: number): Promise<Pedido> {
-    return await this.buscarPorIdUsecase.buscarPedidoPorId(id);
+  async findById(id: number, populaProdutoEmItemPedido = true): Promise<Pedido> {
+    return await this.buscarPorIdUsecase.buscarPedidoPorId(id, populaProdutoEmItemPedido);
   }
 
   async findByIdEstadoDoPedido(pedidoId: number): Promise<{ estadoPedido: EstadoPedido }> {
@@ -70,8 +70,10 @@ export class PedidoService implements IPedidoService {
     return await this.buscarTodosNaoFinalizadosUsecase.buscarTodosPedidos();
   }
 
-  async checkout(pedido: Pedido): Promise<PedidoComDadosDePagamento> {
-    return await this.checkoutPedidoUsecase.checkout(pedido);
+  async checkout(id: number): Promise<PedidoComDadosDePagamento> {
+    return await this.findById(id).then((pedido) => {
+      return this.checkoutPedidoUsecase.checkout(pedido);
+    });
   }
 
   async buscarItensPedidoPorPedidoId(pedidoId: number): Promise<ItemPedido[]> {

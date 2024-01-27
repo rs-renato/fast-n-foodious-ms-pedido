@@ -4,6 +4,8 @@ import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
 import { PedidoConstants } from 'src/shared/constants';
 import { ProdutoIntegration } from '../../../integration/produto/produto.integration';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 @Injectable()
 export class BuscarPedidoPorIdUseCase {
@@ -14,23 +16,30 @@ export class BuscarPedidoPorIdUseCase {
     @Inject(ProdutoIntegration) private produtoIntegration: ProdutoIntegration,
   ) {}
 
-  async buscarPedidoPorId(id: number): Promise<Pedido> {
-    return await this.repository
+  async buscarPedidoPorId(id: number, populaProdutoEmItemPedido = true): Promise<Pedido> {
+    const pedidos = await this.repository
       .find({
         where: [{ id }],
         relations: ['itensPedido'],
       })
-      .then((pedidos) => {
-        if (pedidos === undefined || pedidos.length === 0) {
-          return pedidos[0];
-        }
-        return this.produtoIntegration.insereProdutoEmItemPedido(pedidos[0]);
-      })
       .catch((error) => {
         const errorMessage = `Erro ao consultar pedido no banco de dados: ${error}`;
-
         this.logger.error(errorMessage);
         throw new ServiceException(errorMessage);
       });
+
+    if (!pedidos.length) {
+      this.logger.error(`Pedido id=${id} não encontrado`);
+      throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${id}`);
+    }
+
+    if (!populaProdutoEmItemPedido) {
+      return pedidos[0];
+    }
+
+    return await this.produtoIntegration.populaProdutoEmItemPedido(pedidos[0]).catch((error) => {
+      this.logger.error(`Erro ao popular detalhes do pedido id=${id}: ${JSON.stringify(error)}`);
+      throw new IntegrationApplicationException(`Houve um erro ao consultar detalhes do pedido: ${id}`);
+    });
   }
 }

@@ -1,9 +1,11 @@
-import { NotFoundException, ServiceUnavailableException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import * as process from 'process';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class ProdutoIntegration {
@@ -22,12 +24,13 @@ export class ProdutoIntegration {
       .pipe(map((res) => res.data))
       .pipe(
         catchError((error) => {
+          this.logger.warn(`Houve um erro ao buscar produto id: ${id} - ${JSON.stringify(error)}`);
           const statusError = error?.response?.status ?? error?.status;
 
-          if (statusError === 404) {
-            throw new NotFoundException(`Produto ${id} não encontrado.`);
+          if (statusError === HttpStatus.NOT_FOUND) {
+            throw new NaoEncontradoApplicationException(`Produto ${id} não encontrado.`);
           }
-          throw new ServiceUnavailableException(
+          throw new IntegrationApplicationException(
             'Não foi possível realizar a integração com o MS de Produto para buscar o produto.',
           );
         }),
@@ -43,7 +46,7 @@ export class ProdutoIntegration {
     return produtoDto;
   }
 
-  async insereProdutosEmItensPedido(pedidos: Pedido[]): Promise<Pedido[]> {
+  async populaProdutosEmItensPedido(pedidos: Pedido[]): Promise<Pedido[]> {
     for (const pedido of pedidos) {
       if (pedido.hasOwnProperty('itensPedido')) {
         // necessário porque itensPedido é opcional - sem essa verificação, ocorre erro 'itensPedido is not iterable'
@@ -55,9 +58,9 @@ export class ProdutoIntegration {
     return pedidos;
   }
 
-  async insereProdutoEmItemPedido(pedido: Pedido): Promise<Pedido> {
+  async populaProdutoEmItemPedido(pedido: Pedido): Promise<Pedido> {
     const pedidoParametro = [pedido];
-    const pedidos = await this.insereProdutosEmItensPedido(pedidoParametro);
+    const pedidos = await this.populaProdutosEmItensPedido(pedidoParametro);
     return pedidos[0];
   }
 }

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Inject,
-  Logger,
-  NotFoundException,
-  Post,
-  Query,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Logger, Post, Query, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IClienteService } from 'src/application/cliente/service/cliente.service.interface';
 import { BaseRestApi } from 'src/presentation/rest/base.api';
@@ -56,10 +45,6 @@ export class ClienteRestApi extends BaseRestApi {
   async buscaPorCpf(@Query(ValidationPipe) query: BuscarPorCpfClienteRequest): Promise<BuscarPorCpfClienteResponse> {
     this.logger.debug(`Consultando cliente por cpf: ${query}`);
     return await this.service.findByCpf(query.cpf).then((cliente) => {
-      if (cliente === undefined) {
-        throw new NotFoundException('Cliente não encontrado');
-      }
-
       return new BuscarPorCpfClienteResponse(cliente);
     });
   }

@@ -1,8 +1,9 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { AddItemPedidoValidator } from 'src/application/item-pedido/validation/add-item-pedido.validator';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
 export class ProdutoExistentePedidoValidator implements AddItemPedidoValidator {
@@ -24,7 +25,7 @@ export class ProdutoExistentePedidoValidator implements AddItemPedidoValidator {
       );
       return true;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof NaoEncontradoApplicationException) {
         throw new ValidationException(ProdutoExistentePedidoValidator.ERROR_MESSAGE);
       }
       this.logger.debug(`${ProdutoExistentePedidoValidator.name} finalizado com erro: ${error}`);
