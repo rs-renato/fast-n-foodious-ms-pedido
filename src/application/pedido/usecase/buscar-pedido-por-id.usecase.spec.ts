@@ -9,10 +9,13 @@ import { PedidoConstants } from 'src/shared/constants';
 import { BuscarPedidoPorIdUseCase } from './buscar-pedido-por-id.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 
 describe('BuscarPedidoPorIdUseCase', () => {
   let useCase: BuscarPedidoPorIdUseCase;
   let repository: IPedidoRepository;
+  let produtoIntegration: ProdutoIntegration
 
   const pedidoId = 123;
   const pedidoMock: Pedido = {
@@ -27,7 +30,8 @@ describe('BuscarPedidoPorIdUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule],
-      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders,
+      ],
     }).compile();
 
     // Desabilita a saída de log
@@ -35,6 +39,7 @@ describe('BuscarPedidoPorIdUseCase', () => {
 
     useCase = module.get<BuscarPedidoPorIdUseCase>(PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE);
     repository = module.get<IPedidoRepository>(PedidoConstants.IREPOSITORY);
+    produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
   });
 
   describe('buscarPedidoPorId', () => {
@@ -46,11 +51,26 @@ describe('BuscarPedidoPorIdUseCase', () => {
       expect(result).toEqual(pedidoMock);
     });
 
+    it('deve buscar um pedido por ID com sucesso (sem itens)', async () => {
+      jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);
+
+      const result = await useCase.buscarPedidoPorId(pedidoId, false);
+
+      expect(result).toEqual(pedidoMock);
+    });
+
     it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
       const error = new Error('Erro no repositório');
       jest.spyOn(repository, 'find').mockRejectedValue(error);
 
       await expect(useCase.buscarPedidoPorId(pedidoId)).rejects.toThrowError(ServiceException);
+    });
+
+    it('deve lançar uma IntegrationApplicationException em caso de erro na integração', async () => {
+      jest.spyOn(repository, 'find').mockResolvedValue([pedidoMock]);      
+      jest.spyOn(produtoIntegration, 'populaProdutoEmItemPedido').mockRejectedValue(new Error('any error'));
+
+      await expect(useCase.buscarPedidoPorId(pedidoId)).rejects.toThrowError(IntegrationApplicationException);
     });
   });
 });
