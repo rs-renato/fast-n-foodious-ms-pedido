@@ -8,6 +8,7 @@ import { ValidatorUtils } from 'src/shared/validator.utils';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
+import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 
 @Injectable()
 export class CheckoutPedidoUseCase {
@@ -36,6 +37,7 @@ export class CheckoutPedidoUseCase {
       totalPedido += itemPedido.quantidade * produto.preco;
     }
     pedido.total = totalPedido;
+    pedido.estadoPedido = EstadoPedido.CHECKOUT;
 
     // registra a necessidade de pagamento do pedido
     const pagamento = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido);

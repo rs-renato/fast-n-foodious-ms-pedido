@@ -18,27 +18,39 @@ import { EditarItemPedidoUseCase } from 'src/application/item-pedido/usecase/edi
 import { DeletarItemPedidoUseCase } from 'src/application/item-pedido/usecase/deletar-item-pedido.usecase';
 import { ProdutoInativoPedidoValidator } from 'src/application/item-pedido/validation/produto-inativo.validator';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
+import { PedidoPagamentoPendenteValidator } from 'src/application/item-pedido/validation/pedido-pagamento-pendente.validator';
+import { CheckoutRealizadoItemValidator } from 'src/application/item-pedido/validation/checkout-realizado-item.validator';
 
 export const ItemPedidoProviders: Provider[] = [
   { provide: ItemPedidoConstants.ISERVICE, useClass: ItemPedidoService },
   {
     provide: ItemPedidoConstants.ADD_ITEM_PEDIDO_VALIDATOR,
-    inject: [PedidoConstants.IREPOSITORY, ProdutoIntegration],
+    inject: [PedidoConstants.IREPOSITORY,
+      ItemPedidoConstants.IREPOSITORY,
+      ProdutoIntegration],
     useFactory: (
       pedidoRepository: IRepository<Pedido>,
+      itemPedidoRepository: IRepository<ItemPedido>,
       produtoIntegration: ProdutoIntegration,
     ): AddItemPedidoValidator[] => [
       new QuantidadeMinimaItemValidator(),
       new PedidoExistenteValidator(pedidoRepository),
       new ProdutoExistentePedidoValidator(produtoIntegration),
       new ProdutoInativoPedidoValidator(produtoIntegration),
+      new PedidoPagamentoPendenteValidator(pedidoRepository, itemPedidoRepository),
+      new CheckoutRealizadoItemValidator(pedidoRepository, itemPedidoRepository),
     ],
   },
   {
     provide: ItemPedidoConstants.EDITAR_ITEM_PEDIDO_VALIDATOR,
-    inject: [ItemPedidoConstants.IREPOSITORY],
-    useFactory: (repository: IRepository<ItemPedido>): EditarItemPedidoValidator[] => [
+    inject: [ItemPedidoConstants.IREPOSITORY,
+      PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IRepository<ItemPedido>,
+        pedidoRepository: IRepository<Pedido>,
+      ): EditarItemPedidoValidator[] => [
       new ItemPedidoExistenteValidator(repository),
+      new PedidoPagamentoPendenteValidator(pedidoRepository, repository),
+      new CheckoutRealizadoItemValidator(pedidoRepository, repository),
     ],
   },
   {
