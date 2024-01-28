@@ -25,9 +25,7 @@ export const ItemPedidoProviders: Provider[] = [
   { provide: ItemPedidoConstants.ISERVICE, useClass: ItemPedidoService },
   {
     provide: ItemPedidoConstants.ADD_ITEM_PEDIDO_VALIDATOR,
-    inject: [PedidoConstants.IREPOSITORY,
-      ItemPedidoConstants.IREPOSITORY,
-      ProdutoIntegration],
+    inject: [PedidoConstants.IREPOSITORY, ItemPedidoConstants.IREPOSITORY, ProdutoIntegration],
     useFactory: (
       pedidoRepository: IRepository<Pedido>,
       itemPedidoRepository: IRepository<ItemPedido>,
@@ -43,11 +41,11 @@ export const ItemPedidoProviders: Provider[] = [
   },
   {
     provide: ItemPedidoConstants.EDITAR_ITEM_PEDIDO_VALIDATOR,
-    inject: [ItemPedidoConstants.IREPOSITORY,
-      PedidoConstants.IREPOSITORY],
-    useFactory: (repository: IRepository<ItemPedido>,
-        pedidoRepository: IRepository<Pedido>,
-      ): EditarItemPedidoValidator[] => [
+    inject: [ItemPedidoConstants.IREPOSITORY, PedidoConstants.IREPOSITORY],
+    useFactory: (
+      repository: IRepository<ItemPedido>,
+      pedidoRepository: IRepository<Pedido>,
+    ): EditarItemPedidoValidator[] => [
       new ItemPedidoExistenteValidator(repository),
       new PedidoPagamentoPendenteValidator(pedidoRepository, repository),
       new CheckoutRealizadoItemValidator(pedidoRepository, repository),

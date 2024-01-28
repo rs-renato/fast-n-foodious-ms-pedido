@@ -4,5 +4,5 @@ export enum EstadoPedido {
   EM_PREPARACAO = 2,
   PRONTO = 3,
   FINALIZADO = 4,
-  CHECKOUT= 5,
+  CHECKOUT = 5,
 }
