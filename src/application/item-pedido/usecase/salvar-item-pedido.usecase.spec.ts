@@ -64,6 +64,7 @@ describe('SalvarItemPedidoUseCase', () => {
 
     jest.spyOn(pedidoRepository, 'findBy').mockResolvedValue([pedido]);
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
+    jest.spyOn(repository, 'findBy').mockResolvedValue([itemPedidoMock]);
   });
 
   describe('salvarItemPedido', () => {
