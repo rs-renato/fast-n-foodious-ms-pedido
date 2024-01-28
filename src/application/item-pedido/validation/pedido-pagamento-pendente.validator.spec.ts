@@ -19,7 +19,7 @@ describe('PedidoPagamentoPendenteValidator', () => {
     dataInicio: '2023-08-30',
     estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
     ativo: true,
-    total: 100.00,
+    total: 100.0,
     itensPedido: [],
   };
 
@@ -70,10 +70,10 @@ describe('PedidoPagamentoPendenteValidator', () => {
     });
 
     it('should not throw ValidationException if pedido is in PAGAMENTO_PENDENTE', async () => {
-        mockedPedido.estadoPedido = EstadoPedido.PAGAMENTO_PENDENTE;
-        jest.spyOn(pedidoRepository, 'findBy').mockResolvedValue([mockedPedido]);
-  
-        await expect(validator.validate(mockedItemPedido)).resolves.toBe(true);
+      mockedPedido.estadoPedido = EstadoPedido.PAGAMENTO_PENDENTE;
+      jest.spyOn(pedidoRepository, 'findBy').mockResolvedValue([mockedPedido]);
+
+      await expect(validator.validate(mockedItemPedido)).resolves.toBe(true);
     });
   });
 });

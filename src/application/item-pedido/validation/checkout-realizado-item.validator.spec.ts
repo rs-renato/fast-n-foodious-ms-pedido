@@ -19,7 +19,7 @@ describe('CheckoutRealizadoItemValidator', () => {
     dataInicio: '2023-08-30',
     estadoPedido: EstadoPedido.CHECKOUT,
     ativo: true,
-    total: 100.00,
+    total: 100.0,
     itensPedido: [],
   };
 
