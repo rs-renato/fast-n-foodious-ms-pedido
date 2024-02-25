@@ -29,7 +29,7 @@ export class PagamentoSqsIntegration {
     return await this.sqsClient
       .send(command)
       .then((response) => {
-        this.logger.log(`Resposta do publish na fila: ${JSON.stringify(response.$metadata)}`);
+        this.logger.log(`Resposta do publish na fila: ${JSON.stringify(response)}`);
         return response;
       })
       .catch((error) => {
