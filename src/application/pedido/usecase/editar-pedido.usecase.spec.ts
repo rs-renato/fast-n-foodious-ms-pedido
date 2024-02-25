@@ -10,6 +10,7 @@ import { EditarPedidoUseCase } from './editar-pedido.usecase';
 import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 
 describe('EditarPedidoUseCase', () => {
   let useCase: EditarPedidoUseCase;
@@ -32,7 +33,7 @@ describe('EditarPedidoUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...PedidoProviders,
         ...IntegrationProviders,

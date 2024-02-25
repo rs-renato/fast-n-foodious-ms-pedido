@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { IPedidoService } from 'src/application/pedido/service/pedido.service.interface';
 import { EstadoCorretoNovoPedidoValidator } from 'src/application/pedido/validation/estado-correto-novo-pedido.validator';
@@ -17,17 +18,20 @@ import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shar
 import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
+import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
   let pedidoRepository: IPedidoRepository;
   let itemPedidoRepository: IRepository<ItemPedido>;
   let validators: SalvarPedidoValidator[];
-  let pagamentoIntegration: PagamentoIntegration;
+  let pagamentoSqsIntegration: PagamentoSqsIntegration;
+  let pagamentoRestIntegration: PagamentoRestIntegration;
   let produtoIntegration: ProdutoIntegration;
 
   const pedidoId = 123;
@@ -104,10 +108,17 @@ describe('PedidoService', () => {
     ativo: true,
   };
 
+  const output: SendMessageCommandOutput = {
+    $metadata: {
+      httpStatusCode: 200,
+      requestId: '12345',
+    },
+  };
+
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...PedidoProviders,
         ...PersistenceInMemoryProviders,
@@ -152,7 +163,8 @@ describe('PedidoService', () => {
     itemPedidoRepository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
     validators = module.get<SalvarPedidoValidator[]>(PedidoConstants.SALVAR_PEDIDO_VALIDATOR);
     service = module.get<IPedidoService>(PedidoConstants.ISERVICE);
-    pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
+    pagamentoRestIntegration = module.get<PagamentoRestIntegration>(PagamentoRestIntegration);
     produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
 
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
@@ -367,20 +379,21 @@ describe('PedidoService', () => {
   describe('checkout', () => {
     it('deve chamar o caso de uso de checkout com o pedido correto', async () => {
       const expectedResult = {
-        pagamento: {
-          dataHoraPagamento: undefined,
-          estadoPagamento: 0,
-          id: 1,
-          pedidoId: 1,
-          total: 0,
-          transacaoId: '863c99369e3d033aa1f080419d0502b226b3718945ba425481c9f565a85be8c8',
-        },
+        pagamento: undefined,
+        // pagamento: {
+        //   dataHoraPagamento: undefined,
+        //   estadoPagamento: 0,
+        //   id: 1,
+        //   pedidoId: 1,
+        //   total: 0,
+        //   transacaoId: '863c99369e3d033aa1f080419d0502b226b3718945ba425481c9f565a85be8c8',
+        // },
         pedido,
       };
-      pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+      pagamentoRestIntegration.buscarPorPedidoId = jest.fn(() => {
         throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
-      jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedResult.pagamento);
+      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
       jest.spyOn(service, 'findById').mockResolvedValue(pedido);
       const resultado = await service.checkout(pedido.id);
       expect(resultado).toEqual(expectedResult);

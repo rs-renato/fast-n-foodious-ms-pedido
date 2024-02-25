@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { BuscarItensPorPedidoIdUseCase } from 'src/application/pedido/usecase/buscar-itens-por-pedido-id.usecase';
@@ -15,11 +16,13 @@ import { CheckoutPedidoUseCase } from './checkout-pedido.usecase';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 
 describe('CheckoutPedidoUseCase', () => {
   let useCase: CheckoutPedidoUseCase;
@@ -27,7 +30,8 @@ describe('CheckoutPedidoUseCase', () => {
   let buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase;
   let editarPedidoUseCase: EditarPedidoUseCase;
   let clienteRepository: IRepository<Cliente>;
-  let pagamentoIntegration: PagamentoIntegration;
+  let pagamentoSqsIntegration: PagamentoSqsIntegration;
+  let pagamentoRestIntegration: PagamentoRestIntegration;
   let produtoIntegration: ProdutoIntegration;
 
   const itemPedidoMock: ItemPedido = {
@@ -48,14 +52,15 @@ describe('CheckoutPedidoUseCase', () => {
 
   const expectedCheckoutPedido = {
     pedido,
-    pagamento: {
-      dataHoraPagamento: undefined,
-      estadoPagamento: 0,
-      id: 1,
-      pedidoId: 1,
-      total: 20,
-      transacaoId: '863c99369e3d033aa1f080419d0502b226b3718945ba425481c9f565a85be8c8',
-    },
+    pagamento: undefined,
+    // pagamento: {
+    //   dataHoraPagamento: undefined,
+    //   estadoPagamento: 0,
+    //   id: 1,
+    //   pedidoId: 1,
+    //   total: 20,
+    //   transacaoId: '863c99369e3d033aa1f080419d0502b226b3718945ba425481c9f565a85be8c8',
+    // },
   };
 
   const produto: ProdutoDto = {
@@ -75,9 +80,16 @@ describe('CheckoutPedidoUseCase', () => {
     cpf: '25634428777',
   };
 
+  const output: SendMessageCommandOutput = {
+    $metadata: {
+      httpStatusCode: 200,
+      requestId: '12345',
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...PedidoProviders,
         ...ItemPedidoProviders,
@@ -112,7 +124,8 @@ describe('CheckoutPedidoUseCase', () => {
     buscarProdutoPorIdUseCase = module.get<BuscarProdutoPorIdUseCase>(ProdutoConstants.BUSCAR_PRODUTO_POR_ID_USECASE);
     editarPedidoUseCase = module.get<EditarPedidoUseCase>(PedidoConstants.EDITAR_PEDIDO_USECASE);
     clienteRepository = module.get<IRepository<Cliente>>(ClienteConstants.IREPOSITORY);
-    pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
+    pagamentoRestIntegration = module.get<PagamentoRestIntegration>(PagamentoRestIntegration);
     produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
   });
 
@@ -121,13 +134,13 @@ describe('CheckoutPedidoUseCase', () => {
     jest.spyOn(buscarProdutoPorIdUseCase, 'buscarProdutoPorID').mockResolvedValue(produto);
     jest.spyOn(editarPedidoUseCase, 'editarPedido').mockResolvedValue(pedido);
 
-    pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+    pagamentoRestIntegration.buscarPorPedidoId = jest.fn(() => {
       throw new NaoEncontradoApplicationException('Pagamento não encontrado');
     });
 
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
 
-    jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(expectedCheckoutPedido.pagamento);
+    jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
 
     return await useCase.checkout(pedido);
   }

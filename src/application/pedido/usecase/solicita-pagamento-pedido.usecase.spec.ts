@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
@@ -7,14 +8,15 @@ import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/pro
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { PedidoConstants } from 'src/shared/constants';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
+import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
 
 describe('SolicitaPagamentoPedidoUseCase', () => {
   let useCase: SolicitaPagamentoPedidoUseCase;
-  let pagamentoIntegration: PagamentoIntegration;
+  let pagamentoSqsIntegration: PagamentoSqsIntegration;
 
   const pedido: Pedido = {
     id: 1,
@@ -34,9 +36,16 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
     id: 1,
   };
 
+  const output: SendMessageCommandOutput = {
+    $metadata: {
+      httpStatusCode: 200,
+      requestId: '12345',
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
@@ -44,21 +53,21 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
     module.useLogger(false);
 
     useCase = module.get<SolicitaPagamentoPedidoUseCase>(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE);
-    pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
   });
 
   describe('SolicitaPagamentoPedidoUseCase', () => {
-    it('deve realizar o pagamento do pedido e gerar o id de transação', async () => {
-      jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockResolvedValue(pagamento);
+    it('deve realizar o pagamento do pedido e gerar o id de mensagem', async () => {
+      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
 
-      const pagamentoResponse = await useCase.solicitaPagamento(pedido);
+      const response = await useCase.solicitaPagamento(pedido);
 
-      expect(pagamentoResponse.pedidoId).toEqual(pedido.id);
+      expect(response).toEqual(output);
     });
 
     it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
       const error = new IntegrationApplicationException('Erro');
-      jest.spyOn(pagamentoIntegration, 'solicitaPagamentoPedido').mockRejectedValue(error);
+      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockRejectedValue(error);
 
       await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(IntegrationApplicationException);
     });

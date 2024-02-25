@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
@@ -49,7 +50,7 @@ describe('SalvarItemPedidoUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 

@@ -2,9 +2,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CheckoutPedidoValidator } from 'src/application/pedido/validation/checkout-pedido.validator';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 
 @Injectable()
 export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator {
@@ -12,7 +12,7 @@ export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator
 
   private logger: Logger = new Logger(CheckoutPedidoRealizadoValidator.name);
 
-  constructor(@Inject(PagamentoIntegration) private pagamentoIntegration: PagamentoIntegration) {}
+  constructor(@Inject(PagamentoRestIntegration) private pagamentoRestIntegration: PagamentoRestIntegration) {}
 
   async validate({ id }: Pedido): Promise<boolean> {
     this.logger.log(
@@ -21,7 +21,7 @@ export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator
 
     let pagamentoDto: PagamentoDto;
     try {
-      pagamentoDto = await this.pagamentoIntegration.buscarPorPedidoId(id);
+      pagamentoDto = await this.pagamentoRestIntegration.buscarPorPedidoId(id);
       this.logger.debug(`PagamentoDto: ${JSON.stringify(pagamentoDto)}`);
     } catch (error) {
       if (error instanceof NaoEncontradoApplicationException) {

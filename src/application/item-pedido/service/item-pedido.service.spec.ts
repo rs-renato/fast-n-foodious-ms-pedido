@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
@@ -53,7 +54,7 @@ describe('ItemPedidoService', () => {
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 

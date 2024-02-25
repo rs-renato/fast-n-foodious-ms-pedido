@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ProdutoExistentePedidoValidator } from './produto-existente.validator';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ProdutoConstants } from 'src/shared/constants';
@@ -32,7 +33,7 @@ describe('ProdutoExistentePedidoValidator', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...IntegrationProviders,
         ProdutoExistentePedidoValidator,
