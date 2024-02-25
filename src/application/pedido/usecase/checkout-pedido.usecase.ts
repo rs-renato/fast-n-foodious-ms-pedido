@@ -40,11 +40,10 @@ export class CheckoutPedidoUseCase {
     pedido.estadoPedido = EstadoPedido.CHECKOUT;
 
     // registra a necessidade de pagamento do pedido
-    let pedidoRetornado = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido)
-      .then((output) => {
-        this.logger.debug(`output: ${JSON.stringify(output)}`);
-        return this.editarPedidoUseCase.editarPedido(pedido);
-      });
+    const pedidoRetornado = await this.solicitaPagamentoPedidoUseCase.solicitaPagamento(pedido).then((output) => {
+      this.logger.debug(`output: ${JSON.stringify(output)}`);
+      return this.editarPedidoUseCase.editarPedido(pedido);
+    });
 
     this.logger.debug(`pedidoRetornado: ${JSON.stringify(pedidoRetornado)}`);
 
