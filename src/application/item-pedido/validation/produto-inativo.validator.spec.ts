@@ -41,7 +41,12 @@ describe('ProdutoInativoPedidoValidator', () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders, ProdutoInativoPedidoValidator],
+      providers: [
+        ...IntegrationProviders,
+        ...PedidoProviders,
+        ...PersistenceInMemoryProviders,
+        ProdutoInativoPedidoValidator,
+      ],
     }).compile();
 
     // Obtém a instância do validator e do repositório a partir do módulo de teste

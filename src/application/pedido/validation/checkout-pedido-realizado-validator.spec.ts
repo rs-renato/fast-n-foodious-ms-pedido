@@ -34,7 +34,9 @@ describe('CheckoutPedidoRealizadoValidator', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
       providers: [
-        ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders,
+        ...IntegrationProviders,
+        ...PedidoProviders,
+        ...PersistenceInMemoryProviders,
         CheckoutPedidoRealizadoValidator,
         // Mock do repositório de Pagamento
         {

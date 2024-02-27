@@ -37,7 +37,9 @@ describe('ProdutoExistentePedidoValidator', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
       providers: [
-        ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders,
+        ...IntegrationProviders,
+        ...PedidoProviders,
+        ...PersistenceInMemoryProviders,
         ProdutoExistentePedidoValidator,
         {
           provide: ProdutoConstants.IREPOSITORY,

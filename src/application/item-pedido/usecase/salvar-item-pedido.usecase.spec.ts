@@ -52,7 +52,7 @@ describe('SalvarItemPedidoUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PedidoProviders,...PersistenceInMemoryProviders],
+      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log
