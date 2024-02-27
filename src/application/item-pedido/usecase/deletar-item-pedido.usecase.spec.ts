@@ -11,6 +11,7 @@ import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 
 describe('DeletarItemPedidoUseCase', () => {
   let useCase: DeletarItemPedidoUseCase;
@@ -36,7 +37,7 @@ describe('DeletarItemPedidoUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      providers: [...ItemPedidoProviders, ...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log

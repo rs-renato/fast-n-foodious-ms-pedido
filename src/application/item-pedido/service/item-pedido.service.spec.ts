@@ -17,6 +17,7 @@ import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 
 describe('ItemPedidoService', () => {
   let service: IItemPedidoService;
@@ -55,7 +56,7 @@ describe('ItemPedidoService', () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     module.useLogger(false);

@@ -7,6 +7,8 @@ import { ProdutoIntegration } from 'src/integration/produto/produto.integration'
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 
 const IMAGEM_BASE64_SAMPLE =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
@@ -39,7 +41,7 @@ describe('ProdutoInativoPedidoValidator', () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...IntegrationProviders, ProdutoInativoPedidoValidator],
+      providers: [...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders, ProdutoInativoPedidoValidator],
     }).compile();
 
     // Obtém a instância do validator e do repositório a partir do módulo de teste

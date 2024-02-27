@@ -12,11 +12,11 @@ import { PedidoConstants } from 'src/shared/constants';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
-import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 describe('SolicitaPagamentoPedidoUseCase', () => {
   let useCase: SolicitaPagamentoPedidoUseCase;
-  let pagamentoSqsIntegration: PagamentoSqsIntegration;
+  let pagamentoSqsIntegration: SqsIntegration;
 
   const pedido: Pedido = {
     id: 1,
@@ -53,12 +53,12 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
     module.useLogger(false);
 
     useCase = module.get<SolicitaPagamentoPedidoUseCase>(PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE);
-    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
+    pagamentoSqsIntegration = module.get<SqsIntegration>(SqsIntegration);
   });
 
   describe('SolicitaPagamentoPedidoUseCase', () => {
     it('deve realizar o pagamento do pedido e gerar o id de mensagem', async () => {
-      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
+      jest.spyOn(pagamentoSqsIntegration, 'sendSolicitaPagamentoPedido').mockResolvedValue(output);
 
       const response = await useCase.solicitaPagamento(pedido);
 
@@ -67,7 +67,7 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
 
     it('deve lançar uma ServiceException em caso de erro no repositório', async () => {
       const error = new IntegrationApplicationException('Erro');
-      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockRejectedValue(error);
+      jest.spyOn(pagamentoSqsIntegration, 'sendSolicitaPagamentoPedido').mockRejectedValue(error);
 
       await expect(useCase.solicitaPagamento(pedido)).rejects.toThrowError(IntegrationApplicationException);
     });

@@ -3,7 +3,9 @@ import { ProdutoIntegration } from '../produto/produto.integration';
 import { ConfigService } from '@nestjs/config';
 import { SQSClient } from '@aws-sdk/client-sqs';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
-import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
+import { BuscarPedidoPorIdUseCase, EditarPedidoUseCase } from 'src/application/pedido/usecase';
+import { PedidoConstants } from 'src/shared/constants';
 
 export const IntegrationProviders: Provider[] = [
   {
@@ -15,13 +17,17 @@ export const IntegrationProviders: Provider[] = [
     useClass: PagamentoRestIntegration,
   },
   {
-    inject: [ConfigService],
-    provide: PagamentoSqsIntegration,
-    useFactory: (configService: ConfigService): PagamentoSqsIntegration =>
-      new PagamentoSqsIntegration(
-        new SQSClient({
-          endpoint: configService.get('AWS_SQS_ENDPOINT'),
-        }),
+    inject: [ConfigService, PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE, PedidoConstants.EDITAR_PEDIDO_USECASE],
+    provide: SqsIntegration,
+    useFactory: (
+      configService: ConfigService,
+      buscarPedidoPorIdUseCase: BuscarPedidoPorIdUseCase,
+      editarPedidoUseCase: EditarPedidoUseCase,
+    ): SqsIntegration =>
+      new SqsIntegration(
+        new SQSClient({ endpoint: configService.get('AWS_SQS_ENDPOINT') }),
+        editarPedidoUseCase,
+        buscarPedidoPorIdUseCase,
       ),
   },
 ];

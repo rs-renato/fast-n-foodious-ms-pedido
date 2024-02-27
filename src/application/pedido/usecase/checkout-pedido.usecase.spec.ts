@@ -21,7 +21,7 @@ import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { PedidoComDadosDePagamento } from 'src/application/pedido/service/pedido.service.interface';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
-import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 
 describe('CheckoutPedidoUseCase', () => {
@@ -30,7 +30,7 @@ describe('CheckoutPedidoUseCase', () => {
   let buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase;
   let editarPedidoUseCase: EditarPedidoUseCase;
   let clienteRepository: IRepository<Cliente>;
-  let pagamentoSqsIntegration: PagamentoSqsIntegration;
+  let pagamentoSqsIntegration: SqsIntegration;
   let pagamentoRestIntegration: PagamentoRestIntegration;
   let produtoIntegration: ProdutoIntegration;
 
@@ -124,7 +124,7 @@ describe('CheckoutPedidoUseCase', () => {
     buscarProdutoPorIdUseCase = module.get<BuscarProdutoPorIdUseCase>(ProdutoConstants.BUSCAR_PRODUTO_POR_ID_USECASE);
     editarPedidoUseCase = module.get<EditarPedidoUseCase>(PedidoConstants.EDITAR_PEDIDO_USECASE);
     clienteRepository = module.get<IRepository<Cliente>>(ClienteConstants.IREPOSITORY);
-    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
+    pagamentoSqsIntegration = module.get<SqsIntegration>(SqsIntegration);
     pagamentoRestIntegration = module.get<PagamentoRestIntegration>(PagamentoRestIntegration);
     produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
   });
@@ -140,7 +140,7 @@ describe('CheckoutPedidoUseCase', () => {
 
     jest.spyOn(produtoIntegration, 'getProdutoById').mockResolvedValue(produto);
 
-    jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
+    jest.spyOn(pagamentoSqsIntegration, 'sendSolicitaPagamentoPedido').mockResolvedValue(output);
 
     return await useCase.checkout(pedido);
   }

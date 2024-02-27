@@ -23,14 +23,14 @@ import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
-import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
   let pedidoRepository: IPedidoRepository;
   let itemPedidoRepository: IRepository<ItemPedido>;
   let validators: SalvarPedidoValidator[];
-  let pagamentoSqsIntegration: PagamentoSqsIntegration;
+  let pagamentoSqsIntegration: SqsIntegration;
   let pagamentoRestIntegration: PagamentoRestIntegration;
   let produtoIntegration: ProdutoIntegration;
 
@@ -163,7 +163,7 @@ describe('PedidoService', () => {
     itemPedidoRepository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
     validators = module.get<SalvarPedidoValidator[]>(PedidoConstants.SALVAR_PEDIDO_VALIDATOR);
     service = module.get<IPedidoService>(PedidoConstants.ISERVICE);
-    pagamentoSqsIntegration = module.get<PagamentoSqsIntegration>(PagamentoSqsIntegration);
+    pagamentoSqsIntegration = module.get<SqsIntegration>(SqsIntegration);
     pagamentoRestIntegration = module.get<PagamentoRestIntegration>(PagamentoRestIntegration);
     produtoIntegration = module.get<ProdutoIntegration>(ProdutoIntegration);
 
@@ -393,7 +393,7 @@ describe('PedidoService', () => {
       pagamentoRestIntegration.buscarPorPedidoId = jest.fn(() => {
         throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
-      jest.spyOn(pagamentoSqsIntegration, 'publishSolicitaPagamentoPedido').mockResolvedValue(output);
+      jest.spyOn(pagamentoSqsIntegration, 'sendSolicitaPagamentoPedido').mockResolvedValue(output);
       jest.spyOn(service, 'findById').mockResolvedValue(pedido);
       const resultado = await service.checkout(pedido.id);
       expect(resultado).toEqual(expectedResult);

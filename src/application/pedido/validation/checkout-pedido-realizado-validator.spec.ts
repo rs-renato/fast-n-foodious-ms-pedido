@@ -12,6 +12,9 @@ import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
+import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 
 describe('CheckoutPedidoRealizadoValidator', () => {
   let validator: CheckoutPedidoRealizadoValidator;
@@ -31,7 +34,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
       providers: [
-        ...IntegrationProviders,
+        ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders,
         CheckoutPedidoRealizadoValidator,
         // Mock do repositório de Pagamento
         {

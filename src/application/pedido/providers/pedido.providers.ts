@@ -29,7 +29,7 @@ import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shar
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
-import { PagamentoSqsIntegration } from 'src/integration/pagamento/pagamento.sqs.integration';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 
 export const PedidoProviders: Provider[] = [
@@ -128,8 +128,8 @@ export const PedidoProviders: Provider[] = [
   },
   {
     provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
-    inject: [PagamentoSqsIntegration],
-    useFactory: (pagamentoSnsIntegration: PagamentoSqsIntegration): SolicitaPagamentoPedidoUseCase =>
+    inject: [SqsIntegration],
+    useFactory: (pagamentoSnsIntegration: SqsIntegration): SolicitaPagamentoPedidoUseCase =>
       new SolicitaPagamentoPedidoUseCase(pagamentoSnsIntegration),
   },
   {
