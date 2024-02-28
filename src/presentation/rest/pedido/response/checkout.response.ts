@@ -12,6 +12,6 @@ export class CheckoutResponse {
 
   constructor(checkout: PedidoComDadosDePagamento) {
     this.pedido = new CheckoutPedidoResponse(checkout.pedido);
-    this.pagamento = new PagamentoPedidoResponse(checkout.pagamento);
+    // this.pagamento = new PagamentoPedidoResponse(checkout.pagamento);
   }
 }

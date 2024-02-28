@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-pedido.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
@@ -9,6 +10,7 @@ import { ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { BuscarItensPorPedidoIdUseCase } from './buscar-itens-por-pedido-id.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('BuscarItensPorPedidoIdUseCase', () => {
   let useCase: BuscarItensPorPedidoIdUseCase;
@@ -22,8 +24,14 @@ describe('BuscarItensPorPedidoIdUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
-      providers: [...ItemPedidoProviders, ...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      imports: [HttpModule, ConfigModule],
+      providers: [
+        ...ItemPedidoProviders,
+        ...PedidoProviders,
+        ...IntegrationProviders,
+        ...ClienteProviders,
+        ...PersistenceInMemoryProviders,
+      ],
     }).compile();
 
     // Desabilita a saída de log

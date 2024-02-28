@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ItemPedido } from 'src/enterprise/item-pedido/model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ProdutoInativoPedidoValidator } from 'src/application/item-pedido/validation/produto-inativo.validator';
@@ -6,6 +7,9 @@ import { ProdutoIntegration } from 'src/integration/produto/produto.integration'
 import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 const IMAGEM_BASE64_SAMPLE =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
@@ -37,8 +41,14 @@ describe('ProdutoInativoPedidoValidator', () => {
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
-      providers: [...IntegrationProviders, ProdutoInativoPedidoValidator],
+      imports: [HttpModule, ConfigModule],
+      providers: [
+        ...IntegrationProviders,
+        ...PedidoProviders,
+        ...ClienteProviders,
+        ...PersistenceInMemoryProviders,
+        ProdutoInativoPedidoValidator,
+      ],
     }).compile();
 
     // Obtém a instância do validator e do repositório a partir do módulo de teste

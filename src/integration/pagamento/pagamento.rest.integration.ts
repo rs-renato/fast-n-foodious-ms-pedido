@@ -7,8 +7,8 @@ import { IntegrationApplicationException } from 'src/application/exception/integ
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 
 @Injectable()
-export class PagamentoIntegration {
-  private logger = new Logger(PagamentoIntegration.name);
+export class PagamentoRestIntegration {
+  private logger = new Logger(PagamentoRestIntegration.name);
 
   private MS_PAGAMENTO_URL = process.env.MS_PAGAMENTO_INTEGRATION_URL;
 
@@ -18,7 +18,7 @@ export class PagamentoIntegration {
     this.logger.debug(
       `solicitaPagamentoPedido: invocando serviço de integração em http://${this.MS_PAGAMENTO_URL}/v1/pagamento/solicitar para o pedido ${pedidoId}, com o total ${totalPedido}`,
     );
-    const request = this.httpService
+    const response = this.httpService
       .post(`http://${this.MS_PAGAMENTO_URL}/v1/pagamento/solicitar`, {
         pedidoId: pedidoId,
         totalPedido: totalPedido,
@@ -33,7 +33,7 @@ export class PagamentoIntegration {
         }),
       );
 
-    const pagamentoResponse = await lastValueFrom(request);
+    const pagamentoResponse = await lastValueFrom(response);
 
     this.logger.debug('pagamentoResponse: ' + JSON.stringify(pagamentoResponse));
 

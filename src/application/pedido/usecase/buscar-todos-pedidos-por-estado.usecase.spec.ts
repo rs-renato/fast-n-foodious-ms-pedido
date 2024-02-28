@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
@@ -9,6 +10,7 @@ import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosPorEstadoUseCase } from './buscar-todos-pedidos-por-estado.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('BuscarTodosPedidosPorEstadoUseCase', () => {
   let useCase: BuscarTodosPedidosPorEstadoUseCase;
@@ -36,8 +38,8 @@ describe('BuscarTodosPedidosPorEstadoUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
-      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      imports: [HttpModule, ConfigModule],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...ClienteProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log

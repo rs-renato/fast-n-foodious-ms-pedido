@@ -11,7 +11,8 @@ import { CpfValidoClienteValidator } from 'src/application/cliente/validation/cp
 import { EmailUnicoClienteValidator } from 'src/application/cliente/validation/email-unico-cliente.validator';
 import { EmailValidoClienteValidator } from 'src/application/cliente/validation/email-valido-cliente.validator';
 import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/identificar-cliente-por-cpf.usecase';
-import { ClienteConstants } from 'src/shared/constants';
+import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
+import { BuscarClientePorIdPedidoUsecase } from 'src/application/cliente/usecase/buscar-cliente-por-id-pedido.usecase';
 
 export const ClienteProviders: Provider[] = [
   { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
@@ -32,6 +33,12 @@ export const ClienteProviders: Provider[] = [
     inject: [ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE],
     useFactory: (usecase: BuscarClientePorCpfUseCase): IdentificarClienteUseCase =>
       new IdentificarClienteUseCase(usecase),
+  },
+  {
+    provide: ClienteConstants.BUSCAR_CLIENTE_POR_ID_PEDIDO,
+    inject: [PedidoConstants.IREPOSITORY, ClienteConstants.IREPOSITORY],
+    useFactory: (pedidoRepository, clienteRepository): BuscarClientePorIdPedidoUsecase =>
+      new BuscarClientePorIdPedidoUsecase(pedidoRepository, clienteRepository),
   },
   {
     provide: ClienteConstants.SALVAR_CLIENTE_VALIDATOR,
