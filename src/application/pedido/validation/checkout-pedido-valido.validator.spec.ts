@@ -90,7 +90,7 @@ describe('CheckoutPedidoValidator', () => {
       (repository.findBy as jest.Mock).mockImplementationOnce(() => {
         return Promise.resolve([pedidoRecebido]);
       });
-      await expect(validator.validate(pedido)).rejects.toThrowError('Pedido informado já realizou checkout');
+      await expect(validator.validate(pedido)).rejects.toThrowError('Pedido informado já realizou checkout e/ou já foi pago');
     });
   });
 });

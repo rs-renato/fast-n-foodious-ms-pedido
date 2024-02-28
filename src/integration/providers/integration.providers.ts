@@ -5,7 +5,10 @@ import { SQSClient } from '@aws-sdk/client-sqs';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 import { BuscarPedidoPorIdUseCase, EditarPedidoUseCase } from 'src/application/pedido/usecase';
-import { PedidoConstants } from 'src/shared/constants';
+import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
+import { BuscarClientePorIdPedidoUsecase } from 'src/application/cliente/usecase/buscar-cliente-por-id-pedido.usecase';
+import { SesIntegration } from 'src/integration/ses/ses.integration';
+import { SESClient } from '@aws-sdk/client-ses';
 
 export const IntegrationProviders: Provider[] = [
   {
@@ -17,17 +20,18 @@ export const IntegrationProviders: Provider[] = [
     useClass: PagamentoRestIntegration,
   },
   {
-    inject: [ConfigService, PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE, PedidoConstants.EDITAR_PEDIDO_USECASE],
+    inject: [ConfigService, PedidoConstants.EDITAR_PEDIDO_USECASE, PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE, ClienteConstants.BUSCAR_CLIENTE_POR_ID_PEDIDO],
     provide: SqsIntegration,
     useFactory: (
       configService: ConfigService,
-      buscarPedidoPorIdUseCase: BuscarPedidoPorIdUseCase,
       editarPedidoUseCase: EditarPedidoUseCase,
+      buscarPedidoPorIdUseCase: BuscarPedidoPorIdUseCase,
+      buscarClientePorIdPedidoUsecase: BuscarClientePorIdPedidoUsecase
     ): SqsIntegration =>
       new SqsIntegration(
-        new SQSClient({ endpoint: configService.get('AWS_SQS_ENDPOINT') }),
+        new SQSClient({ endpoint: configService.get('AWS_ENDPOINT') }),
+        new SesIntegration(new SESClient({ endpoint: configService.get('AWS_ENDPOINT') }), buscarClientePorIdPedidoUsecase),
         editarPedidoUseCase,
-        buscarPedidoPorIdUseCase,
-      ),
+        buscarPedidoPorIdUseCase,      ),
   },
 ];

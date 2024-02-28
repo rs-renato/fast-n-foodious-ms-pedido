@@ -8,7 +8,7 @@ import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.re
 
 @Injectable()
 export class CheckoutPedidoRealizadoValidator implements CheckoutPedidoValidator {
-  public static CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout';
+  public static CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout e/ou já foi pago';
 
   private logger: Logger = new Logger(CheckoutPedidoRealizadoValidator.name);
 

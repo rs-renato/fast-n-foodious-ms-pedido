@@ -11,16 +11,20 @@ import {
 } from '@aws-sdk/client-sqs';
 import { setTimeout } from 'timers/promises';
 import { BuscarPedidoPorIdUseCase, EditarPedidoUseCase } from 'src/application/pedido/usecase';
-import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
-import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
+import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
+import { SesIntegration } from 'src/integration/ses/ses.integration';
+import { getEstadoPagamentoFromValue } from 'src/enterprise/pagamento/estado-pagamento.enum';
 
 @Injectable()
 export class SqsIntegration {
   private logger = new Logger(SqsIntegration.name);
 
+  private SQS_PREPARACAO_PEDIDO_REQ_URL = process.env.SQS_PREPARACAO_PEDIDO_REQ_URL;
   private SQS_SOLICITAR_PAGAMENTO_REQ_URL = process.env.SQS_SOLICITAR_PAGAMENTO_REQ_URL;
   private SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL;
+  private SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL;
+
   private SQS_MAX_NUMBER_MESSAGES = 1;
   private SQS_WAIT_TIME_SECONDS = 20;
   private SQS_VISIBILITY_TIMEOUT = 20;
@@ -28,34 +32,85 @@ export class SqsIntegration {
 
   constructor(
     private sqsClient: SQSClient,
+    private sesIntegration: SesIntegration,
     private editarPedidoUseCase: EditarPedidoUseCase,
     private buscarPedidoPorIdUseCase: BuscarPedidoPorIdUseCase,
   ) {}
 
-  start(): void {
+  startReceiveEstadoPagamentoPedido(): void {
     (async () => {
       while (true) {
-        await this.receiveEstadoPagamentoPedido()
+        await this.receiveEstadoPagamentoPedidoConfirmado()
           .then((messages) => {
-            if (messages) {
-              messages.forEach((message) => {
-                this.logger.log(`mensagem consumida: ${JSON.stringify(message)}`);
-                const body = JSON.parse(message.Body);
-                this.buscarPedidoPorIdUseCase.buscarPedidoPorId(body.pagamento.pedidoId).then((pedido) => {
-                  pedido.estadoPedido = EstadoPedido.RECEBIDO;
-                  this.editarPedidoUseCase.editarPedido(pedido);
-                });
+            this.atualizaEstadoPedido(messages, EstadoPedido.RECEBIDO)
+              .then(() => {
+                this.sendPreparacaoPedido(messages)
+                  .then(() => this.enviaEmailNotificacao(messages))
               });
-            }
           })
           .catch(async (err) => {
             this.logger.error(
-              `receiveEstadoPagamentoPedido: Erro ao consumir a mensagem da fila: ${JSON.stringify(err)}`,
+              `receiveEstadoPagamentoPedidoConfirmado: Erro ao consumir a mensagem da fila: ${JSON.stringify(err)}`,
             );
             await setTimeout(this.SQS_CONSUMER_TIMEOUT);
           });
       }
     })();
+
+    (async () => {
+      while (true) {
+        await this.receiveEstadoPagamentoPedidoRejeitado()
+          .then((messages) => {
+            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE)
+              .then(() => {
+                this.enviaEmailNotificacao(messages);
+              });
+          })
+          .catch(async (err) => {
+            this.logger.error(
+              `receiveEstadoPagamentoPedidoConfirmado: Erro ao consumir a mensagem da fila: ${JSON.stringify(err)}`,
+            );
+            await setTimeout(this.SQS_CONSUMER_TIMEOUT);
+          });
+      }
+    })();
+  }
+  
+  private async enviaEmailNotificacao(messages: Message[]) {
+    for (const message of messages) {
+      const body = JSON.parse(message.Body);
+      this.sesIntegration.sendEmailPagamento({
+        id: body.pagamento.id,
+        pedidoId: body.pagamento.pedidoId,
+        dataHoraPagamento: body.pagamento.dataHoraPagamento,
+        estadoPagamento: getEstadoPagamentoFromValue(body.pagamento.estadoPagamento),
+        total: body.pagamento.total,
+        transacaoId: body.pagamento.transacaoId
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Houve um erro no envio de email de notificação de resultado de pagamento: ${JSON.stringify(error)}`,
+        );
+      });
+    }
+  }
+
+  private async atualizaEstadoPedido(messages: Message[], estadoPedido: EstadoPedido): Promise<Pedido> {
+    if (messages) {
+      for (const message of messages) {
+        this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
+        const body = JSON.parse(message.Body);
+        return await this.buscarPedidoPorIdUseCase.buscarPedidoPorId(body.pagamento.pedidoId)
+          .then((pedido) => {
+            pedido.estadoPedido = estadoPedido;
+            return this.editarPedidoUseCase.editarPedido(pedido);
+          })
+          .catch((error) => {
+            this.logger.error(`Houve um erro ao atualizar o estado do pedido: ${error}`);
+            throw new IntegrationApplicationException('Não foi possível atualizar o estado do pedido');
+          });
+      }
+    }
   }
 
   async sendSolicitaPagamentoPedido(pedidoId: number, totalPedido: number): Promise<SendMessageCommandOutput> {
@@ -76,7 +131,7 @@ export class SqsIntegration {
     return await this.sqsClient
       .send(command)
       .then((response) => {
-        this.logger.log(`Resposta do publish na fila: ${JSON.stringify(response)}`);
+        this.logger.log(`Resposta do publish na fila de solicitação de pagamento: ${JSON.stringify(response)}`);
         return response;
       })
       .catch((error) => {
@@ -87,11 +142,58 @@ export class SqsIntegration {
       });
   }
 
-  async receiveEstadoPagamentoPedido(): Promise<Message[]> {
+  private async sendPreparacaoPedido(messages: Message[]): Promise<SendMessageCommandOutput> {
+
+    if(messages){
+      for(let message of messages){
+        const body = JSON.parse(message.Body);
+        const pedidoId = body.pagamento.pedidoId
+
+        return await this.buscarPedidoPorIdUseCase.buscarPedidoPorId(pedidoId)
+          .then(async (pedido) => {
+            const command = new SendMessageCommand({
+              MessageGroupId: 'preparacao-pedido',
+              MessageDeduplicationId: `${pedidoId}`,
+              QueueUrl: this.SQS_PREPARACAO_PEDIDO_REQ_URL,
+              MessageBody: JSON.stringify({
+                pedido: pedido,
+              }),
+            });
+        
+            this.logger.debug(
+              `Invocando SendMessageCommand para solicitação de preparação do pedido: ${JSON.stringify(command)}`,
+            );
+        
+            return await this.sqsClient
+              .send(command)
+              .then((response) => {
+                this.logger.log(`Resposta do publish na fila de preparação de pedido: ${JSON.stringify(response)}`);
+                return response;
+              })
+              .catch((error) => {
+                this.logger.error(
+                  `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
+                );
+                throw new IntegrationApplicationException('Não foi possível solicitar a preparação do pedido.');
+              });
+          })
+      }
+    }
+  }
+
+  private async receiveEstadoPagamentoPedidoConfirmado(): Promise<Message[]> {
+    return this.receiveEstadoPagamentoPedido(this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL)
+  }
+
+  private async receiveEstadoPagamentoPedidoRejeitado(): Promise<Message[]> {
+    return this.receiveEstadoPagamentoPedido(this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL)
+  }
+
+  private async receiveEstadoPagamentoPedido(QueueUrl: string): Promise<Message[]> {
     const command = new ReceiveMessageCommand({
       AttributeNames: ['CreatedTimestamp'],
       MessageAttributeNames: ['All'],
-      QueueUrl: this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL,
+      QueueUrl: QueueUrl,
       MaxNumberOfMessages: this.SQS_MAX_NUMBER_MESSAGES,
       WaitTimeSeconds: this.SQS_WAIT_TIME_SECONDS,
       VisibilityTimeout: this.SQS_VISIBILITY_TIMEOUT,
@@ -105,13 +207,13 @@ export class SqsIntegration {
       .send(command)
       .then((response) => {
         this.logger.debug(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
-        return response.Messages;
+        return response.Messages || [];
       })
       .then(async (messages) => {
         if (messages && messages.length) {
           this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(messages)}`);
           const command = new DeleteMessageCommand({
-            QueueUrl: this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL,
+            QueueUrl: QueueUrl,
             ReceiptHandle: messages[0].ReceiptHandle,
           });
           this.logger.debug(

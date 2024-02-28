@@ -9,7 +9,7 @@ import { PedidoConstants } from 'src/shared/constants';
 @Injectable()
 export class CheckoutPedidoValidoValidator implements CheckoutPedidoValidator {
   public static readonly PEDIDO_INEXISTENTE_ERROR_MESSAGE = 'Código de pedido inexistente';
-  public static readonly CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout';
+  public static readonly CHECKOUT_JA_REALIZADO_ERROR_MESSAGE = 'Pedido informado já realizou checkout e/ou já foi pago';
 
   private logger: Logger = new Logger(CheckoutPedidoValidoValidator.name);
 
