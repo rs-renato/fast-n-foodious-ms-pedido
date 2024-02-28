@@ -50,7 +50,6 @@ describe('CheckoutRealizadoItemValidator', () => {
 
     validator = module.get<IValidator<ItemPedido>>(CheckoutRealizadoItemValidator);
     pedidoRepository = module.get<IRepository<Pedido>>(PedidoConstants.IREPOSITORY);
-    itemPedidoRepository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
   });
 
   describe('validate', () => {
