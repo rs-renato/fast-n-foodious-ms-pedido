@@ -11,7 +11,6 @@ import { PedidoConstants, ItemPedidoConstants } from 'src/shared/constants';
 describe('CheckoutRealizadoItemValidator', () => {
   let validator: IValidator<ItemPedido>;
   let pedidoRepository: IRepository<Pedido>;
-  let itemPedidoRepository: IRepository<ItemPedido>;
 
   const mockedPedido: Pedido = {
     id: 1,

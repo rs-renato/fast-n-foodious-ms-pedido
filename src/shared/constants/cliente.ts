@@ -5,5 +5,5 @@ export const IREPOSITORY = 'IRepository<Cliente>';
 export const REPOSITORY_CLIENTE_ENTITY = 'Repository<ClienteEntity>';
 export const IDENTIFICAR_CLIENTE_POR_CPF_USECASE = 'IdentificarClienteUseCase';
 export const BUSCAR_CLIENTE_POR_CPF_USECASE = 'BuscarClientePorCpfUsecase';
-export const BUSCAR_CLIENTE_POR_ID_PEDIDO = 'BuscarClientePorIdPedidoUsecase'
+export const BUSCAR_CLIENTE_POR_ID_PEDIDO = 'BuscarClientePorIdPedidoUsecase';
 export const SALVAR_CLIENTE_USECASE = 'SalvarClienteUseCase';

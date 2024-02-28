@@ -36,6 +36,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
       providers: [
         ...IntegrationProviders,
         ...PedidoProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         CheckoutPedidoRealizadoValidator,
         // Mock do repositório de Pagamento

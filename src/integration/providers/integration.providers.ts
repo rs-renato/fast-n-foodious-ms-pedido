@@ -20,18 +20,27 @@ export const IntegrationProviders: Provider[] = [
     useClass: PagamentoRestIntegration,
   },
   {
-    inject: [ConfigService, PedidoConstants.EDITAR_PEDIDO_USECASE, PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE, ClienteConstants.BUSCAR_CLIENTE_POR_ID_PEDIDO],
+    inject: [
+      ConfigService,
+      PedidoConstants.EDITAR_PEDIDO_USECASE,
+      PedidoConstants.BUSCAR_PEDIDO_POR_ID_USECASE,
+      ClienteConstants.BUSCAR_CLIENTE_POR_ID_PEDIDO,
+    ],
     provide: SqsIntegration,
     useFactory: (
       configService: ConfigService,
       editarPedidoUseCase: EditarPedidoUseCase,
       buscarPedidoPorIdUseCase: BuscarPedidoPorIdUseCase,
-      buscarClientePorIdPedidoUsecase: BuscarClientePorIdPedidoUsecase
+      buscarClientePorIdPedidoUsecase: BuscarClientePorIdPedidoUsecase,
     ): SqsIntegration =>
       new SqsIntegration(
         new SQSClient({ endpoint: configService.get('AWS_ENDPOINT') }),
-        new SesIntegration(new SESClient({ endpoint: configService.get('AWS_ENDPOINT') }), buscarClientePorIdPedidoUsecase),
+        new SesIntegration(
+          new SESClient({ endpoint: configService.get('AWS_ENDPOINT') }),
+          buscarClientePorIdPedidoUsecase,
+        ),
         editarPedidoUseCase,
-        buscarPedidoPorIdUseCase,      ),
+        buscarPedidoPorIdUseCase,
+      ),
   },
 ];

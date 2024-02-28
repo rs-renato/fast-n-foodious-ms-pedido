@@ -11,6 +11,7 @@ import { SalvarPedidoUseCase } from './salvar-pedido.usecase';
 import { DateUtils } from 'src/shared/date.utils';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('SalvarPedidoUseCase', () => {
   let useCase: SalvarPedidoUseCase;
@@ -37,6 +38,7 @@ describe('SalvarPedidoUseCase', () => {
       providers: [
         ...PedidoProviders,
         ...IntegrationProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         // Mock do serviço IRepository<Cliente>
         {

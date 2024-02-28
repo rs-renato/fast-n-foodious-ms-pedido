@@ -9,6 +9,7 @@ import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosNaoFinalizadosUseCase } from './buscar-todos-pedidos-nao-finalizados.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
   let useCase: BuscarTodosPedidosNaoFinalizadosUseCase;
@@ -44,6 +45,7 @@ describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
       providers: [
         ...PedidoProviders,
         ...IntegrationProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         // Mock do serviço IRepository<Pedido>
         {

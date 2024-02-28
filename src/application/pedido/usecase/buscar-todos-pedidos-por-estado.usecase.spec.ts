@@ -10,6 +10,7 @@ import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosPorEstadoUseCase } from './buscar-todos-pedidos-por-estado.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('BuscarTodosPedidosPorEstadoUseCase', () => {
   let useCase: BuscarTodosPedidosPorEstadoUseCase;
@@ -38,7 +39,7 @@ describe('BuscarTodosPedidosPorEstadoUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...ClienteProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log

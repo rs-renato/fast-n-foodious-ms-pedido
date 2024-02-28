@@ -24,6 +24,7 @@ import { NaoEncontradoApplicationException } from 'src/application/exception/nao
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('PedidoService', () => {
   let service: IPedidoService;
@@ -121,6 +122,7 @@ describe('PedidoService', () => {
       imports: [HttpModule, ConfigModule],
       providers: [
         ...PedidoProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         ...IntegrationProviders,
         // Mock do serviço IRepository<Pedido>

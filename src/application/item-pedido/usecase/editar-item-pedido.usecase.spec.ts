@@ -12,6 +12,7 @@ import { IntegrationProviders } from 'src/integration/providers/integration.prov
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('DeletarItemPedidoUseCase', () => {
   let useCase: DeletarItemPedidoUseCase;
@@ -37,7 +38,13 @@ describe('DeletarItemPedidoUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...ItemPedidoProviders, ...IntegrationProviders, ...PedidoProviders, ...PersistenceInMemoryProviders],
+      providers: [
+        ...ItemPedidoProviders,
+        ...IntegrationProviders,
+        ...PedidoProviders,
+        ...ClienteProviders,
+        ...PersistenceInMemoryProviders,
+      ],
     }).compile();
 
     // Desabilita a saída de log

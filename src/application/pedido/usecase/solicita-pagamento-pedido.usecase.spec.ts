@@ -1,18 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
-import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
-import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 import { PedidoConstants } from 'src/shared/constants';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('SolicitaPagamentoPedidoUseCase', () => {
   let useCase: SolicitaPagamentoPedidoUseCase;
@@ -27,15 +26,6 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
     total: 10,
   };
 
-  const pagamento: PagamentoDto = {
-    dataHoraPagamento: new Date(),
-    estadoPagamento: EstadoPagamento.PENDENTE,
-    pedidoId: 1,
-    total: 10,
-    transacaoId: '123456-abcdef',
-    id: 1,
-  };
-
   const output: SendMessageCommandOutput = {
     $metadata: {
       httpStatusCode: 200,
@@ -46,7 +36,7 @@ describe('SolicitaPagamentoPedidoUseCase', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
+      providers: [...PedidoProviders, ...IntegrationProviders, ...ClienteProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log

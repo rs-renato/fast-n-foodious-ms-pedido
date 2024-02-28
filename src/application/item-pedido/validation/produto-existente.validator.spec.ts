@@ -11,6 +11,7 @@ import { IntegrationProviders } from 'src/integration/providers/integration.prov
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('ProdutoExistentePedidoValidator', () => {
   let validator: ProdutoExistentePedidoValidator;
@@ -39,6 +40,7 @@ describe('ProdutoExistentePedidoValidator', () => {
       providers: [
         ...IntegrationProviders,
         ...PedidoProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         ProdutoExistentePedidoValidator,
         {

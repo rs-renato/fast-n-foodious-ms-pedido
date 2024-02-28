@@ -23,6 +23,7 @@ import { NaoEncontradoApplicationException } from 'src/application/exception/nao
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
 import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('CheckoutPedidoUseCase', () => {
   let useCase: CheckoutPedidoUseCase;
@@ -94,6 +95,7 @@ describe('CheckoutPedidoUseCase', () => {
         ...PedidoProviders,
         ...ItemPedidoProviders,
         ...IntegrationProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
 
         // Mock do serviço IRepository<Cliente>

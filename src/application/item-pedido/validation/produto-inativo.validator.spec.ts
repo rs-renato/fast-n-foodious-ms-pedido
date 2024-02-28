@@ -9,6 +9,7 @@ import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 const IMAGEM_BASE64_SAMPLE =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
@@ -44,6 +45,7 @@ describe('ProdutoInativoPedidoValidator', () => {
       providers: [
         ...IntegrationProviders,
         ...PedidoProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         ProdutoInativoPedidoValidator,
       ],
