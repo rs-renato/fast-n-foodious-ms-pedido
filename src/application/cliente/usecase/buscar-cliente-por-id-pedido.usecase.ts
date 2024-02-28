@@ -17,22 +17,19 @@ export class BuscarClientePorIdPedidoUsecase {
 
   async buscarClientePorPedidoId(pedidoId: number): Promise<Cliente> {
     this.logger.log(`Realizando consulta de cliente para o pedido: ${pedidoId}`);
-    return await this.pedidoRepository
-      .findBy({ id: pedidoId })
-      .then((pedidos) => {
-        if (!pedidos.length) {
-          this.logger.error(`Pedido id=${pedidoId} não encontrado`);
-          throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${pedidoId}`);
-        }
+    const pedidos = await this.pedidoRepository.findBy({ id: pedidoId }).catch((error) => {
+      this.logger.error(`Erro ao buscar cliente do pedido: ${error} `);
+      throw new ServiceException(`Houve um erro ao obter dados do cliente: ${error}`);
+    });
 
-        return this.clienteRepository.findBy({ id: pedidos[0].clienteId }).then((clientes) => {
-          this.logger.log(`Cliente ${clientes[0].email} encontrado para o pedido #${pedidoId}`);
-          return clientes[0];
-        });
-      })
-      .catch((error) => {
-        this.logger.error(`Erro ao buscar cliente do pedido: ${error} `);
-        throw new ServiceException(`Houve um erro ao obter dados do cliente: ${error}`);
-      });
+    if (!pedidos.length) {
+      this.logger.error(`Pedido id=${pedidoId} não encontrado`);
+      throw new NaoEncontradoApplicationException(`Pedido não encontrado: ${pedidoId}`);
+    }
+
+    return this.clienteRepository.findBy({ id: pedidos[0].clienteId }).then((clientes) => {
+      this.logger.log(`Cliente ${clientes[0].email} encontrado para o pedido #${pedidoId}`);
+      return clientes[0];
+    });
   }
 }
