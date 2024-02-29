@@ -44,11 +44,10 @@ export class SqsIntegration {
         await this.receiveEstadoPagamentoPedidoConfirmado()
           .then((messages) => {
             this.atualizaEstadoPedido(messages, EstadoPedido.RECEBIDO).then(() => {
-              this.sendPreparacaoPedido(messages)
-                .then(() => {
-                  this.deleteEstadoPagamentoPedidoConfirmado(messages)
-                  this.enviaEmailNotificacao(messages)
-                });
+              this.sendPreparacaoPedido(messages).then(() => {
+                this.deleteEstadoPagamentoPedidoConfirmado(messages);
+                this.enviaEmailNotificacao(messages);
+              });
             });
           })
           .catch(async (err) => {
@@ -64,11 +63,10 @@ export class SqsIntegration {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
           .then((messages) => {
-            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE)
-              .then(() => {
-                this.deleteEstadoPagamentoPedidoRejeitado(messages)
-                this.enviaEmailNotificacao(messages);
-              });
+            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
+              this.deleteEstadoPagamentoPedidoRejeitado(messages);
+              this.enviaEmailNotificacao(messages);
+            });
           })
           .catch(async (err) => {
             this.logger.error(
@@ -227,15 +225,18 @@ export class SqsIntegration {
       });
   }
 
-  private async deleteEstadoPagamentoPedidoConfirmado(messages: Message[], ): Promise<DeleteMessageBatchCommandOutput> {
+  private async deleteEstadoPagamentoPedidoConfirmado(messages: Message[]): Promise<DeleteMessageBatchCommandOutput> {
     return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL);
   }
 
-  private async deleteEstadoPagamentoPedidoRejeitado(messages: Message[], ): Promise<DeleteMessageBatchCommandOutput> {
+  private async deleteEstadoPagamentoPedidoRejeitado(messages: Message[]): Promise<DeleteMessageBatchCommandOutput> {
     return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL);
   }
-  
-  private async deleteEstadoPagamentoPedido(messages: Message[], QueueUrl: string): Promise<DeleteMessageBatchCommandOutput> {
+
+  private async deleteEstadoPagamentoPedido(
+    messages: Message[],
+    QueueUrl: string,
+  ): Promise<DeleteMessageBatchCommandOutput> {
     this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(messages)}`);
     const command = new DeleteMessageBatchCommand({
       QueueUrl: QueueUrl,
@@ -250,12 +251,13 @@ export class SqsIntegration {
       )}`,
     );
 
-    return await this.sqsClient.send(command)
-      .catch((error) => {
-        this.logger.error(
-          `Erro ao deletar da fila o estado de pagamento do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
-        );
-        throw new IntegrationApplicationException('Não foi possível deletar o estado de pagamento do pedido da fila.');
-      });
+    return await this.sqsClient.send(command).catch((error) => {
+      this.logger.error(
+        `Erro ao deletar da fila o estado de pagamento do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(
+          command,
+        )}`,
+      );
+      throw new IntegrationApplicationException('Não foi possível deletar o estado de pagamento do pedido da fila.');
+    });
   }
 }
