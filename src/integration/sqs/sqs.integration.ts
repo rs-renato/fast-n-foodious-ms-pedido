@@ -49,7 +49,7 @@ export class SqsIntegration {
                   this.deleteEstadoPagamentoPedidoConfirmado(message);
                   this.enviaEmailNotificacao(message);
                 });
-              }); 
+              });
             }
           })
           .catch(async (err) => {
@@ -101,7 +101,6 @@ export class SqsIntegration {
   }
 
   private async atualizaEstadoPedido(message: Message, estadoPedido: EstadoPedido): Promise<Pedido> {
-
     this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
     const body = JSON.parse(message.Body);
     return await this.buscarPedidoPorIdUseCase
@@ -171,9 +170,9 @@ export class SqsIntegration {
         })
         .catch((error) => {
           this.logger.error(
-            `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(
-              error,
-            )} - Command: ${JSON.stringify(command)}`,
+            `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(
+              command,
+            )}`,
           );
           throw new IntegrationApplicationException('Não foi possível solicitar a preparação do pedido.');
         });
@@ -228,14 +227,11 @@ export class SqsIntegration {
     return this.deleteEstadoPagamentoPedido(message, this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL);
   }
 
-  private async deleteEstadoPagamentoPedido(
-    message: Message,
-    QueueUrl: string,
-  ): Promise<DeleteMessageCommandOutput> {
+  private async deleteEstadoPagamentoPedido(message: Message, QueueUrl: string): Promise<DeleteMessageCommandOutput> {
     this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
     const command = new DeleteMessageCommand({
       QueueUrl: QueueUrl,
-      ReceiptHandle: message.ReceiptHandle
+      ReceiptHandle: message.ReceiptHandle,
     });
     this.logger.debug(
       `Invocando DeleteMessageCommandOutput para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
