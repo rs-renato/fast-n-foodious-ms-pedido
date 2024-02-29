@@ -149,7 +149,7 @@ $ MYSQL_HOST=localhost NODE_ENV=local npm run start
 ```
 
 ### 🚨⚡️ Execução em modo produção (deprecated: substituído por AWS Fargate ECS)
-***Nota 1:** O K8S foi substituído pelo serviço gerenciado AWS Fargate ECS. A construção da insfraestrura é realizada através de IaC (Terraform) com seus respectivos scripts em repositórios específicos de Storage, Compute e Network. A documentação abaixo apenas ilustra a solução v2.0.0 (monolito) e foi mantida aqui caso seja necessário subir a aplicação de uma maneira mais fácil para avaliação dos instrutores (`considearar a execução via docker-compose-all.yml`)*
+***Nota 1:** O K8S foi substituído pelo serviço gerenciado AWS Fargate ECS. A construção da insfraestrura é realizada através de IaC (Terraform) com seus respectivos scripts em repositórios específicos de Storage, Compute e Network. A documentação abaixo apenas ilustra a solução v2.0.0 (monolito) e foi mantida aqui caso seja necessário subir a aplicação de uma maneira mais fácil para avaliação dos instrutores (`considerar a execução via docker-compose-all.yml`)*
 
 ***Nota 2:** O container da aplicação depende do mysql estar up & running. Então seja paciente, o tempo para o container do mysql estar disponível pode veriar, dependendo da disponibilidade de recursos e suas configurações de hardware locais.* 
 
