@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as process from 'process';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 import {
-  DeleteMessageCommand,
+  DeleteMessageBatchCommand,
+  DeleteMessageBatchCommandOutput,
   Message,
   ReceiveMessageCommand,
   SQSClient,
@@ -43,7 +44,11 @@ export class SqsIntegration {
         await this.receiveEstadoPagamentoPedidoConfirmado()
           .then((messages) => {
             this.atualizaEstadoPedido(messages, EstadoPedido.RECEBIDO).then(() => {
-              this.sendPreparacaoPedido(messages).then(() => this.enviaEmailNotificacao(messages));
+              this.sendPreparacaoPedido(messages)
+                .then(() => {
+                  this.deleteEstadoPagamentoPedidoConfirmado(messages)
+                  this.enviaEmailNotificacao(messages)
+                });
             });
           })
           .catch(async (err) => {
@@ -59,9 +64,11 @@ export class SqsIntegration {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
           .then((messages) => {
-            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
-              this.enviaEmailNotificacao(messages);
-            });
+            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE)
+              .then(() => {
+                this.deleteEstadoPagamentoPedidoRejeitado(messages)
+                this.enviaEmailNotificacao(messages);
+              });
           })
           .catch(async (err) => {
             this.logger.error(
@@ -198,31 +205,15 @@ export class SqsIntegration {
       VisibilityTimeout: this.SQS_VISIBILITY_TIMEOUT,
     });
 
-    this.logger.debug(
+    this.logger.verbose(
       `Invocando ReceiveMessageCommand para obtenção de estado de pagamento do pedido: ${JSON.stringify(command)}`,
     );
 
     return await this.sqsClient
       .send(command)
       .then((response) => {
-        this.logger.debug(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
+        this.logger.verbose(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
         return response.Messages || [];
-      })
-      .then(async (messages) => {
-        if (messages && messages.length) {
-          this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(messages)}`);
-          const command = new DeleteMessageCommand({
-            QueueUrl: QueueUrl,
-            ReceiptHandle: messages[0].ReceiptHandle,
-          });
-          this.logger.debug(
-            `Invocando DeleteMessageCommand para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
-              command,
-            )}`,
-          );
-          await this.sqsClient.send(command);
-        }
-        return messages;
       })
       .catch((error) => {
         this.logger.error(
@@ -233,6 +224,38 @@ export class SqsIntegration {
         throw new IntegrationApplicationException(
           'Não foi possível processar a solicitação de estado de pagamento do pedido.',
         );
+      });
+  }
+
+  private async deleteEstadoPagamentoPedidoConfirmado(messages: Message[], ): Promise<DeleteMessageBatchCommandOutput> {
+    return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL);
+  }
+
+  private async deleteEstadoPagamentoPedidoRejeitado(messages: Message[], ): Promise<DeleteMessageBatchCommandOutput> {
+    return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL);
+  }
+  
+  private async deleteEstadoPagamentoPedido(messages: Message[], QueueUrl: string): Promise<DeleteMessageBatchCommandOutput> {
+    this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(messages)}`);
+    const command = new DeleteMessageBatchCommand({
+      QueueUrl: QueueUrl,
+      Entries: messages.map((message) => ({
+        Id: message.MessageId,
+        ReceiptHandle: message.ReceiptHandle,
+      })),
+    });
+    this.logger.debug(
+      `Invocando DeleteMessageBatchCommand para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
+        command,
+      )}`,
+    );
+
+    return await this.sqsClient.send(command)
+      .catch((error) => {
+        this.logger.error(
+          `Erro ao deletar da fila o estado de pagamento do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
+        );
+        throw new IntegrationApplicationException('Não foi possível deletar o estado de pagamento do pedido da fila.');
       });
   }
 }

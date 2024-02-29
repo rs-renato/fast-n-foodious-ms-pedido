@@ -10,9 +10,9 @@ import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum'
 export class SesIntegration {
   private logger = new Logger(SesIntegration.name);
 
-  private EMAIL_SENDER = 'sac@fnf.com';
-  private SUBJECT_PAGAMENTO_RECUSADO = 'Houve um problema na autorização de pagamento do seu Pedido';
-  private SUBJECT_PAGAMENTO_APROVADO = 'Pagamento autorizado com sucesso para o seu Pedido';
+  private SES_SOURCE_EMAIL = process.env.SES_SOURCE_EMAIL;
+  private SES_SUBJECT_PAGAMENTO_RECUSADO = 'Houve um problema na autorização de pagamento do seu Pedido';
+  private SES_SUBJECT_PAGAMENTO_APROVADO = 'Pagamento autorizado com sucesso para o seu Pedido';
 
   constructor(private sesClient: SESClient, private buscarClientePorIdPedidoUsecase: BuscarClientePorIdPedidoUsecase) {}
 
@@ -20,10 +20,10 @@ export class SesIntegration {
     return await this.buscarClientePorIdPedidoUsecase
       .buscarClientePorPedidoId(pagamento.pedidoId)
       .then(async (cliente) => {
-        this.logger.log(`Enviando email de pedido rejeitado para: ${cliente.email}. Pedido #${pagamento.pedidoId}`);
+        this.logger.log(`Enviando email de pedido para: ${cliente.email}. Pedido #${pagamento.pedidoId}`);
 
         const command = new SendEmailCommand({
-          Source: this.EMAIL_SENDER,
+          Source: this.SES_SOURCE_EMAIL,
           Destination: {
             ToAddresses: [cliente.email],
           },
@@ -32,8 +32,8 @@ export class SesIntegration {
               Charset: 'UTF-8',
               Data:
                 (pagamento.estadoPagamento === EstadoPagamento.CONFIRMADO
-                  ? this.SUBJECT_PAGAMENTO_APROVADO
-                  : this.SUBJECT_PAGAMENTO_RECUSADO) + `#${pagamento.pedidoId}`,
+                  ? this.SES_SUBJECT_PAGAMENTO_APROVADO
+                  : this.SES_SUBJECT_PAGAMENTO_RECUSADO) + `#${pagamento.pedidoId}`,
             },
             Body: {
               Text: {
