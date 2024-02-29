@@ -326,4 +326,13 @@ describe('ClienteRestApi (e2e)', () => {
         expect(response.body.message).toEqual(['CPF deve ser válido']);
       });
   });
+
+  it('DELETE /v1/cliente?cpf - deve deletar cliente', async () => {
+    // realiza requisição e compara a resposta de erro
+    return await request(app.getHttpServer())
+      .delete(`/v1/cliente?cpf=`)
+      .then((response) => {
+        expect(response.status).toEqual(200);
+      });
+  });
 });
