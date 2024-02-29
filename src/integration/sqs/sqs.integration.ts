@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as process from 'process';
 import { IntegrationApplicationException } from 'src/application/exception/integration-application.exception';
 import {
-  DeleteMessageBatchCommand,
-  DeleteMessageBatchCommandOutput,
+  DeleteMessageCommand,
+  DeleteMessageCommandOutput,
   Message,
   ReceiveMessageCommand,
   SQSClient,
@@ -43,12 +43,14 @@ export class SqsIntegration {
       while (true) {
         await this.receiveEstadoPagamentoPedidoConfirmado()
           .then((messages) => {
-            this.atualizaEstadoPedido(messages, EstadoPedido.RECEBIDO).then(() => {
-              this.sendPreparacaoPedido(messages).then(() => {
-                this.deleteEstadoPagamentoPedidoConfirmado(messages);
-                this.enviaEmailNotificacao(messages);
-              });
-            });
+            for (const message of messages) {
+              this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
+                this.sendPreparacaoPedido(message).then(() => {
+                  this.deleteEstadoPagamentoPedidoConfirmado(message);
+                  this.enviaEmailNotificacao(message);
+                });
+              }); 
+            }
           })
           .catch(async (err) => {
             this.logger.error(
@@ -63,10 +65,12 @@ export class SqsIntegration {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
           .then((messages) => {
-            this.atualizaEstadoPedido(messages, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
-              this.deleteEstadoPagamentoPedidoRejeitado(messages);
-              this.enviaEmailNotificacao(messages);
-            });
+            for (const message of messages) {
+              this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
+                this.deleteEstadoPagamentoPedidoRejeitado(message);
+                this.enviaEmailNotificacao(message);
+              });
+            }
           })
           .catch(async (err) => {
             this.logger.error(
@@ -78,43 +82,38 @@ export class SqsIntegration {
     })();
   }
 
-  private async enviaEmailNotificacao(messages: Message[]): Promise<void> {
-    for (const message of messages) {
-      const body = JSON.parse(message.Body);
-      this.sesIntegration
-        .sendEmailPagamento({
-          id: body.pagamento.id,
-          pedidoId: body.pagamento.pedidoId,
-          dataHoraPagamento: body.pagamento.dataHoraPagamento,
-          estadoPagamento: getEstadoPagamentoFromValue(body.pagamento.estadoPagamento),
-          total: body.pagamento.total,
-          transacaoId: body.pagamento.transacaoId,
-        })
-        .catch((error) => {
-          this.logger.error(
-            `Houve um erro no envio de email de notificação de resultado de pagamento: ${JSON.stringify(error)}`,
-          );
-        });
-    }
+  private async enviaEmailNotificacao(message: Message): Promise<void> {
+    const body = JSON.parse(message.Body);
+    this.sesIntegration
+      .sendEmailPagamento({
+        id: body.pagamento.id,
+        pedidoId: body.pagamento.pedidoId,
+        dataHoraPagamento: body.pagamento.dataHoraPagamento,
+        estadoPagamento: getEstadoPagamentoFromValue(body.pagamento.estadoPagamento),
+        total: body.pagamento.total,
+        transacaoId: body.pagamento.transacaoId,
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Houve um erro no envio de email de notificação de resultado de pagamento: ${JSON.stringify(error)}`,
+        );
+      });
   }
 
-  private async atualizaEstadoPedido(messages: Message[], estadoPedido: EstadoPedido): Promise<Pedido> {
-    if (messages) {
-      for (const message of messages) {
-        this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
-        const body = JSON.parse(message.Body);
-        return await this.buscarPedidoPorIdUseCase
-          .buscarPedidoPorId(body.pagamento.pedidoId)
-          .then((pedido) => {
-            pedido.estadoPedido = estadoPedido;
-            return this.editarPedidoUseCase.editarPedido(pedido);
-          })
-          .catch((error) => {
-            this.logger.error(`Houve um erro ao atualizar o estado do pedido: ${error}`);
-            throw new IntegrationApplicationException('Não foi possível atualizar o estado do pedido');
-          });
-      }
-    }
+  private async atualizaEstadoPedido(message: Message, estadoPedido: EstadoPedido): Promise<Pedido> {
+
+    this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
+    const body = JSON.parse(message.Body);
+    return await this.buscarPedidoPorIdUseCase
+      .buscarPedidoPorId(body.pagamento.pedidoId)
+      .then((pedido) => {
+        pedido.estadoPedido = estadoPedido;
+        return this.editarPedidoUseCase.editarPedido(pedido);
+      })
+      .catch((error) => {
+        this.logger.error(`Houve um erro ao atualizar o estado do pedido: ${error}`);
+        throw new IntegrationApplicationException('Não foi possível atualizar o estado do pedido');
+      });
   }
 
   async sendSolicitaPagamentoPedido(pedidoId: number, totalPedido: number): Promise<SendMessageCommandOutput> {
@@ -146,43 +145,39 @@ export class SqsIntegration {
       });
   }
 
-  private async sendPreparacaoPedido(messages: Message[]): Promise<SendMessageCommandOutput> {
-    if (messages) {
-      for (const message of messages) {
-        const body = JSON.parse(message.Body);
-        const pedidoId = body.pagamento.pedidoId;
+  private async sendPreparacaoPedido(message: Message): Promise<SendMessageCommandOutput> {
+    const body = JSON.parse(message.Body);
+    const pedidoId = body.pagamento.pedidoId;
 
-        return await this.buscarPedidoPorIdUseCase.buscarPedidoPorId(pedidoId).then(async (pedido) => {
-          const command = new SendMessageCommand({
-            MessageGroupId: 'preparacao-pedido',
-            MessageDeduplicationId: `${pedidoId}`,
-            QueueUrl: this.SQS_PREPARACAO_PEDIDO_REQ_URL,
-            MessageBody: JSON.stringify({
-              pedido: pedido,
-            }),
-          });
+    return await this.buscarPedidoPorIdUseCase.buscarPedidoPorId(pedidoId).then(async (pedido) => {
+      const command = new SendMessageCommand({
+        MessageGroupId: 'preparacao-pedido',
+        MessageDeduplicationId: `${pedidoId}`,
+        QueueUrl: this.SQS_PREPARACAO_PEDIDO_REQ_URL,
+        MessageBody: JSON.stringify({
+          pedido: pedido,
+        }),
+      });
 
-          this.logger.debug(
-            `Invocando SendMessageCommand para solicitação de preparação do pedido: ${JSON.stringify(command)}`,
+      this.logger.debug(
+        `Invocando SendMessageCommand para solicitação de preparação do pedido: ${JSON.stringify(command)}`,
+      );
+
+      return await this.sqsClient
+        .send(command)
+        .then((response) => {
+          this.logger.log(`Resposta do publish na fila de preparação de pedido: ${JSON.stringify(response)}`);
+          return response;
+        })
+        .catch((error) => {
+          this.logger.error(
+            `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(
+              error,
+            )} - Command: ${JSON.stringify(command)}`,
           );
-
-          return await this.sqsClient
-            .send(command)
-            .then((response) => {
-              this.logger.log(`Resposta do publish na fila de preparação de pedido: ${JSON.stringify(response)}`);
-              return response;
-            })
-            .catch((error) => {
-              this.logger.error(
-                `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(
-                  error,
-                )} - Command: ${JSON.stringify(command)}`,
-              );
-              throw new IntegrationApplicationException('Não foi possível solicitar a preparação do pedido.');
-            });
+          throw new IntegrationApplicationException('Não foi possível solicitar a preparação do pedido.');
         });
-      }
-    }
+    });
   }
 
   private async receiveEstadoPagamentoPedidoConfirmado(): Promise<Message[]> {
@@ -225,28 +220,25 @@ export class SqsIntegration {
       });
   }
 
-  private async deleteEstadoPagamentoPedidoConfirmado(messages: Message[]): Promise<DeleteMessageBatchCommandOutput> {
-    return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL);
+  private async deleteEstadoPagamentoPedidoConfirmado(message: Message): Promise<DeleteMessageCommandOutput> {
+    return this.deleteEstadoPagamentoPedido(message, this.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL);
   }
 
-  private async deleteEstadoPagamentoPedidoRejeitado(messages: Message[]): Promise<DeleteMessageBatchCommandOutput> {
-    return this.deleteEstadoPagamentoPedido(messages, this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL);
+  private async deleteEstadoPagamentoPedidoRejeitado(message: Message): Promise<DeleteMessageCommandOutput> {
+    return this.deleteEstadoPagamentoPedido(message, this.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL);
   }
 
   private async deleteEstadoPagamentoPedido(
-    messages: Message[],
+    message: Message,
     QueueUrl: string,
-  ): Promise<DeleteMessageBatchCommandOutput> {
-    this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(messages)}`);
-    const command = new DeleteMessageBatchCommand({
+  ): Promise<DeleteMessageCommandOutput> {
+    this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
+    const command = new DeleteMessageCommand({
       QueueUrl: QueueUrl,
-      Entries: messages.map((message) => ({
-        Id: message.MessageId,
-        ReceiptHandle: message.ReceiptHandle,
-      })),
+      ReceiptHandle: message.ReceiptHandle
     });
     this.logger.debug(
-      `Invocando DeleteMessageBatchCommand para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
+      `Invocando DeleteMessageCommandOutput para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
         command,
       )}`,
     );
