@@ -6,4 +6,5 @@ export interface IClienteService extends IService<Cliente> {
   save(type: Cliente): Promise<Cliente>;
   findByCpf(cpf: string): Promise<Cliente>;
   identifyByCpf(cpf: string): Promise<ClienteIdentificado>;
+  deletarByCpf(cpf: string): Promise<boolean>;
 }

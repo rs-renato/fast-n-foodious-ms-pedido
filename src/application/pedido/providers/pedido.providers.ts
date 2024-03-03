@@ -31,6 +31,7 @@ import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
 import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { BuscarTodosPedidosPorClienteIdUseCase } from 'src/application/pedido/usecase/buscar-todos-pedidos-por-cliente-id-usecase';
 
 export const PedidoProviders: Provider[] = [
   { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -161,5 +162,11 @@ export const PedidoProviders: Provider[] = [
         solicitaPagamentoPedidoUseCase,
         validators,
       ),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID,
+    inject: [PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPorClienteIdUseCase =>
+      new BuscarTodosPedidosPorClienteIdUseCase(repository),
   },
 ];

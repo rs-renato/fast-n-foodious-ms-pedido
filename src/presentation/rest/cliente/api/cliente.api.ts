@@ -64,11 +64,12 @@ export class ClienteRestApi extends BaseRestApi {
   }
 
   @Delete()
-  @ApiOperation({ summary: 'Remove cliente pelo CPF', description: 'Remove cliente pelo CPF' })
+  @ApiOperation({ summary: 'Remove cliente pelo CPF2', description: 'Remove cliente pelo CPF22' })
   @HttpCode(200)
   @ApiOkResponse({ description: 'Cliente removido com sucesso' })
   async deletaCliente(@Query(ValidationPipe) query: IdentificarPorCpfClienteRequest): Promise<boolean> {
     this.logger.debug(`Deletando cliente: ${query.cpf}`);
+    await this.service.deletarByCpf(query.cpf);
     return Promise.resolve(true);
   }
 }

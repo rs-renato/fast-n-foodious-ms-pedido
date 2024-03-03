@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { IClienteService } from 'src/application/cliente/service/cliente.service.interface';
 import { ClienteIdentificado } from 'src/enterprise/cliente/model/cliente-identificado.model';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
-
 import { ClienteConstants } from 'src/shared/constants';
 import { BuscarClientePorCpfUseCase } from 'src/application/cliente/usecase/buscar-cliente-por-cpf.usecase';
 import { SalvarClienteUseCase } from 'src/application/cliente/usecase/salvar-cliente.usecase';
 import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/identificar-cliente-por-cpf.usecase';
+import { DeletarClientePorCpfUseCase } from 'src/application/cliente/usecase/deletar-cliente-por-cpf.usecase';
 
 @Injectable()
 export class ClienteService implements IClienteService {
@@ -15,6 +15,8 @@ export class ClienteService implements IClienteService {
     @Inject(ClienteConstants.SALVAR_CLIENTE_USECASE) private salvarUsecase: SalvarClienteUseCase,
     @Inject(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE)
     private identificarUsecase: IdentificarClienteUseCase,
+    @Inject(ClienteConstants.DELETAR_CLIENTE_POR_CPF_USECASE)
+    private deletarClientePorCpfUseCase: DeletarClientePorCpfUseCase,
   ) {}
 
   async findByCpf(cpf: string): Promise<Cliente> {
@@ -27,5 +29,9 @@ export class ClienteService implements IClienteService {
 
   async identifyByCpf(cpf: string): Promise<ClienteIdentificado> {
     return await this.identificarUsecase.identificarClientePorCpf(cpf);
+  }
+
+  async deletarByCpf(cpf: string): Promise<boolean> {
+    return await this.deletarClientePorCpfUseCase.deletarClientePorCpf(cpf);
   }
 }
