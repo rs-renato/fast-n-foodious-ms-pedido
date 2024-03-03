@@ -330,7 +330,7 @@ describe('ClienteRestApi (e2e)', () => {
   it('DELETE /v1/cliente?cpf - deve deletar cliente', async () => {
     // realiza requisição e compara a resposta de erro
     return await request(app.getHttpServer())
-      .delete(`/v1/cliente?cpf=25634428777`)
+      .delete(`/v1/cliente?cpf=${salvarClienteRequest.cpf}`)
       .then((response) => {
         expect(response.status).toEqual(200);
       });
