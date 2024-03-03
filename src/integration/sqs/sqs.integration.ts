@@ -27,8 +27,8 @@ export class SqsIntegration {
   private SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL;
 
   private SQS_MAX_NUMBER_MESSAGES = 1;
-  private SQS_WAIT_TIME_SECONDS = 20;
-  private SQS_VISIBILITY_TIMEOUT = 20;
+  private SQS_WAIT_TIME_SECONDS = 5;
+  private SQS_VISIBILITY_TIMEOUT = 5;
   private SQS_CONSUMER_TIMEOUT = 5000;
 
   constructor(
@@ -42,9 +42,9 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoConfirmado()
-          .then((messages) => {
+          .then(async(messages) => {
             for (const message of messages) {
-              this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
+              await this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
                 this.sendPreparacaoPedido(message).then(() => {
                   this.deleteEstadoPagamentoPedidoConfirmado(message);
                   this.enviaEmailNotificacao(message);
@@ -64,9 +64,9 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
-          .then((messages) => {
+          .then(async(messages) => {
             for (const message of messages) {
-              this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
+              await this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
                 this.deleteEstadoPagamentoPedidoRejeitado(message);
                 this.enviaEmailNotificacao(message);
               });
@@ -101,7 +101,7 @@ export class SqsIntegration {
   }
 
   private async atualizaEstadoPedido(message: Message, estadoPedido: EstadoPedido): Promise<Pedido> {
-    this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
+    this.logger.log(`mensagem consumida: ${JSON.stringify(message)}`);
     const body = JSON.parse(message.Body);
     return await this.buscarPedidoPorIdUseCase
       .buscarPedidoPorId(body.pagamento.pedidoId)
@@ -126,7 +126,7 @@ export class SqsIntegration {
       }),
     });
 
-    this.logger.debug(
+    this.logger.log(
       `Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`,
     );
 
@@ -158,7 +158,7 @@ export class SqsIntegration {
         }),
       });
 
-      this.logger.debug(
+      this.logger.log(
         `Invocando SendMessageCommand para solicitação de preparação do pedido: ${JSON.stringify(command)}`,
       );
 
@@ -197,14 +197,14 @@ export class SqsIntegration {
       VisibilityTimeout: this.SQS_VISIBILITY_TIMEOUT,
     });
 
-    this.logger.verbose(
+    this.logger.debug(
       `Invocando ReceiveMessageCommand para obtenção de estado de pagamento do pedido: ${JSON.stringify(command)}`,
     );
 
     return await this.sqsClient
       .send(command)
       .then((response) => {
-        this.logger.verbose(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
+        this.logger.debug(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
         return response.Messages || [];
       })
       .catch((error) => {
@@ -228,12 +228,12 @@ export class SqsIntegration {
   }
 
   private async deleteEstadoPagamentoPedido(message: Message, QueueUrl: string): Promise<DeleteMessageCommandOutput> {
-    this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
+    this.logger.log(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
     const command = new DeleteMessageCommand({
       QueueUrl: QueueUrl,
       ReceiptHandle: message.ReceiptHandle,
     });
-    this.logger.debug(
+    this.logger.log(
       `Invocando DeleteMessageCommandOutput para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
         command,
       )}`,
