@@ -36,8 +36,11 @@ export class ClienteMemoryRepository implements IRepository<Cliente> {
     throw new RepositoryException('Método não implementado.');
   }
 
-  delete(): Promise<boolean> {
-    throw new RepositoryException('Método não implementado.');
+  delete(id: number): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.repository.splice(id - 1);
+      resolve(true);
+    });
   }
 
   findAll(): Promise<Cliente[]> {

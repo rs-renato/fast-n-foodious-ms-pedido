@@ -7,6 +7,10 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { ClienteConstants } from 'src/shared/constants';
 import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 
 describe('SalvarClienteUseCase', () => {
   let useCase: SalvarClienteUseCase;
@@ -21,7 +25,8 @@ describe('SalvarClienteUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [...ClienteProviders, ...PersistenceInMemoryProviders],
+      imports: [HttpModule, ConfigModule],
+      providers: [...ClienteProviders, ...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     // Desabilita a saída de log

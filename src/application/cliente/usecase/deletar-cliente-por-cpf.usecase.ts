@@ -17,7 +17,7 @@ export class DeletarClientePorCpfUseCase {
     @Inject(PedidoConstants.IREPOSITORY) private pedidoRepository: IPedidoRepository,
     @Inject(ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE)
     private buscarClientePorCpfUseCase: BuscarClientePorCpfUseCase,
-    @Inject(PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID)
+    @Inject(PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE)
     private buscarTodosPedidosPorClienteIdUseCase: BuscarTodosPedidosPorClienteIdUseCase,
   ) {}
 
@@ -53,13 +53,9 @@ export class DeletarClientePorCpfUseCase {
       `Trocando cliente id ${cliente.id} para cliente deletado id ${Cliente.ID_CLIENTE_DELETADO_LGPD} no pedido: ${pedido.id}`,
     );
 
-    this.logger.debug(`RODRIGO pedido.total é ${pedido.total}`);
     if (isNaN(pedido.total)) {
-      this.logger.debug(`OTTERO entrou`);
       delete pedido.total;
     }
-
-    this.logger.debug(`RODRIGO depois da deleção, pedido: ${JSON.stringify(pedido)}`);
 
     await this.pedidoRepository.edit(pedido).catch((error) => {
       this.logger.error(`Erro ao trocar cliente no pedido: ${error} `);

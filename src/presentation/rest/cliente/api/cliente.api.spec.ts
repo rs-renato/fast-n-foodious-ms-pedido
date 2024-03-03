@@ -45,6 +45,7 @@ describe('ClienteRestApi', () => {
             identifyByCpf: jest.fn((cpf) =>
               cpf === response.cpf ? Promise.resolve(response) : Promise.resolve(new ClienteIdentificado(undefined)),
             ),
+            deletarByCpf: jest.fn((cpf) => Promise.resolve(true)),
           },
         },
       ],

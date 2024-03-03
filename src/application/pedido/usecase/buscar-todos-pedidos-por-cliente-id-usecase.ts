@@ -1,7 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
-import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
 import { PedidoConstants } from 'src/shared/constants';

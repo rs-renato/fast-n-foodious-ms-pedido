@@ -164,7 +164,7 @@ export const PedidoProviders: Provider[] = [
       ),
   },
   {
-    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID,
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
     inject: [PedidoConstants.IREPOSITORY],
     useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPorClienteIdUseCase =>
       new BuscarTodosPedidosPorClienteIdUseCase(repository),

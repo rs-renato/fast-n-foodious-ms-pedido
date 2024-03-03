@@ -9,10 +9,17 @@ import { SalvarClienteValidator } from 'src/application/cliente/validation/salva
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { IRepository } from 'src/enterprise/repository/repository';
 import { RepositoryException } from 'src/infrastructure/exception/repository.exception';
-import { ClienteConstants } from 'src/shared/constants';
+import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
 import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
+import { DateUtils } from 'src/shared';
+import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 
 describe('CienteService', () => {
   let service: IClienteService;
@@ -26,11 +33,22 @@ describe('CienteService', () => {
     cpf: '25634428777',
   };
 
+  const pedido: Pedido = {
+    id: 1,
+    clienteId: 1,
+    dataInicio: DateUtils.toString(new Date()),
+    estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
+    ativo: true,
+  };
+
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...ClienteProviders,
+        ...PedidoProviders,
+        ...IntegrationProviders,
         ...PersistenceInMemoryProviders,
 
         // Mock do serviço IRepository<Cliente>
@@ -44,6 +62,20 @@ describe('CienteService', () => {
               // retorna vazio, simulando que não encontrou registros pelo atributos passados por parâmetro
               return Promise.resolve({});
             }),
+            // mock para a chamada repository.delete(cliente)
+            delete: jest.fn(() => Promise.resolve()),
+          },
+        },
+        {
+          provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
+          useValue: {
+            buscarTodosPedidosPorCliente: jest.fn(() => Promise.resolve([pedido])),
+          },
+        },
+        {
+          provide: PedidoConstants.IREPOSITORY,
+          useValue: {
+            edit: jest.fn(() => Promise.resolve()),
           },
         },
       ],
@@ -232,6 +264,27 @@ describe('CienteService', () => {
       await service.identifyByCpf(undefined).then((clienteIdentificado) => {
         expect(clienteIdentificado.anonimo).toEqual(true);
       });
+    });
+  });
+
+  describe('delete', () => {
+    it('deve deletar cliente', async () => {
+      // mock de repositório retornando um cliente para a busca por cpf
+      repository.findBy = jest.fn().mockImplementation(() => {
+        return Promise.resolve([cliente]);
+      });
+
+      await service.deletarByCpf(cliente.cpf).then((result) => {
+        expect(result).toBeTruthy();
+      });
+    });
+
+    it('não deve deletar cliente quando houver um erro de banco ', async () => {
+      const error = new RepositoryException('Erro genérico de banco de dados');
+      jest.spyOn(repository, 'findBy').mockRejectedValue(error);
+
+      // verifica se foi lançada uma exception na camada de serviço
+      await expect(service.deletarByCpf(cliente.cpf)).rejects.toThrowError(ServiceException);
     });
   });
 });

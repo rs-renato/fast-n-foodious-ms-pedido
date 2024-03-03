@@ -65,7 +65,7 @@ export const ClienteProviders: Provider[] = [
       ClienteConstants.IREPOSITORY,
       PedidoConstants.IREPOSITORY,
       ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE,
-      PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID,
+      PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
     ],
     useFactory: (
       clienteRepository: IRepository<Cliente>,
