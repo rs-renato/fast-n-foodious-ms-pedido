@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Logger, Post, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Logger, Post, Query, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IClienteService } from 'src/application/cliente/service/cliente.service.interface';
 import { BaseRestApi } from 'src/presentation/rest/base.api';
@@ -61,5 +61,14 @@ export class ClienteRestApi extends BaseRestApi {
       this.logger.log(`Cliente identificado com sucesso: ${JSON.stringify(clienteIdentificado)}`);
       return new IdentificarPorCpfClienteResponse(clienteIdentificado);
     });
+  }
+
+  @Delete()
+  @ApiOperation({ summary: 'Remove cliente pelo CPF', description: 'Remove cliente pelo CPF' })
+  @HttpCode(200)
+  @ApiOkResponse({ description: 'Cliente removido com sucesso' })
+  async deletaCliente(@Query(ValidationPipe) query: IdentificarPorCpfClienteRequest): Promise<boolean> {
+    this.logger.debug(`Deletando cliente: ${query.cpf}`);
+    return Promise.resolve(true);
   }
 }

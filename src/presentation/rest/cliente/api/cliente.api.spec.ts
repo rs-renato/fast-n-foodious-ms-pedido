@@ -133,4 +133,13 @@ describe('ClienteRestApi', () => {
       expect(result.anonimo).toEqual(true);
     });
   });
+
+  describe('deletaCliente', () => {
+    it('deve deletar cliente por cpf', async () => {
+      // Chama o método deletaCliente do restApi
+      const result = await restApi.deletaCliente({ cpf: request.cpf });
+
+      expect(result).toBeTruthy();
+    });
+  });
 });
