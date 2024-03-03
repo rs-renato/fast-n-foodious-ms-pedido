@@ -42,7 +42,7 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoConfirmado()
-          .then(async(messages) => {
+          .then(async (messages) => {
             for (const message of messages) {
               await this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
                 this.sendPreparacaoPedido(message).then(() => {
@@ -64,7 +64,7 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
-          .then(async(messages) => {
+          .then(async (messages) => {
             for (const message of messages) {
               await this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
                 this.deleteEstadoPagamentoPedidoRejeitado(message);
@@ -126,9 +126,7 @@ export class SqsIntegration {
       }),
     });
 
-    this.logger.log(
-      `Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`,
-    );
+    this.logger.log(`Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`);
 
     return await this.sqsClient
       .send(command)
