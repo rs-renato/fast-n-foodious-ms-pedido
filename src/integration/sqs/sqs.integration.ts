@@ -27,9 +27,9 @@ export class SqsIntegration {
   private SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL;
 
   private SQS_MAX_NUMBER_MESSAGES = 1;
-  private SQS_WAIT_TIME_SECONDS = 5;
-  private SQS_VISIBILITY_TIMEOUT = 5;
-  private SQS_CONSUMER_TIMEOUT = 5000;
+  private SQS_WAIT_TIME_SECONDS = 1;
+  private SQS_VISIBILITY_TIMEOUT = 1;
+  private SQS_CONSUMER_TIMEOUT = 2000;
 
   constructor(
     private sqsClient: SQSClient,
