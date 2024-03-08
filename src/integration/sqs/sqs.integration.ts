@@ -143,7 +143,11 @@ export class SqsIntegration {
       });
   }
 
-  public async sendLgpdProtocoloDelecao(protocolo: string, dataSolicitacao: string, clienteId: number): Promise<SendMessageCommandOutput> {
+  public async sendLgpdProtocoloDelecao(
+    protocolo: string,
+    dataSolicitacao: string,
+    clienteId: number,
+  ): Promise<SendMessageCommandOutput> {
     const command = new SendMessageCommand({
       MessageGroupId: 'lgpd-protocolo-delecao',
       MessageDeduplicationId: `${protocolo}`,
@@ -151,7 +155,7 @@ export class SqsIntegration {
       MessageBody: JSON.stringify({
         protocolo: protocolo,
         dataSolicitacao: dataSolicitacao,
-        clienteId: clienteId
+        clienteId: clienteId,
       }),
     });
 
