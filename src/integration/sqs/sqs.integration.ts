@@ -23,6 +23,7 @@ export class SqsIntegration {
 
   private SQS_PREPARACAO_PEDIDO_REQ_URL = process.env.SQS_PREPARACAO_PEDIDO_REQ_URL;
   private SQS_SOLICITAR_PAGAMENTO_REQ_URL = process.env.SQS_SOLICITAR_PAGAMENTO_REQ_URL;
+  private SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL = process.env.SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL;
   private SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL;
   private SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL;
 
@@ -139,6 +140,34 @@ export class SqsIntegration {
           `Erro ao publicar solicitação de pagamento: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
         );
         throw new IntegrationApplicationException('Não foi possível solicitar o pagamento.');
+      });
+  }
+
+  public async sendLgpdProtocoloDelecao(protocolo: string, dataSolicitacao: string, clienteId: number): Promise<SendMessageCommandOutput> {
+    const command = new SendMessageCommand({
+      MessageGroupId: 'lgpd-protocolo-delecao',
+      MessageDeduplicationId: `${protocolo}`,
+      QueueUrl: this.SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL,
+      MessageBody: JSON.stringify({
+        protocolo: protocolo,
+        dataSolicitacao: dataSolicitacao,
+        clienteId: clienteId
+      }),
+    });
+
+    this.logger.log(`Invocando SendMessageCommand para lgpd protocolo deleção: ${JSON.stringify(command)}`);
+
+    return await this.sqsClient
+      .send(command)
+      .then((response) => {
+        this.logger.log(`Resposta do publish na fila de lgpd protocolo deleção: ${JSON.stringify(response)}`);
+        return response;
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Erro ao publicar lgpd protocolo deleção: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
+        );
+        throw new IntegrationApplicationException('Não foi possível processar o protocolo de deleção.');
       });
   }
 
