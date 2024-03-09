@@ -54,6 +54,7 @@ Sistema de auto-atendimento de fast food (microsserviço pedido). Projeto de con
     * [Webhook: Atualização de estado de Pagamento Confirmado](#webhook-atualização-de-estado-de-pagamento-confirmado)
     * [Webhook: Atualização de estado de Pagamento Rejeitado](#webhook-atualização-de-estado-de-pagamento-rejeitado)
     * [Justificativa](#justificativa)
+* [OWASP Reposts](#owasp-reports)
 * [Links Externos](#links-externos)
 
 ## Arquitetura de Solução (Cloud AWS)
@@ -187,6 +188,17 @@ $ tree -L 1
 ├── fast-n-foodious-ms-pedido
 └── fast-n-foodious-ms-produto
 ```
+Após subir todos os containers, para verificar os contratos de API, acesse a [Documentação da API (Swagger)](#-documentação-da-api-swagger). 
+
+Os testes funcionais (processo de negócio completo) pode ser realizado facilmente através do Postman, via Flows no workspace compartilhado:
+
+**Flow Local**
+![processo-negocio](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/postman/flows/flow-processo-realizacao-pedidos-local.png?raw=true)
+
+Alternativamente, a [collection do postman](https://github.com/rodrigo-ottero/fast-n-foodious-docs/tree/main/postman/collections) pode ser utilizada para os testes locais.
+
+**Ordem de execução**
+![ordem-exec](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/postman/flows/flow-processo-realizacao-pedidos-ordem-exec-local.png?raw=true)
 
 ### 🚨⚡️ Execução em modo produção (deprecated: substituído por AWS Fargate ECS)
 ***Nota 1:** O K8S foi substituído pelo serviço gerenciado AWS Fargate ECS. A construção da insfraestrura é realizada através de IaC (Terraform) com seus respectivos scripts em repositórios específicos de Storage, Compute e Network. A documentação abaixo apenas ilustra a solução v2.0.0 (monolito) e foi mantida aqui caso seja necessário subir a aplicação de uma maneira mais fácil para avaliação dos instrutores (`considerar a execução via docker-compose-all.yml`)*
@@ -329,9 +341,10 @@ horizontalpodautoscaler.autoscaling/fast-n-foodious-ms-pedido-hpa      fast-n-fo
 ```
 
 ## 🧾 Documentação da API (Swagger)
-`docker`    http://localhost:3001/api
-
-`k8s`       http://localhost:3001/api
+`docker & k8s`
+- fast-n-foodious-ms-produto:       http://localhost:3000/api
+- fast-n-foodious-ms-pedido:        http://localhost:3001/api
+- fast-n-foodious-ms-pagamento:     http://localhost:3002/api
 
 ## 🧼 Desinstalação & Cleanup
 Para realizar a desistalação da aplicação e o cleanup da infraestrutura, basta realizar os comandos abaixos de acordo com o modo de instalação.
@@ -611,19 +624,22 @@ test/                                   # Implementações de testes
 
 ## Saga
 ### Checkout: Solicitação de Pagamento
-Integração entre microseriços de pedido e pagamento, no processo de checkout.
+Integração entre micro serviços de pedido e pagamento, no processo de checkout.
 ![Checkout: Solicitação de Pagamento](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/diagramas/png/fast-n-foodious-aws-saga-checkout.png?raw=true)
 
 ### Webhook: Atualização estado de Pagamento Confirmado
-Integração entre microseriços de pagamento e pedido, no processo notificação de pagamento confirmado (webhook).
+Integração entre micro serviços de pagamento e pedido, no processo notificação de pagamento confirmado (webhook).
 ![Webhook: Pagamento Confirmado](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/diagramas/png/fast-n-foodious-aws-saga-webhook-pagamento-confirmado.png?raw=true)
 
 ### Webhook: Atualização estado de Pagamento Rejeitado
-Integração entre microseriços de pagamento e pedido, no processo notificação de pagamento rejeitado (webhook).
+Integração entre micro serviços de pagamento e pedido, no processo notificação de pagamento rejeitado (webhook).
 ![Webhook: Pagamento Rejeitado](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/diagramas/png/fast-n-foodious-aws-saga-webhook-pagamento-rejeitado.png?raw=true)
 
 ### Justificativa
 [Justificativa do Padrão SAGA coreografado](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/saga/saga-coreografado.md)
+
+## OWASP Reposts
+[Relatórios por Microserviços](https://github.com/rodrigo-ottero/fast-n-foodious-docs/blob/main/owasp/README.md)
 
 ## Links Externos
 ### Micro Serviços

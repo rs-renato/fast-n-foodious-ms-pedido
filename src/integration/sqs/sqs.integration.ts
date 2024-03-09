@@ -23,13 +23,14 @@ export class SqsIntegration {
 
   private SQS_PREPARACAO_PEDIDO_REQ_URL = process.env.SQS_PREPARACAO_PEDIDO_REQ_URL;
   private SQS_SOLICITAR_PAGAMENTO_REQ_URL = process.env.SQS_SOLICITAR_PAGAMENTO_REQ_URL;
+  private SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL = process.env.SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL;
   private SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_CONFIRMADO_RES_URL;
   private SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL = process.env.SQS_WEBHOOK_PAGAMENTO_REJEITADO_RES_URL;
 
   private SQS_MAX_NUMBER_MESSAGES = 1;
-  private SQS_WAIT_TIME_SECONDS = 20;
-  private SQS_VISIBILITY_TIMEOUT = 20;
-  private SQS_CONSUMER_TIMEOUT = 5000;
+  private SQS_WAIT_TIME_SECONDS = 1;
+  private SQS_VISIBILITY_TIMEOUT = 1;
+  private SQS_CONSUMER_TIMEOUT = 2000;
 
   constructor(
     private sqsClient: SQSClient,
@@ -42,9 +43,9 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoConfirmado()
-          .then((messages) => {
+          .then(async (messages) => {
             for (const message of messages) {
-              this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
+              await this.atualizaEstadoPedido(message, EstadoPedido.RECEBIDO).then(() => {
                 this.sendPreparacaoPedido(message).then(() => {
                   this.deleteEstadoPagamentoPedidoConfirmado(message);
                   this.enviaEmailNotificacao(message);
@@ -64,9 +65,9 @@ export class SqsIntegration {
     (async (): Promise<void> => {
       while (true) {
         await this.receiveEstadoPagamentoPedidoRejeitado()
-          .then((messages) => {
+          .then(async (messages) => {
             for (const message of messages) {
-              this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
+              await this.atualizaEstadoPedido(message, EstadoPedido.PAGAMENTO_PENDENTE).then(() => {
                 this.deleteEstadoPagamentoPedidoRejeitado(message);
                 this.enviaEmailNotificacao(message);
               });
@@ -101,7 +102,7 @@ export class SqsIntegration {
   }
 
   private async atualizaEstadoPedido(message: Message, estadoPedido: EstadoPedido): Promise<Pedido> {
-    this.logger.debug(`mensagem consumida: ${JSON.stringify(message)}`);
+    this.logger.log(`mensagem consumida: ${JSON.stringify(message)}`);
     const body = JSON.parse(message.Body);
     return await this.buscarPedidoPorIdUseCase
       .buscarPedidoPorId(body.pagamento.pedidoId)
@@ -126,9 +127,7 @@ export class SqsIntegration {
       }),
     });
 
-    this.logger.debug(
-      `Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`,
-    );
+    this.logger.log(`Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`);
 
     return await this.sqsClient
       .send(command)
@@ -141,6 +140,38 @@ export class SqsIntegration {
           `Erro ao publicar solicitação de pagamento: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
         );
         throw new IntegrationApplicationException('Não foi possível solicitar o pagamento.');
+      });
+  }
+
+  public async sendLgpdProtocoloDelecao(
+    protocolo: string,
+    dataSolicitacao: string,
+    clienteId: number,
+  ): Promise<SendMessageCommandOutput> {
+    const command = new SendMessageCommand({
+      MessageGroupId: 'lgpd-protocolo-delecao',
+      MessageDeduplicationId: `${protocolo}`,
+      QueueUrl: this.SQS_LGPD_PROTOCOLO_DELECAO_REQ_URL,
+      MessageBody: JSON.stringify({
+        protocolo: protocolo,
+        dataSolicitacao: dataSolicitacao,
+        clienteId: clienteId,
+      }),
+    });
+
+    this.logger.log(`Invocando SendMessageCommand para lgpd protocolo deleção: ${JSON.stringify(command)}`);
+
+    return await this.sqsClient
+      .send(command)
+      .then((response) => {
+        this.logger.log(`Resposta do publish na fila de lgpd protocolo deleção: ${JSON.stringify(response)}`);
+        return response;
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Erro ao publicar lgpd protocolo deleção: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
+        );
+        throw new IntegrationApplicationException('Não foi possível processar o protocolo de deleção.');
       });
   }
 
@@ -158,7 +189,7 @@ export class SqsIntegration {
         }),
       });
 
-      this.logger.debug(
+      this.logger.log(
         `Invocando SendMessageCommand para solicitação de preparação do pedido: ${JSON.stringify(command)}`,
       );
 
@@ -197,14 +228,14 @@ export class SqsIntegration {
       VisibilityTimeout: this.SQS_VISIBILITY_TIMEOUT,
     });
 
-    this.logger.verbose(
+    this.logger.debug(
       `Invocando ReceiveMessageCommand para obtenção de estado de pagamento do pedido: ${JSON.stringify(command)}`,
     );
 
     return await this.sqsClient
       .send(command)
       .then((response) => {
-        this.logger.verbose(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
+        this.logger.debug(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
         return response.Messages || [];
       })
       .catch((error) => {
@@ -228,12 +259,12 @@ export class SqsIntegration {
   }
 
   private async deleteEstadoPagamentoPedido(message: Message, QueueUrl: string): Promise<DeleteMessageCommandOutput> {
-    this.logger.debug(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
+    this.logger.log(`Deletando mensagem da fila: ${JSON.stringify(message)}`);
     const command = new DeleteMessageCommand({
       QueueUrl: QueueUrl,
       ReceiptHandle: message.ReceiptHandle,
     });
-    this.logger.debug(
+    this.logger.log(
       `Invocando DeleteMessageCommandOutput para remoção de mensagem de estado de pagamento do pedido: ${JSON.stringify(
         command,
       )}`,

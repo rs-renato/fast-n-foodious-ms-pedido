@@ -47,7 +47,7 @@ export class SesIntegration {
           },
         });
 
-        this.logger.debug(
+        this.logger.log(
           `Invocando SendMessageCommand para solicitação de pagamento do pedido: ${JSON.stringify(command)}`,
         );
 
