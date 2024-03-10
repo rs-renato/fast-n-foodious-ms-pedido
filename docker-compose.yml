@@ -12,6 +12,7 @@ services:
       - ${SERVER_PORT:-3001}:${SERVER_PORT:-3001}
     depends_on:
       - mysql-pedido
+      - localstack
     networks:
       - fast-n-foodious-network
   mysql-pedido:
