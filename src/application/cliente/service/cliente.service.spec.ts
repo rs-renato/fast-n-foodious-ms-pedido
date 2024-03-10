@@ -20,11 +20,14 @@ import { ConfigModule } from '@nestjs/config';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { DateUtils } from 'src/shared';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 describe('CienteService', () => {
   let service: IClienteService;
   let repository: IRepository<Cliente>;
   let validators: SalvarClienteValidator[];
+  let clienteSqsIntegration: SqsIntegration;
 
   const cliente: Cliente = {
     id: 1,
@@ -39,6 +42,13 @@ describe('CienteService', () => {
     dataInicio: DateUtils.toString(new Date()),
     estadoPedido: EstadoPedido.PAGAMENTO_PENDENTE,
     ativo: true,
+  };
+
+  const snsIntegrationResponse: SendMessageCommandOutput = {
+    $metadata: {
+      httpStatusCode: 200,
+      requestId: '12345',
+    },
   };
 
   beforeEach(async () => {
@@ -88,6 +98,7 @@ describe('CienteService', () => {
     repository = module.get<IRepository<Cliente>>(ClienteConstants.IREPOSITORY);
     validators = module.get<SalvarClienteValidator[]>(ClienteConstants.SALVAR_CLIENTE_VALIDATOR);
     service = module.get<IClienteService>(ClienteConstants.ISERVICE);
+    clienteSqsIntegration = module.get<SqsIntegration>(SqsIntegration);
   });
 
   describe('injeção de dependências', () => {
@@ -273,7 +284,7 @@ describe('CienteService', () => {
       repository.findBy = jest.fn().mockImplementation(() => {
         return Promise.resolve([cliente]);
       });
-
+      jest.spyOn(clienteSqsIntegration, 'sendLgpdProtocoloDelecao').mockResolvedValue(snsIntegrationResponse);
       await service.deletarByCpf(cliente.cpf).then((result) => {
         expect(result).toBeTruthy();
       });

@@ -15,13 +15,15 @@ import { BuscarTodosPedidosPorClienteIdUseCase } from 'src/application/pedido/us
 import { IRepository } from 'src/enterprise/repository/repository';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 
 describe('DeletarClientePorCpfUseCase', () => {
-  let clienteRepository: IRepository<Cliente>;
   let pedidoRepository: IRepository<Pedido>;
   let deletarClientePorCpfUseCase: DeletarClientePorCpfUseCase;
   let buscarClientePorCpfUseCase: BuscarClientePorCpfUseCase;
   let buscarTodosPedidosPorClienteIdUseCase: BuscarTodosPedidosPorClienteIdUseCase;
+  let clienteSqsIntegration: SqsIntegration;
 
   const clienteId1: Cliente = {
     id: 1,
@@ -37,6 +39,13 @@ describe('DeletarClientePorCpfUseCase', () => {
     estadoPedido: EstadoPedido.EM_PREPARACAO,
     ativo: true,
     total: 50.0,
+  };
+
+  const snsIntegrationResponse: SendMessageCommandOutput = {
+    $metadata: {
+      httpStatusCode: 200,
+      requestId: '12345',
+    },
   };
 
   const pedidos: Pedido[] = [pedidoDoClienteId1];
@@ -63,7 +72,6 @@ describe('DeletarClientePorCpfUseCase', () => {
     // Desabilita a saída de log
     module.useLogger(false);
 
-    clienteRepository = module.get<IRepository<Cliente>>(ClienteConstants.IREPOSITORY);
     pedidoRepository = module.get<IRepository<Pedido>>(PedidoConstants.IREPOSITORY);
     deletarClientePorCpfUseCase = module.get<DeletarClientePorCpfUseCase>(
       ClienteConstants.DELETAR_CLIENTE_POR_CPF_USECASE,
@@ -74,6 +82,7 @@ describe('DeletarClientePorCpfUseCase', () => {
     buscarTodosPedidosPorClienteIdUseCase = module.get<BuscarTodosPedidosPorClienteIdUseCase>(
       PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
     );
+    clienteSqsIntegration = module.get<SqsIntegration>(SqsIntegration);
   });
 
   describe('deletarClientePorCpf', () => {
@@ -81,6 +90,7 @@ describe('DeletarClientePorCpfUseCase', () => {
       jest.spyOn(buscarClientePorCpfUseCase, 'buscarClientePorCpf').mockResolvedValue(clienteId1);
       jest.spyOn(buscarTodosPedidosPorClienteIdUseCase, 'buscarTodosPedidosPorCliente').mockResolvedValue(pedidos);
       jest.spyOn(pedidoRepository, 'edit').mockResolvedValue(pedidoDoClienteId1);
+      jest.spyOn(clienteSqsIntegration, 'sendLgpdProtocoloDelecao').mockResolvedValue(snsIntegrationResponse);
 
       const result = await deletarClientePorCpfUseCase.deletarClientePorCpf(clienteId1.cpf);
 

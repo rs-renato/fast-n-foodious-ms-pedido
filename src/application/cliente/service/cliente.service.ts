@@ -7,6 +7,7 @@ import { BuscarClientePorCpfUseCase } from 'src/application/cliente/usecase/busc
 import { SalvarClienteUseCase } from 'src/application/cliente/usecase/salvar-cliente.usecase';
 import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/identificar-cliente-por-cpf.usecase';
 import { DeletarClientePorCpfUseCase } from 'src/application/cliente/usecase/deletar-cliente-por-cpf.usecase';
+import { ClienteDeletado } from 'src/enterprise/cliente/model/cliente-deletado.model';
 
 @Injectable()
 export class ClienteService implements IClienteService {
@@ -31,7 +32,7 @@ export class ClienteService implements IClienteService {
     return await this.identificarUsecase.identificarClientePorCpf(cpf);
   }
 
-  async deletarByCpf(cpf: string): Promise<boolean> {
+  async deletarByCpf(cpf: string): Promise<ClienteDeletado> {
     return await this.deletarClientePorCpfUseCase.deletarClientePorCpf(cpf);
   }
 }

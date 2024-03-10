@@ -18,6 +18,7 @@ import { EditarPedidoUseCase } from 'src/application/pedido/usecase';
 import { DeletarClientePorCpfUseCase } from 'src/application/cliente/usecase/deletar-cliente-por-cpf.usecase';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 export const ClienteProviders: Provider[] = [
   { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
@@ -66,18 +67,21 @@ export const ClienteProviders: Provider[] = [
       PedidoConstants.IREPOSITORY,
       ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE,
       PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
+      SqsIntegration,
     ],
     useFactory: (
       clienteRepository: IRepository<Cliente>,
       pedidoRepository: IPedidoRepository,
       buscarClientePorCpfUseCase: BuscarClientePorCpfUseCase,
       buscarTodosPedidosPorClienteIdUseCase: BuscarTodosPedidosPorClienteIdUseCase,
+      clienteSnsIntegration: SqsIntegration,
     ): DeletarClientePorCpfUseCase =>
       new DeletarClientePorCpfUseCase(
         clienteRepository,
         pedidoRepository,
         buscarClientePorCpfUseCase,
         buscarTodosPedidosPorClienteIdUseCase,
+        clienteSnsIntegration,
       ),
   },
 ];
