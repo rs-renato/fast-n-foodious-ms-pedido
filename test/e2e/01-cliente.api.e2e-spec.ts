@@ -332,6 +332,7 @@ describe('ClienteRestApi (e2e)', () => {
     return await request(app.getHttpServer())
       .delete(`/v1/cliente?cpf=${salvarClienteRequest.cpf}`)
       .then((response) => {
+        console.error('response', JSON.stringify(response));
         expect(response.status).toEqual(200);
       });
   });
