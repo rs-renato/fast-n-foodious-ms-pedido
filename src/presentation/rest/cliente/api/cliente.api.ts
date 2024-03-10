@@ -73,7 +73,7 @@ export class ClienteRestApi extends BaseRestApi {
   ): Promise<DeletarClientePorCpfResponse> {
     this.logger.debug(`Deletando cliente: ${query.cpf}`);
     return await this.service.deletarByCpf(query.cpf).then((deletado) => {
-      this.logger.log(`Cliente deletado com sucesso: ${deletado}`);
+      this.logger.log(`Cliente deletado com sucesso: ${JSON.stringify(deletado)}`);
       return new DeletarClientePorCpfResponse(deletado);
     });
   }
