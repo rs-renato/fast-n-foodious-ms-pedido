@@ -24,7 +24,7 @@ describe('ClienteRestApi (e2e)', () => {
 
     // Define um objeto de cliente esperado como resultado
     salvarClienteResponse = {
-      id: 1,
+      id: 2,
       nome: 'Teste',
       email: 'teste@teste.com',
       cpf: '25634428777',
