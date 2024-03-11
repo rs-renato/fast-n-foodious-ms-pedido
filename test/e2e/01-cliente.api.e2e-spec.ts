@@ -24,7 +24,7 @@ describe('ClienteRestApi (e2e)', () => {
 
     // Define um objeto de cliente esperado como resultado
     salvarClienteResponse = {
-      id: 2,
+      id: 1,
       nome: 'Teste',
       email: 'teste@teste.com',
       cpf: '25634428777',
@@ -252,7 +252,7 @@ describe('ClienteRestApi (e2e)', () => {
   it('POST /v1/cliente/identifica?cpf - Deve identificar cliente anônimo com cpf inexistente', async () => {
     // realiza requisição e compara a resposta de erro
     return await request(app.getHttpServer())
-      .post(`/v1/cliente/identifica?cpf=00000000191`)
+      .post(`/v1/cliente/identifica?cpf=03007321042`)
       .then((response) => {
         expect(response.status).toEqual(200);
         expect(response.body.anonimo).toEqual(true);
@@ -300,10 +300,10 @@ describe('ClienteRestApi (e2e)', () => {
   it('GET /v1/cliente?cpf - Não deve consultar cliente por cpf inexistente', async () => {
     // realiza requisição e compara a resposta de erro
     return await request(app.getHttpServer())
-      .get(`/v1/cliente?cpf=00000000191`)
+      .get(`/v1/cliente?cpf=03007321042`)
       .then((response) => {
         expect(response.status).toEqual(404);
-        expect(response.body.message).toEqual('Cliente não encontrado: 00000000191');
+        expect(response.body.message).toEqual('Cliente não encontrado: 03007321042');
       });
   });
 
