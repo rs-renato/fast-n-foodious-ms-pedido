@@ -9,6 +9,7 @@ import { BuscarPorCpfClienteResponse } from 'src/presentation/rest/cliente/respo
 import { IdentificarPorCpfClienteResponse } from 'src/presentation/rest/cliente/response/identificar-por-cpf-cliente.response';
 import { SalvarClienteResponse } from 'src/presentation/rest/cliente/response/salvar-cliente.response';
 import { ClienteConstants } from 'src/shared/constants';
+import { DeletarClientePorCpfResponse } from 'src/presentation/rest/cliente/response/deletar-cliente-por-cpf.response';
 
 @Controller('v1/cliente')
 @ApiTags('Cliente')
@@ -67,8 +68,13 @@ export class ClienteRestApi extends BaseRestApi {
   @ApiOperation({ summary: 'Remove cliente pelo CPF', description: 'Remove cliente pelo CPF' })
   @HttpCode(200)
   @ApiOkResponse({ description: 'Cliente removido com sucesso' })
-  async deletaCliente(@Query(ValidationPipe) query: IdentificarPorCpfClienteRequest): Promise<boolean> {
+  async deletaCliente(
+    @Query(ValidationPipe) query: IdentificarPorCpfClienteRequest,
+  ): Promise<DeletarClientePorCpfResponse> {
     this.logger.debug(`Deletando cliente: ${query.cpf}`);
-    return Promise.resolve(true);
+    return await this.service.deletarByCpf(query.cpf).then((deletado) => {
+      this.logger.log(`Cliente deletado com sucesso: ${JSON.stringify(deletado)}`);
+      return new DeletarClientePorCpfResponse(deletado);
+    });
   }
 }

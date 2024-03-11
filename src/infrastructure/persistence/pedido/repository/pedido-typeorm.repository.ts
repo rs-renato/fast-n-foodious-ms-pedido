@@ -75,7 +75,7 @@ export class PedidoTypeormRepository implements IPedidoRepository {
       })
       .catch((error) => {
         throw new RepositoryException(
-          `Houve um erro ao editar o pedido no banco de dados: '${pedido}': ${error.message}`,
+          `Houve um erro ao editar o pedido no banco de dados: '${JSON.stringify(pedido)}': ${error.message}`,
         );
       });
   }

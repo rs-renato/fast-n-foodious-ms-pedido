@@ -65,8 +65,21 @@ export class ClienteTypeormRepository implements IRepository<Cliente> {
     throw new RepositoryException('Método não implementado.');
   }
 
-  delete(): Promise<boolean> {
-    throw new RepositoryException('Método não implementado.');
+  async delete(id: number): Promise<boolean> {
+    this.logger.debug(`Deletando fisicamente cliente id: ${id}`);
+    const cliente = (await this.findBy({ id: id }))[0];
+
+    return this.repository
+      .delete(cliente)
+      .then(() => {
+        this.logger.debug(`Cliente deletado com sucesso no banco de dados: ${cliente.id}`);
+        return true;
+      })
+      .catch((error) => {
+        throw new RepositoryException(
+          `Houve um erro ao deletar fisicamente o cliente no banco de dados: '${cliente}': ${error.message}`,
+        );
+      });
   }
 
   findAll(): Promise<Cliente[]> {

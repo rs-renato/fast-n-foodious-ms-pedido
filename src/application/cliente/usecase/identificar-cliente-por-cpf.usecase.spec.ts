@@ -7,6 +7,10 @@ import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { ServiceException } from 'src/enterprise/exception/service.exception';
 import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 import { ClienteConstants } from 'src/shared/constants';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { IntegrationProviders } from 'src/integration/providers/integration.providers';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 
 describe('IdentificarClienteUseCase', () => {
   let useCase: IdentificarClienteUseCase;
@@ -22,7 +26,8 @@ describe('IdentificarClienteUseCase', () => {
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
-      providers: [...ClienteProviders, ...PersistenceInMemoryProviders],
+      imports: [HttpModule, ConfigModule],
+      providers: [...ClienteProviders, ...PedidoProviders, ...IntegrationProviders, ...PersistenceInMemoryProviders],
     }).compile();
 
     useCase = module.get<IdentificarClienteUseCase>(ClienteConstants.IDENTIFICAR_CLIENTE_POR_CPF_USECASE);

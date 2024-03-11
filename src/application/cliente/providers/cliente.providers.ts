@@ -1,4 +1,4 @@
-import { Provider } from '@nestjs/common';
+import { Inject, Provider } from '@nestjs/common';
 import { ClienteService } from 'src/application/cliente/service/cliente.service';
 import { Cliente } from 'src/enterprise/cliente/model/cliente.model';
 import { IRepository } from 'src/enterprise/repository/repository';
@@ -13,6 +13,12 @@ import { EmailValidoClienteValidator } from 'src/application/cliente/validation/
 import { IdentificarClienteUseCase } from 'src/application/cliente/usecase/identificar-cliente-por-cpf.usecase';
 import { ClienteConstants, PedidoConstants } from 'src/shared/constants';
 import { BuscarClientePorIdPedidoUsecase } from 'src/application/cliente/usecase/buscar-cliente-por-id-pedido.usecase';
+import { BuscarTodosPedidosPorClienteIdUseCase } from 'src/application/pedido/usecase/buscar-todos-pedidos-por-cliente-id-usecase';
+import { EditarPedidoUseCase } from 'src/application/pedido/usecase';
+import { DeletarClientePorCpfUseCase } from 'src/application/cliente/usecase/deletar-cliente-por-cpf.usecase';
+import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
+import { IPedidoRepository } from 'src/enterprise/pedido/repository/pedido.repository.interface';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 export const ClienteProviders: Provider[] = [
   { provide: ClienteConstants.ISERVICE, useClass: ClienteService },
@@ -53,5 +59,29 @@ export const ClienteProviders: Provider[] = [
   {
     provide: ClienteConstants.BUSCAR_CLIENTE_VALIDATOR,
     useFactory: (): BuscarClienteValidator[] => [new CpfValidoClienteValidator()],
+  },
+  {
+    provide: ClienteConstants.DELETAR_CLIENTE_POR_CPF_USECASE,
+    inject: [
+      ClienteConstants.IREPOSITORY,
+      PedidoConstants.IREPOSITORY,
+      ClienteConstants.BUSCAR_CLIENTE_POR_CPF_USECASE,
+      PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
+      SqsIntegration,
+    ],
+    useFactory: (
+      clienteRepository: IRepository<Cliente>,
+      pedidoRepository: IPedidoRepository,
+      buscarClientePorCpfUseCase: BuscarClientePorCpfUseCase,
+      buscarTodosPedidosPorClienteIdUseCase: BuscarTodosPedidosPorClienteIdUseCase,
+      clienteSnsIntegration: SqsIntegration,
+    ): DeletarClientePorCpfUseCase =>
+      new DeletarClientePorCpfUseCase(
+        clienteRepository,
+        pedidoRepository,
+        buscarClientePorCpfUseCase,
+        buscarTodosPedidosPorClienteIdUseCase,
+        clienteSnsIntegration,
+      ),
   },
 ];
