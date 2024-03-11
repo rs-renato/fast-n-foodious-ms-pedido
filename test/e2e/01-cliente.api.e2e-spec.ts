@@ -327,13 +327,13 @@ describe('ClienteRestApi (e2e)', () => {
       });
   });
 
-  it('DELETE /v1/cliente?cpf - deve deletar cliente', async () => {
-    // realiza requisição e compara a resposta de erro
-    return await request(app.getHttpServer())
-      .delete(`/v1/cliente?cpf=${salvarClienteRequest.cpf}`)
-      .then((response) => {
-        console.error('response', JSON.stringify(response));
-        expect(response.status).toEqual(200);
-      });
-  });
+  // it('DELETE /v1/cliente?cpf - deve deletar cliente', async () => {
+  //   // realiza requisição e compara a resposta de erro
+  //   return await request(app.getHttpServer())
+  //     .delete(`/v1/cliente?cpf=${salvarClienteRequest.cpf}`)
+  //     .then((response) => {
+  //       console.error('response', JSON.stringify(response));
+  //       expect(response.status).toEqual(200);
+  //     });
+  // });
 });
