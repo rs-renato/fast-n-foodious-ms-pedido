@@ -171,7 +171,7 @@ export class SqsIntegration {
         this.logger.error(
           `Erro ao publicar lgpd protocolo deleção: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
         );
-        throw new IntegrationApplicationException('Não foi possível processar o protocolo de deleção.');
+        throw new IntegrationApplicationException(`Não foi possível processar o protocolo de deleção: ${JSON.stringify(error)}`);
       });
   }
 
