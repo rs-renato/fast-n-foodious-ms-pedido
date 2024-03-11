@@ -59,7 +59,7 @@ jobs:
       - name: Run E2E Tests (With TypeORM Repositories - MySQL)
         run: docker-compose --env-file ./envs/prod.env exec -T fast-n-foodious-ms-pedido sh -c "npm run test:e2e"
       - name: Stop and Remove Docker Containers
-        run: docker-compose --env-file ./envs/prod.env down
+        run: docker-compose --env-file ./envs/prod.env down -v
 
   bdd-test:
     runs-on: ubuntu-latest
