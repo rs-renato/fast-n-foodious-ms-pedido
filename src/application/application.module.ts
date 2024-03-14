@@ -9,9 +9,10 @@ import { ItemPedidoProviders } from 'src/application/item-pedido/providers/item-
 import { ClienteConstants, PedidoConstants, ItemPedidoConstants } from 'src/shared/constants';
 import { IntegrationProviders } from '../integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, ConfigModule],
   providers: [...ClienteProviders, ...PedidoProviders, ...ItemPedidoProviders, ...IntegrationProviders],
   exports: [
     { provide: ClienteConstants.ISERVICE, useClass: ClienteService },

@@ -47,6 +47,8 @@ describe('ClienteTypeormRepository', () => {
             findBy: jest.fn(() => {
               return Promise.resolve([clienteEntity]);
             }),
+            // mock para a chamada repositoryTypeOrm.delete(cliente)
+            delete: jest.fn(() => Promise.resolve()),
           },
         },
       ],
@@ -175,12 +177,21 @@ describe('ClienteTypeormRepository', () => {
   });
 
   describe('delete', () => {
-    it('deletar deve falhar porque não foi implementado', async () => {
-      try {
-        await expect(repository.delete(1));
-      } catch (error) {
-        expect(error.message).toEqual('Método não implementado.');
-      }
+    it('deve deletar cliente corretamente', async () => {
+      const repositorySpy = (repositoryTypeOrm.delete as jest.Mock).mockResolvedValue(true);
+
+      await repository.delete(1).then((result) => {
+        expect(result).toBeTruthy();
+      });
+      expect(repositorySpy).toBeCalled();
+    });
+
+    it('não deve deletar o item do pedido quando houver um erro de banco ', async () => {
+      const error = new TypeORMError('Erro genérico do TypeORM');
+      jest.spyOn(repositoryTypeOrm, 'delete').mockRejectedValue(error);
+
+      // verifica se foi lançada uma exception na camada infra
+      await expect(repository.delete(1)).rejects.toThrowError(RepositoryException);
     });
   });
 

@@ -1,18 +1,18 @@
+import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
-import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
 
 @Injectable()
 export class SolicitaPagamentoPedidoUseCase {
   private logger = new Logger(SolicitaPagamentoPedidoUseCase.name);
 
-  constructor(@Inject(PagamentoIntegration) private pagamentoIntegration: PagamentoIntegration) {}
+  constructor(@Inject(SqsIntegration) private pagamentoSnsIntegration: SqsIntegration) {}
 
-  async solicitaPagamento(pedido: Pedido): Promise<PagamentoDto> {
+  async solicitaPagamento(pedido: Pedido): Promise<SendMessageCommandOutput> {
     this.logger.log(`solicitaPagamento: pedido = ${JSON.stringify(pedido)}`);
-    const pagamentoDto = await this.pagamentoIntegration.solicitaPagamentoPedido(pedido.id, pedido.total);
-    this.logger.debug(`pagamentoDto = ${JSON.stringify(pagamentoDto)}`);
-    return pagamentoDto;
+    const response = await this.pagamentoSnsIntegration.sendSolicitaPagamentoPedido(pedido.id, pedido.total);
+    this.logger.debug(`requestId = ${JSON.stringify(response.$metadata)}`);
+    return response;
   }
 }

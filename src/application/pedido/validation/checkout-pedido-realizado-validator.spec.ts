@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { PagamentoConstants } from 'src/shared/constants';
@@ -9,12 +10,15 @@ import { EstadoPagamento } from 'src/enterprise/pagamento/estado-pagamento.enum'
 import { PagamentoDto } from 'src/enterprise/pagamento/pagamento-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
+import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
 
 describe('CheckoutPedidoRealizadoValidator', () => {
   let validator: CheckoutPedidoRealizadoValidator;
-  let pagamentoIntegration: PagamentoIntegration;
+  let pagamentoRestIntegration: PagamentoRestIntegration;
 
   const pagamento: PagamentoDto = {
     pedidoId: 1,
@@ -28,9 +32,12 @@ describe('CheckoutPedidoRealizadoValidator', () => {
   beforeEach(async () => {
     // Configuração do módulo de teste
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...IntegrationProviders,
+        ...PedidoProviders,
+        ...ClienteProviders,
+        ...PersistenceInMemoryProviders,
         CheckoutPedidoRealizadoValidator,
         // Mock do repositório de Pagamento
         {
@@ -47,7 +54,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
 
     // Obtém a instância do validator e do repositório a partir do módulo de teste
     validator = module.get<CheckoutPedidoRealizadoValidator>(CheckoutPedidoRealizadoValidator);
-    pagamentoIntegration = module.get<PagamentoIntegration>(PagamentoIntegration);
+    pagamentoRestIntegration = module.get<PagamentoRestIntegration>(PagamentoRestIntegration);
   });
 
   describe('validate', () => {
@@ -60,7 +67,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
         ativo: true,
       };
 
-      pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+      pagamentoRestIntegration.buscarPorPedidoId = jest.fn(() => {
         throw new NaoEncontradoApplicationException('Pagamento não encontrado');
       });
 
@@ -78,7 +85,7 @@ describe('CheckoutPedidoRealizadoValidator', () => {
       };
 
       // Mock para retornar um pagamento, simulando que o pedido já realizou checkout
-      pagamentoIntegration.buscarPorPedidoId = jest.fn(() => {
+      pagamentoRestIntegration.buscarPorPedidoId = jest.fn(() => {
         return Promise.resolve(pagamento);
       });
 

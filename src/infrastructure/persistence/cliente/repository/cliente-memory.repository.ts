@@ -8,7 +8,7 @@ export class ClienteMemoryRepository implements IRepository<Cliente> {
   private logger: Logger = new Logger(ClienteMemoryRepository.name);
 
   private repository: Array<Cliente> = [];
-  private static ID_COUNT = 0;
+  private static ID_COUNT = 1;
 
   async findBy(attributes: Partial<Cliente>): Promise<Cliente[]> {
     this.logger.debug(`Realizando consulta de cliente: com os parâmetros ${JSON.stringify(attributes)}`);
@@ -36,8 +36,11 @@ export class ClienteMemoryRepository implements IRepository<Cliente> {
     throw new RepositoryException('Método não implementado.');
   }
 
-  delete(): Promise<boolean> {
-    throw new RepositoryException('Método não implementado.');
+  delete(id: number): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.repository.splice(id - 1);
+      resolve(true);
+    });
   }
 
   findAll(): Promise<Cliente[]> {

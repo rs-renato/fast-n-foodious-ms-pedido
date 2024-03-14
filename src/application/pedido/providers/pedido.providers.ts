@@ -28,8 +28,10 @@ import { IRepository } from 'src/enterprise/repository/repository';
 import { ClienteConstants, ItemPedidoConstants, PedidoConstants } from 'src/shared/constants';
 import { ProdutoIntegration } from 'src/integration/produto/produto.integration';
 import { BuscarProdutoPorIdUseCase } from 'src/application/pedido/usecase/buscar-produto-por-id.usecase';
-import { PagamentoIntegration } from 'src/integration/pagamento/pagamento.integration';
 import { SolicitaPagamentoPedidoUseCase } from 'src/application/pedido/usecase/solicita-pagamento-pedido.usecase';
+import { SqsIntegration } from 'src/integration/sqs/sqs.integration';
+import { PagamentoRestIntegration } from 'src/integration/pagamento/pagamento.rest.integration';
+import { BuscarTodosPedidosPorClienteIdUseCase } from 'src/application/pedido/usecase/buscar-todos-pedidos-por-cliente-id-usecase';
 
 export const PedidoProviders: Provider[] = [
   { provide: PedidoConstants.ISERVICE, useClass: PedidoService },
@@ -45,13 +47,13 @@ export const PedidoProviders: Provider[] = [
 
   {
     provide: PedidoConstants.CHECKOUT_PEDIDO_VALIDATOR,
-    inject: [ClienteConstants.IREPOSITORY, PagamentoIntegration],
+    inject: [ClienteConstants.IREPOSITORY, PagamentoRestIntegration],
     useFactory: (
       clienteRepository: IRepository<Cliente>,
-      pagamentoIntegration: PagamentoIntegration,
+      pagamentoRestIntegration: PagamentoRestIntegration,
     ): CheckoutPedidoValidator[] => [
       new ClienteExistentePedidoValidator(clienteRepository),
-      new CheckoutPedidoRealizadoValidator(pagamentoIntegration),
+      new CheckoutPedidoRealizadoValidator(pagamentoRestIntegration),
       new CheckoutPedidoQuantidadeDeItensValidator(),
     ],
   },
@@ -127,9 +129,9 @@ export const PedidoProviders: Provider[] = [
   },
   {
     provide: PedidoConstants.SOLICITA_PAGAMENTO_PEDIDO_USECASE,
-    inject: [PagamentoIntegration],
-    useFactory: (pagamentoIntegration: PagamentoIntegration): SolicitaPagamentoPedidoUseCase =>
-      new SolicitaPagamentoPedidoUseCase(pagamentoIntegration),
+    inject: [SqsIntegration],
+    useFactory: (pagamentoSnsIntegration: SqsIntegration): SolicitaPagamentoPedidoUseCase =>
+      new SolicitaPagamentoPedidoUseCase(pagamentoSnsIntegration),
   },
   {
     provide: PedidoConstants.BUSCAR_PRODUTO_POR_ID_USECASE,
@@ -160,5 +162,11 @@ export const PedidoProviders: Provider[] = [
         solicitaPagamentoPedidoUseCase,
         validators,
       ),
+  },
+  {
+    provide: PedidoConstants.BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE,
+    inject: [PedidoConstants.IREPOSITORY],
+    useFactory: (repository: IPedidoRepository): BuscarTodosPedidosPorClienteIdUseCase =>
+      new BuscarTodosPedidosPorClienteIdUseCase(repository),
   },
 ];

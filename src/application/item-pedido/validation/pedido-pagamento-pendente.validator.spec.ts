@@ -11,7 +11,6 @@ import { PedidoConstants, ItemPedidoConstants } from 'src/shared/constants';
 describe('PedidoPagamentoPendenteValidator', () => {
   let validator: IValidator<ItemPedido>;
   let pedidoRepository: IRepository<Pedido>;
-  let itemPedidoRepository: IRepository<ItemPedido>;
 
   const mockedPedido: Pedido = {
     id: 1,
@@ -51,7 +50,6 @@ describe('PedidoPagamentoPendenteValidator', () => {
 
     validator = module.get<IValidator<ItemPedido>>(PedidoPagamentoPendenteValidator);
     pedidoRepository = module.get<IRepository<Pedido>>(PedidoConstants.IREPOSITORY);
-    itemPedidoRepository = module.get<IRepository<ItemPedido>>(ItemPedidoConstants.IREPOSITORY);
   });
 
   describe('validate', () => {

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { ProdutoExistentePedidoValidator } from './produto-existente.validator';
 import { ValidationException } from 'src/enterprise/exception/validation.exception';
 import { ProdutoConstants } from 'src/shared/constants';
@@ -8,6 +9,9 @@ import { ProdutoDto } from 'src/enterprise/produto/produto-dto';
 import { HttpModule } from '@nestjs/axios';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { NaoEncontradoApplicationException } from 'src/application/exception/nao-encontrado.exception';
+import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
+import { PersistenceInMemoryProviders } from 'src/infrastructure/persistence/providers/persistence-in-memory.providers';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('ProdutoExistentePedidoValidator', () => {
   let validator: ProdutoExistentePedidoValidator;
@@ -32,9 +36,12 @@ describe('ProdutoExistentePedidoValidator', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...IntegrationProviders,
+        ...PedidoProviders,
+        ...ClienteProviders,
+        ...PersistenceInMemoryProviders,
         ProdutoExistentePedidoValidator,
         {
           provide: ProdutoConstants.IREPOSITORY,

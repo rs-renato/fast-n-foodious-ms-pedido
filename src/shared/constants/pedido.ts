@@ -16,3 +16,4 @@ export const BUSCAR_PRODUTO_POR_ID_USECASE = 'BuscarProdutoPorIdUseCase';
 export const CHECKOUT_PEDIDO_USECASE = 'CheckoutPedidoUseCase';
 export const CHECKOUT_PEDIDO_VALIDATOR = 'CheckoutPedidoValidator';
 export const SOLICITA_PAGAMENTO_PEDIDO_USECASE = 'SolicitaPagamentoPedidoUseCase_NEW';
+export const BUSCAR_TODOS_PEDIDOS_POR_CLIENTE_ID_USECASE = 'BuscarTodosPedidosPorClienteIdUseCase';

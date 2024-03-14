@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { PedidoProviders } from 'src/application/pedido/providers/pedido.providers';
 import { EstadoPedido } from 'src/enterprise/pedido/enum/estado-pedido.enum';
 import { Pedido } from 'src/enterprise/pedido/model/pedido.model';
@@ -8,6 +9,7 @@ import { PedidoConstants } from 'src/shared/constants';
 import { BuscarTodosPedidosNaoFinalizadosUseCase } from './buscar-todos-pedidos-nao-finalizados.usecase';
 import { IntegrationProviders } from 'src/integration/providers/integration.providers';
 import { HttpModule } from '@nestjs/axios';
+import { ClienteProviders } from 'src/application/cliente/providers/cliente.providers';
 
 describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
   let useCase: BuscarTodosPedidosNaoFinalizadosUseCase;
@@ -39,10 +41,11 @@ describe('BuscarTodosPedidosNaoFinalizadosUseCase', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
+      imports: [HttpModule, ConfigModule],
       providers: [
         ...PedidoProviders,
         ...IntegrationProviders,
+        ...ClienteProviders,
         ...PersistenceInMemoryProviders,
         // Mock do serviço IRepository<Pedido>
         {

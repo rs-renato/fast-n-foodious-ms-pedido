@@ -45,6 +45,7 @@ describe('ClienteRestApi', () => {
             identifyByCpf: jest.fn((cpf) =>
               cpf === response.cpf ? Promise.resolve(response) : Promise.resolve(new ClienteIdentificado(undefined)),
             ),
+            deletarByCpf: jest.fn((cpf) => Promise.resolve(true)),
           },
         },
       ],
@@ -131,6 +132,15 @@ describe('ClienteRestApi', () => {
 
       // Verifica se o resultado obtido é igual ao objeto cliente esperado
       expect(result.anonimo).toEqual(true);
+    });
+  });
+
+  describe('deletaCliente', () => {
+    it('deve deletar cliente por cpf', async () => {
+      // Chama o método deletaCliente do restApi
+      const result = await restApi.deletaCliente({ cpf: request.cpf });
+
+      expect(result).toBeTruthy();
     });
   });
 });
