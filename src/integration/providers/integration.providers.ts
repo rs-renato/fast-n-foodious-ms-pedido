@@ -34,9 +34,9 @@ export const IntegrationProviders: Provider[] = [
       buscarClientePorIdPedidoUsecase: BuscarClientePorIdPedidoUsecase,
     ): SqsIntegration =>
       new SqsIntegration(
-        new SQSClient({ endpoint: configService.get('AWS_ENDPOINT') }),
+        new SQSClient({ endpoint: configService.get('AWS_ENDPOINT'), region: configService.get('AWS_REGION')}),
         new SesIntegration(
-          new SESClient({ endpoint: configService.get('AWS_ENDPOINT') }),
+          new SESClient({ endpoint: configService.get('AWS_ENDPOINT'), region: configService.get('AWS_REGION')}),
           buscarClientePorIdPedidoUsecase,
         ),
         editarPedidoUseCase,
