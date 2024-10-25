@@ -53,7 +53,7 @@ export class SqsIntegration {
               });
             }
           })
-          .catch(async err => {
+          .catch(async (err) => {
             this.logger.error(
               `receiveEstadoPagamentoPedidoConfirmado: Erro ao consumir a mensagem da fila: ${JSON.stringify(err)}`,
             );
@@ -73,7 +73,7 @@ export class SqsIntegration {
               });
             }
           })
-          .catch(async err => {
+          .catch(async (err) => {
             this.logger.error(
               `receiveEstadoPagamentoPedidoRejeitado: Erro ao consumir a mensagem da fila: ${JSON.stringify(err)}`,
             );
@@ -96,7 +96,7 @@ export class SqsIntegration {
         total: body.pagamento.total,
         transacaoId: body.pagamento.transacaoId,
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error(
           `Houve um erro no envio de email de notificação de resultado de pagamento: ${JSON.stringify(error)}`,
         );
@@ -112,7 +112,7 @@ export class SqsIntegration {
         pedido.estadoPedido = estadoPedido;
         return this.editarPedidoUseCase.editarPedido(pedido);
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error(`Houve um erro ao atualizar o estado do pedido: ${error}`);
         throw new IntegrationApplicationException('Não foi possível atualizar o estado do pedido');
       });
@@ -137,7 +137,7 @@ export class SqsIntegration {
         this.logger.log(`Resposta do publish na fila de solicitação de pagamento: ${JSON.stringify(response)}`);
         return response;
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error(
           `Erro ao publicar solicitação de pagamento: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
         );
@@ -169,7 +169,7 @@ export class SqsIntegration {
         this.logger.log(`Resposta do publish na fila de lgpd protocolo deleção: ${JSON.stringify(response)}`);
         return response;
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error(
           `Erro ao publicar lgpd protocolo deleção: ${JSON.stringify(error)} - Command: ${JSON.stringify(command)}`,
         );
@@ -201,7 +201,7 @@ export class SqsIntegration {
           this.logger.log(`Resposta do publish na fila de preparação de pedido: ${JSON.stringify(response)}`);
           return response;
         })
-        .catch(error => {
+        .catch((error) => {
           this.logger.error(
             `Erro ao publicar solicitação de preparação do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(
               command,
@@ -240,7 +240,7 @@ export class SqsIntegration {
         this.logger.debug(`Resposta do receive message da fila: ${JSON.stringify(response)}`);
         return response.Messages || [];
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error(
           `Erro ao processar solicitação de estado de pagamento do pedido: ${JSON.stringify(
             error,
@@ -272,7 +272,7 @@ export class SqsIntegration {
       )}`,
     );
 
-    return await this.sqsClient.send(command).catch(error => {
+    return await this.sqsClient.send(command).catch((error) => {
       this.logger.error(
         `Erro ao deletar da fila o estado de pagamento do pedido: ${JSON.stringify(error)} - Command: ${JSON.stringify(
           command,
